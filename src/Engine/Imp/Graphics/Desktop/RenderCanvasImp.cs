@@ -2,18 +2,16 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using SDPixelFormat = System.Drawing.Imaging.PixelFormat;
-using PixelFormat = OpenToolkit.Graphics.OpenGL.PixelFormat;
-using OpenToolkit.Graphics.OpenGL;
-using OpenToolkit.Windowing.Common;
-using OpenToolkit.Windowing.Common.Input;
-using OpenToolkit.Windowing.Desktop;
-using OpenToolkit.Mathematics;
+using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.Common.Input;
+using OpenTK.Windowing.Desktop;
+using OpenTK.Mathematics;
 using Fusee.Engine.Common;
-using OpenToolkit.Windowing.GraphicsLibraryFramework;
-using System.IO;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace Fusee.Engine.Imp.Graphics.Desktop
 {
@@ -511,7 +509,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 _gameWindow = new RenderCanvasGameWindow(this, width, height, false);
             }
             if (appIcon != null)
-                _gameWindow.Icon = new WindowIcon(new OpenToolkit.Windowing.Common.Input.Image(appIcon.Width, appIcon.Height, SwapColors(appIcon.ToBitmap(), ChangeColors.SwapBlueAndRed)));
+                _gameWindow.Icon = new WindowIcon(new OpenTK.Windowing.Common.Input.Image(appIcon.Width, appIcon.Height, SwapColors(appIcon.ToBitmap(), ChangeColors.SwapBlueAndRed)));
 
             _gameWindow.Size = new Vector2i(width, height);
         }
@@ -939,7 +937,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
     {
         #region Fields
 
-        private RenderCanvasImp _renderCanvasImp;
+        private RenderCanvasImp _renderCanvasImp;      
 
         /// <summary>
         /// Gets the delta time.
@@ -1003,11 +1001,13 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             {
                 Size = new Vector2i(width, height),
                 Title = "Fusee Engine",
-
+                APIVersion = new Version(4, 2)
             })
         {
-            _renderCanvasImp = renderCanvasImp;
+            MakeCurrent(); //Needed with OpenTK 4.0 prev 9.2 and above. See https://github.com/opentk/opentk/issues/1118
+            GL.LoadBindings(new GLFWBindingsContext());
 
+            _renderCanvasImp = renderCanvasImp;
             _renderCanvasImp.BaseWidth = Size.X;
             _renderCanvasImp.BaseHeight = Size.Y;
         }
@@ -1019,15 +1019,10 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         protected override void OnLoad()
         {
             // Check for necessary capabilities
-            string version = GL.GetString(StringName.Version);
-
-            int major = (int)version[0];
-            // int minor = (int)version[2];
-
+            var version = GL.GetString(StringName.Version).Split("."); //TODO: OpenTK4.0 - should be accessable via OpenTK.GameWindow.APIVersion which doesn't seem to be setup correctly at the moment.
+            int.TryParse(version[0], out int major);
             if (major < 2)
-            {
-                throw new InvalidOperationException("You need at least OpenGL 2.0 to run this example. GLSL not supported.");
-            }
+                throw new InvalidOperationException("You need at least OpenGL 2.0 to run this example. GLSL not supported.");            
 
             GL.ClearColor(Color.MidnightBlue);
 
@@ -1036,7 +1031,6 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
             // Use VSync!
             VSync = VSyncMode.On;
-            //Context.SwapInterval = 1;
 
             _renderCanvasImp.DoInit();
         }
@@ -1047,7 +1041,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             _renderCanvasImp.Dispose();
         }
 
-        protected override void OnResize(OpenToolkit.Windowing.Common.ResizeEventArgs e)
+        protected override void OnResize(OpenTK.Windowing.Common.ResizeEventArgs e)
         {
             if (_renderCanvasImp != null)
             {
