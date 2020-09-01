@@ -937,7 +937,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
     {
         #region Fields
 
-        private RenderCanvasImp _renderCanvasImp;      
+        private RenderCanvasImp _renderCanvasImp;
 
         /// <summary>
         /// Gets the delta time.
@@ -1022,7 +1022,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             var version = GL.GetString(StringName.Version).Split("."); //TODO: OpenTK4.0 - should be accessable via OpenTK.GameWindow.APIVersion which doesn't seem to be setup correctly at the moment.
             int.TryParse(version[0], out int major);
             if (major < 2)
-                throw new InvalidOperationException("You need at least OpenGL 2.0 to run this example. GLSL not supported.");            
+                throw new InvalidOperationException("You need at least OpenGL 2.0 to run this example. GLSL not supported.");
 
             GL.ClearColor(Color.MidnightBlue);
 
