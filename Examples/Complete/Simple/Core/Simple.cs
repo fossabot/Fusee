@@ -88,6 +88,11 @@ namespace Fusee.Examples.Simple.Core
                 _angleVelHorz = -RotationSpeed * touchVel.x * DeltaTime * 0.0005f;
                 _angleVelVert = -RotationSpeed * touchVel.y * DeltaTime * 0.0005f;
             }
+            else if (SpaceMouse.IsConnected)
+            {
+                _angleVelHorz = -RotationSpeed * SpaceMouse.Rotation.y * DeltaTime * 0.0005f;
+                _angleVelVert = RotationSpeed * SpaceMouse.Rotation.x * DeltaTime * 0.0005f;
+            }
             else
             {
                 if (_keys)
