@@ -1,0 +1,35 @@
+{
+  "runtimeTarget": {
+    "name": ".NETStandard,Version=v2.1/",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETStandard,Version=v2.1": {},
+    ".NETStandard,Version=v2.1/": {
+      "OpenTK.Core/4.0.0": {
+        "dependencies": {
+          "StyleCop.Analyzers": "1.1.0-beta008"
+        },
+        "runtime": {
+          "OpenTK.Core.dll": {}
+        }
+      },
+      "StyleCop.Analyzers/1.1.0-beta008": {}
+    }
+  },
+  "libraries": {
+    "OpenTK.Core/4.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "StyleCop.Analyzers/1.1.0-beta008": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-wooFpXhCyYaY554qO5BGgLjIJmXcZ10RYTO2FLhpOGhAyOw9Xvd82E+M9CSrRtBHc+uJXtnnr+OVOBGIJqa3TQ==",
+      "path": "stylecop.analyzers/1.1.0-beta008",
+      "hashPath": "stylecop.analyzers.1.1.0-beta008.nupkg.sha512"
+    }
+  }
+}
