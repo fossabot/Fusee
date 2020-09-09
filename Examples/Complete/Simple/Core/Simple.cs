@@ -9,7 +9,6 @@ using Fusee.Math.Core;
 using Fusee.Xene;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using static Fusee.Engine.Core.Input;
 using static Fusee.Engine.Core.Time;
 
@@ -19,6 +18,7 @@ namespace Fusee.Examples.Simple.Core
     public class Simple : RenderCanvas
     {
         public bool IsInitialized = false;
+        public IWindowHandle WindowHandle;
 
         // angle variables
         private static float _angleHorz = M.PiOver3, _angleVert = -M.PiOver6 * 0.5f, _angleVelHorz, _angleVelVert;

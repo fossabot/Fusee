@@ -1,23 +1,57 @@
 ﻿using Fusee.Base.Common;
 using Fusee.Base.Core;
 using Fusee.Base.Imp.Desktop;
+using Fusee.Engine.Common;
 using Fusee.Engine.Core;
 using Fusee.Engine.Core.Scene;
+using Fusee.Engine.Imp.Graphics.Desktop;
 using Fusee.Serialization;
+using System;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+
 using Path = Fusee.Base.Common.Path;
 
 namespace Fusee.Examples.Simple.Lib
 {
+    //TODO: Make platform independent?
     public static class SimpleLib
     {
-        public delegate void ExecFusAppDelegate();
+        #region Delegates - entry points when hosting a dotnet runtime with host fxr
 
-        public static bool IsAppInitialized { get; set; } = false;
+        public delegate void ExecFusAppDelegate();
+        public delegate void AbortFusThreadDelegate();
+        public delegate bool IsAppInitializedDelegate();
+        public delegate IntPtr GetWindowHandleDelegate();
+
+        #endregion
 
         private static Thread _fusThread;
+        private static Core.Simple _app;
+        private static IWindowHandle _windowHandle;
+
+        public static IntPtr GetWindowHandle()
+        {
+            return ((WindowHandle)_windowHandle).Handle;
+        }
+
+        public static void ExecFusAppInNewThread()
+        {
+            _fusThread = new Thread(() =>
+            {
+                InitAndRunApp();
+            });
+
+            _fusThread.Start();
+
+            SpinWait.SpinUntil(() => _app != null && _app.IsInitialized);
+        }
+
+        public static void ExecFusApp()
+        {
+            InitAndRunApp();
+        }
 
         public static void AbortFusThread()
         {
@@ -27,35 +61,17 @@ namespace Fusee.Examples.Simple.Lib
             }
         }
 
-        public static async void ExecFusAppAsync()
+        public static bool IsAppInitialized()
         {
-            Core.Simple app = null;
-
-            _fusThread = new Thread(() =>
-            {
-                InitAndRunApp();
-            });
-
-            _fusThread.Start();
-
-            SpinWait.SpinUntil(() => app != null && app.IsInitialized);
-            //Closed += (s, e) => app?.CloseGameWindow();
-            IsAppInitialized = true;
-
-        }
-
-        public static void ExecFusApp()
-        {
-            InitAndRunApp();
-            IsAppInitialized = true;
+            return _app.IsInitialized;
         }
 
         private static void InitAndRunApp()
         {
             // Inject Fusee.Engine.Base InjectMe dependencies
-            IO.IOImp = new Fusee.Base.Imp.Desktop.IOImp();
+            IO.IOImp = new IOImp();
 
-            var fap = new Fusee.Base.Imp.Desktop.FileAssetProvider("Assets");
+            var fap = new FileAssetProvider("Assets");
             fap.RegisterTypeHandler(
                 new AssetHandler
                 {
@@ -81,17 +97,20 @@ namespace Fusee.Examples.Simple.Lib
 
             AssetStorage.RegisterProvider(fap);
 
-            var app = new Core.Simple();
+            _app = new Core.Simple();
 
             // Inject Fusee.Engine InjectMe dependencies (hard coded)
             System.Drawing.Icon appIcon = System.Drawing.Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
-            app.CanvasImplementor = new Fusee.Engine.Imp.Graphics.Desktop.RenderCanvasImp(appIcon);
-            app.ContextImplementor = new Fusee.Engine.Imp.Graphics.Desktop.RenderContextImp(app.CanvasImplementor);
-            Input.AddDriverImp(new Fusee.Engine.Imp.Graphics.Desktop.RenderCanvasInputDriverImp(app.CanvasImplementor));
-            Input.AddDriverImp(new Fusee.Engine.Imp.Graphics.Desktop.WindowsTouchInputDriverImp(app.CanvasImplementor));
+            _app.CanvasImplementor = new RenderCanvasImp(appIcon);
+            _app.ContextImplementor = new RenderContextImp(_app.CanvasImplementor);
+            Input.AddDriverImp(new RenderCanvasInputDriverImp(_app.CanvasImplementor));
+            Input.AddDriverImp(new WindowsTouchInputDriverImp(_app.CanvasImplementor));
+            Input.AddDriverImp(new WindowsSpaceMouseDriverImp(_app.CanvasImplementor));
+
+            _windowHandle = _app.CanvasImplementor.WindowHandle;
 
             // Start the app
-            app.Run();
+            _app.Run();
         }
     }
 }
