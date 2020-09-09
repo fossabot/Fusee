@@ -4,14 +4,6 @@
     <OutputType>Exe</OutputType>
     <OutputPath>$(BaseOutputPath)\Examples\Simple\Desktop\</OutputPath>
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="..\..\..\..\ext\OpenTk4.0prev9.4_release-build\OpenTK.Windowing.Desktop\netcoreapp3.1\glfw3-x64.dll" Link="glfw3-x64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\..\..\ext\OpenTk4.0prev9.4_release-build\OpenTK.Windowing.Desktop\netcoreapp3.1\glfw3-x86.dll" Link="glfw3-x86.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="$(FuseeEngineRoot)\src\Base\Imp\Desktop\Fusee.Base.Imp.Desktop.csproj" />
@@ -19,5 +11,5 @@
     <ProjectReference Include="..\Core\Fusee.Examples.Simple.Core.csproj" />
     <ProjectReference Include="..\Lib\Fusee.Examples.Simple.Lib.csproj" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
-  </ItemGroup>
+  </ItemGroup>  
 </Project>
