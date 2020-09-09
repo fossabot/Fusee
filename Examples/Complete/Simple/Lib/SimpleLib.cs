@@ -103,7 +103,7 @@ namespace Fusee.Examples.Simple.Lib
             System.Drawing.Icon appIcon = System.Drawing.Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
             _app.CanvasImplementor = new RenderCanvasImp(appIcon);
             _app.ContextImplementor = new RenderContextImp(_app.CanvasImplementor);
-            Input.AddDriverImp(new RenderCanvasInputDriverImp(_app.CanvasImplementor));
+            Input.AddDriverImp(new Fusee.Engine.Imp.Graphics.Desktop.RenderCanvasInputDriverImp(_app.CanvasImplementor));
             Input.AddDriverImp(new WindowsTouchInputDriverImp(_app.CanvasImplementor));
             Input.AddDriverImp(new WindowsSpaceMouseDriverImp(_app.CanvasImplementor));
 

@@ -4977,6 +4977,13 @@
             </para>
             </remarks>
         </member>
+        <member name="M:OpenTK.Windowing.GraphicsLibraryFramework.GLFW.GlfwGetWin32Window(OpenTK.Windowing.GraphicsLibraryFramework.Window*)">
+            <summary>
+            This function returns the Windows specific window handle (HWND).
+            </summary>
+            <param name="window">The window to query.</param>
+            <returns>The Windows specific window handle (HWND).</returns>
+        </member>
         <member name="M:OpenTK.Windowing.GraphicsLibraryFramework.GLFW.SetWindowMaximizeCallback(OpenTK.Windowing.GraphicsLibraryFramework.Window*,OpenTK.Windowing.GraphicsLibraryFramework.GLFWCallbacks.WindowMaximizeCallback)">
             <summary>
             <para>

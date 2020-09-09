@@ -4,6 +4,14 @@
     <OutputType>Exe</OutputType>
     <OutputPath>$(BaseOutputPath)\Examples\Simple\Desktop\</OutputPath>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\ext\OpenTk4.0prev9.4_release-build\OpenTK.Windowing.Desktop\netcoreapp3.1\glfw3-x64.dll" Link="glfw3-x64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\..\..\ext\OpenTk4.0prev9.4_release-build\OpenTK.Windowing.Desktop\netcoreapp3.1\glfw3-x86.dll" Link="glfw3-x86.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="$(FuseeEngineRoot)\src\Base\Imp\Desktop\Fusee.Base.Imp.Desktop.csproj" />

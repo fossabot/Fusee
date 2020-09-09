@@ -526,9 +526,10 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         public bool GetButton(int iButtonId)
         {
             //ToDo OpenTk4.0 - Seems not to be quite right.... check if a device is connected beforehand?
-            JoystickState state = _gameWindow.JoystickStates[DeviceID];
-            if (state.Name != null)
-                return _gameWindow.JoystickStates[DeviceID].IsButtonDown(iButtonId);
+
+            //JoystickState state = _gameWindow.JoystickStates[DeviceID];
+            //if (state.Name != null)
+            //    return _gameWindow.JoystickStates[DeviceID].IsButtonDown(iButtonId);
 
             return false;
 
