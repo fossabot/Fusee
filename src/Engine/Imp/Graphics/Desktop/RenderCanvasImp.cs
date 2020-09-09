@@ -514,7 +514,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 _gameWindow = new RenderCanvasGameWindow(this, width, height, false);
             }
             if (appIcon != null)
-                _gameWindow.Icon = new WindowIcon(new OpenToolkit.Windowing.Common.Input.Image(appIcon.Width, appIcon.Height, SwapColors(appIcon.ToBitmap(), ChangeColors.SwapBlueAndRed)));
+                _gameWindow.Icon = new WindowIcon(new OpenTK.Windowing.Common.Input.Image(appIcon.Width, appIcon.Height, SwapColors(appIcon.ToBitmap(), ChangeColors.SwapBlueAndRed)));
 
             _gameWindow.Size = new Vector2i(width, height);
 
