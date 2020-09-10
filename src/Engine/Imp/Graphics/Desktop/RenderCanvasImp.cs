@@ -983,7 +983,18 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             }
         }
 
-        public IntPtr Handle => Hwnd;
+        public IntPtr Handle 
+        {
+            get
+            {
+                IntPtr hwnd;
+                unsafe
+                {
+                    hwnd = GLFW.GlfwGetWin32Window(WindowPtr);
+                }
+                return hwnd;
+            }
+        }
 
         #endregion
 

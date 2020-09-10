@@ -13,21 +13,22 @@ using System.Threading;
 
 using Path = Fusee.Base.Common.Path;
 
-namespace Fusee.Examples.Simple.Lib
+namespace Fusee.Examples.Simple.Desktop
 {
-    //TODO: Make platform independent?
-    public static class SimpleLib
+    /// <summary>
+    /// The purpose of this class is to expose functionality of this application so it can be called from external environments e.g. some GUI.
+    /// </summary>
+    public static class Lib
     {
         #region Delegates - entry points when hosting a dotnet runtime with host fxr
 
+        public delegate void ExecFusAppInNewThreadDelegate();
         public delegate void ExecFusAppDelegate();
-        public delegate void AbortFusThreadDelegate();
         public delegate bool IsAppInitializedDelegate();
         public delegate IntPtr GetWindowHandleDelegate();
 
         #endregion
-
-        private static Thread _fusThread;
+  
         private static Core.Simple _app;
         private static IWindowHandle _windowHandle;
 
@@ -38,12 +39,12 @@ namespace Fusee.Examples.Simple.Lib
 
         public static void ExecFusAppInNewThread()
         {
-            _fusThread = new Thread(() =>
+            var fusThread = new Thread(() =>
             {
                 InitAndRunApp();
             });
 
-            _fusThread.Start();
+            fusThread.Start();
 
             SpinWait.SpinUntil(() => _app != null && _app.IsInitialized);
         }
@@ -51,14 +52,6 @@ namespace Fusee.Examples.Simple.Lib
         public static void ExecFusApp()
         {
             InitAndRunApp();
-        }
-
-        public static void AbortFusThread()
-        {
-            if (_fusThread != null)
-            {
-                _fusThread.Abort();
-            }
         }
 
         public static bool IsAppInitialized()
@@ -103,7 +96,7 @@ namespace Fusee.Examples.Simple.Lib
             System.Drawing.Icon appIcon = System.Drawing.Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
             _app.CanvasImplementor = new RenderCanvasImp(appIcon);
             _app.ContextImplementor = new RenderContextImp(_app.CanvasImplementor);
-            Input.AddDriverImp(new Fusee.Engine.Imp.Graphics.Desktop.RenderCanvasInputDriverImp(_app.CanvasImplementor));
+            Input.AddDriverImp(new RenderCanvasInputDriverImp(_app.CanvasImplementor));
             Input.AddDriverImp(new WindowsTouchInputDriverImp(_app.CanvasImplementor));
             Input.AddDriverImp(new WindowsSpaceMouseDriverImp(_app.CanvasImplementor));
 

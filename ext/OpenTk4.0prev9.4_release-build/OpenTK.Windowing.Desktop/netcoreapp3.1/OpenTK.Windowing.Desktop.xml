@@ -395,11 +395,6 @@
             Gets the native <see cref="T:OpenTK.Windowing.GraphicsLibraryFramework.Window"/> pointer for use with <see cref="T:OpenTK.Windowing.GraphicsLibraryFramework.GLFW"/> API.
             </summary>
         </member>
-        <member name="P:OpenTK.Windowing.Desktop.NativeWindow.Hwnd">
-            <summary>
-            Gets the Windows specific window handle (HWND).
-            </summary>
-        </member>
         <member name="P:OpenTK.Windowing.Desktop.NativeWindow.KeyboardState">
             <inheritdoc />
         </member>
