@@ -18,6 +18,10 @@ namespace Fusee.Examples.Simple.Core
     public class Simple : RenderCanvas
     {
         public bool IsInitialized = false;
+
+        public bool IsRenderPauseRequested = false;
+        public bool IsClosingRequested = false;
+
         public IWindowHandle WindowHandle;
 
         // angle variables
@@ -65,7 +69,10 @@ namespace Fusee.Examples.Simple.Core
         public override void RenderAFrame()
         {
             // Clear the backbuffer
-            RC.Clear(ClearFlags.Color | ClearFlags.Depth);
+            RC.Clear(ClearFlags.Color | ClearFlags.Depth);            
+
+            if (IsRenderPauseRequested)
+                return;
 
             RC.Viewport(0, 0, Width, Height);
 
@@ -138,6 +145,9 @@ namespace Fusee.Examples.Simple.Core
 
             // Swap buffers: Show the contents of the backbuffer (containing the currently rendered frame) on the front buffer.
             Present();
+
+            if (IsClosingRequested)
+                CloseGameWindow();
         }
 
         private SceneContainer CreateGui()

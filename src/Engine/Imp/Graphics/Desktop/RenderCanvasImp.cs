@@ -12,6 +12,7 @@ using Fusee.Engine.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 namespace Fusee.Engine.Imp.Graphics.Desktop
 {
@@ -772,7 +773,10 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         public void CloseGameWindow()
         {
             if (_gameWindow != null)
+            {
                 _gameWindow.Close();
+                _gameWindow.Dispose();
+            }
         }
 
         /// <summary>
@@ -993,8 +997,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 unsafe
                 {
                     var monitor = CurrentMonitor.ToUnsafePtr<OpenTK.Windowing.GraphicsLibraryFramework.Monitor>();
-                    var videoMode = *GLFW.GetVideoMode(monitor); 
-                    res = new Vector2(videoMode.Width, videoMode.Height);                    
+                    var videoMode = *GLFW.GetVideoMode(monitor);
+                    res = new Vector2(videoMode.Width, videoMode.Height);
                 }
                 return res;
             }
@@ -1094,9 +1098,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             //TODO: OpenTK4.0 - esc will lead to NullReference on Input properties
-            if (KeyboardState[Key.Escape]) 
-                Close();
-            
+            //if (KeyboardState[Key.Escape])
+            //{
+            //    Close();
+            //    Dispose();
+            //}
 
             if (KeyboardState[Key.F11])
                 WindowState = (WindowState != WindowState.Fullscreen) ? WindowState.Fullscreen : WindowState.Normal;
@@ -1104,6 +1110,13 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
+            if (KeyboardState[Key.Escape])
+            {
+                Close();
+                Dispose();
+                return;
+            }
+
             DeltaTime = (float)e.Time;
 
             if (_renderCanvasImp != null)

@@ -10,7 +10,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-
+using System.Threading.Tasks;
 using Path = Fusee.Base.Common.Path;
 
 namespace Fusee.Examples.Simple.Desktop
@@ -26,25 +26,35 @@ namespace Fusee.Examples.Simple.Desktop
         public delegate void ExecFusAppDelegate();
         public delegate bool IsAppInitializedDelegate();
         public delegate IntPtr GetWindowHandleDelegate();
+        public delegate void CloseGameWindowDelegate();
+        public delegate void SetRenderPauseDelegate(bool isRenderPauseRequested);
 
         #endregion
-  
+
         private static Core.Simple _app;
         private static IWindowHandle _windowHandle;
+        public static Task FusTask { get; private set; }
+
+        private static CancellationTokenSource _cts;
 
         public static IntPtr GetWindowHandle()
         {
             return ((WindowHandle)_windowHandle).Handle;
         }
 
+        /// <summary>
+        /// Will create and run a new instance of Core.Simple.
+        /// Note that we can only call this from the main thread at the moment, due to glfw limitations.
+        /// </summary>
         public static void ExecFusAppInNewThread()
         {
-            var fusThread = new Thread(() =>
+            _cts = new CancellationTokenSource();
+            CancellationToken ct = _cts.Token;
+            FusTask = Task.Run(() =>
             {
                 InitAndRunApp();
-            });
 
-            fusThread.Start();
+            }, ct);
 
             SpinWait.SpinUntil(() => _app != null && _app.IsInitialized);
         }
@@ -56,7 +66,23 @@ namespace Fusee.Examples.Simple.Desktop
 
         public static bool IsAppInitialized()
         {
-            return _app.IsInitialized;
+            if (_app != null)
+                return _app.IsInitialized;
+            return false;
+        }
+
+        public static void CloseGameWindow()
+        {
+            _app.IsClosingRequested = true;
+            _cts.Cancel();
+            FusTask.Wait();
+            _cts.Dispose();
+        }
+
+        public static void SetRenderPause(bool isRenderPauseRequested)
+        {
+            if(_app != null)
+                _app.IsRenderPauseRequested = isRenderPauseRequested;
         }
 
         private static void InitAndRunApp()
@@ -105,5 +131,6 @@ namespace Fusee.Examples.Simple.Desktop
             // Start the app
             _app.Run();
         }
+
     }
 }
