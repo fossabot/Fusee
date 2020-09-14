@@ -81,7 +81,7 @@ namespace Fusee.Examples.Simple.Desktop
 
         public static void SetRenderPause(bool isRenderPauseRequested)
         {
-            if(_app != null)
+            if (_app != null)
                 _app.IsRenderPauseRequested = isRenderPauseRequested;
         }
 

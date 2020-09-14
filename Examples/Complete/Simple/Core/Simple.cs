@@ -69,7 +69,7 @@ namespace Fusee.Examples.Simple.Core
         public override void RenderAFrame()
         {
             // Clear the backbuffer
-            RC.Clear(ClearFlags.Color | ClearFlags.Depth);            
+            RC.Clear(ClearFlags.Color | ClearFlags.Depth);
 
             if (IsRenderPauseRequested)
                 return;
