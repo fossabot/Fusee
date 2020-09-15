@@ -34,25 +34,22 @@
 
   <ItemGroup>
     <Reference Include="OpenTK.Core">
-      <HintPath>..\..\..\..\..\ext\OpenTk4.0prev9.4_release-build\OpenTK.Core\netstandard2.1\OpenTK.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\ext\OpenTk4.0pre\OpenTK.Core\netstandard2.1\OpenTK.Core.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK.Graphics">
-      <HintPath>..\..\..\..\..\ext\OpenTk4.0prev9.4_release-build\OpenTK.Graphics\netstandard2.0\OpenTK.Graphics.dll</HintPath>
-    </Reference>
-    <Reference Include="OpenTK.Input">
-      <HintPath>..\..\..\..\..\ext\OpenTk4.0prev9.4_release-build\OpenTK.Input\netstandard2.0\OpenTK.Input.dll</HintPath>
+      <HintPath>..\..\..\..\..\ext\OpenTk4.0pre\OpenTK.Graphics\netstandard2.1\OpenTK.Graphics.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK.Mathematics">
-      <HintPath>..\..\..\..\..\ext\OpenTk4.0prev9.4_release-build\OpenTK.Mathematics\netstandard2.0\OpenTK.Mathematics.dll</HintPath>
+      <HintPath>..\..\..\..\..\ext\OpenTk4.0pre\OpenTK.Mathematics\netstandard2.1\OpenTK.Mathematics.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK.Windowing.Common">
-      <HintPath>..\..\..\..\..\ext\OpenTk4.0prev9.4_release-build\OpenTK.Windowing.Common\netstandard2.0\OpenTK.Windowing.Common.dll</HintPath>
+      <HintPath>..\..\..\..\..\ext\OpenTk4.0pre\OpenTK.Windowing.Common\netstandard2.1\OpenTK.Windowing.Common.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK.Windowing.Desktop">
-      <HintPath>..\..\..\..\..\ext\OpenTk4.0prev9.4_release-build\OpenTK.Windowing.Desktop\netcoreapp3.1\OpenTK.Windowing.Desktop.dll</HintPath>
+      <HintPath>..\..\..\..\..\ext\OpenTk4.0pre\OpenTK.Windowing.Desktop\netcoreapp3.1\OpenTK.Windowing.Desktop.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK.Windowing.GraphicsLibraryFramework">
-      <HintPath>..\..\..\..\..\ext\OpenTk4.0prev9.4_release-build\OpenTK.Windowing.GraphicsLibraryFramework\netcoreapp3.1\OpenTK.Windowing.GraphicsLibraryFramework.dll</HintPath>
+      <HintPath>..\..\..\..\..\ext\OpenTk4.0pre\OpenTK.Windowing.GraphicsLibraryFramework\netcoreapp3.1\OpenTK.Windowing.GraphicsLibraryFramework.dll</HintPath>
     </Reference>
   </ItemGroup>
 

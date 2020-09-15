@@ -11,6 +11,11 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\ext\OpenTk4.0pre\opentk.redist.glfw\glfw3.dll" Link="glfw3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
     
   <ItemGroup>
     <ProjectReference Include="$(FuseeEngineRoot)\src\Base\Imp\Desktop\Fusee.Base.Imp.Desktop.csproj">

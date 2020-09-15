@@ -683,7 +683,6 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             {
                 _gameWindow = new RenderCanvasGameWindow(this, width, height, false);
             }
-            _gameWindow.MakeCurrent();
             _gameWindow.Size = new Vector2i(0, 0);
         }
 
@@ -983,7 +982,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 IntPtr hwnd;
                 unsafe
                 {
-                    hwnd = GLFW.GlfwGetWin32Window(WindowPtr);
+                    hwnd = GLFW.GetWin32Window(WindowPtr);
                 }
                 return hwnd;
             }

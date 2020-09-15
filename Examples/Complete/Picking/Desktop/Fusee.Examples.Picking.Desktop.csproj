@@ -5,7 +5,7 @@
     <OutputPath>$(BaseOutputPath)\Examples\Picking\Desktop\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\ext\OpenTk4.0prev9.4_release-build\opentk.redist.glfw\glfw3.dll" Link="glfw3.dll">
+    <None Include="..\..\..\..\ext\OpenTk4.0pre\opentk.redist.glfw\glfw3.dll" Link="glfw3.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

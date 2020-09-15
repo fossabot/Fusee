@@ -1,0 +1,2533 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenTK.Windowing.Common</name>
+    </assembly>
+    <members>
+        <member name="T:OpenTK.Windowing.Common.ContextAPI">
+            <summary>
+            Describes the graphics API you want the context to use.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.ContextAPI.NoAPI">
+            <summary>
+            Indicates that an API has not been specifically requested for context creation.
+            </summary>
+            <remarks>
+            <para>
+            This is primarily for integrating an external API with this window, such as Vulkan.
+            </para>
+            </remarks>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.ContextAPI.OpenGLES">
+            <summary>
+            Indicates that the context should be created for OpenGL ES.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.ContextAPI.OpenGL">
+            <summary>
+            Indicates that the context should be created for OpenGL.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.ContextFlags">
+            <summary>
+            Enumerates various flags that affect the creation of new GraphicsContexts.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.ContextFlags.Default">
+            <summary>
+            The default value of the GraphicsContextFlags enumeration.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.ContextFlags.Debug">
+            <summary>
+            Indicates that this is a debug GraphicsContext. Debug contexts may provide
+            additional debugging information at the cost of performance.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.ContextFlags.ForwardCompatible">
+            <summary>
+            Indicates that this is a forward compatible GraphicsContext. Forward-compatible contexts
+            do not support functionality marked as deprecated in the current GraphicsContextVersion.
+            </summary>
+            <remarks>Forward-compatible contexts are defined only for OpenGL versions 3.0 and later.</remarks>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.ContextFlags.Offscreen">
+            <summary>
+            Indicates that this GraphicsContext is intended for offscreen rendering.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.ContextProfile">
+            <summary>
+            Selects the profile for the context's graphics API. This only applies on OpenGL 3.2 upwards, and has no effect on older versions.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.ContextProfile.Any">
+            <summary>
+            Used for unknown OpenGL profile or OpenGL ES.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.ContextProfile.Compatability">
+            <summary>
+            Selects compatability profile. You should only use this if maintaining legacy code.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.ContextProfile.Core">
+            <summary>
+            Selects core profile. All new projects should use this unless they have a good reason not to.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.InputAction">
+            <summary>
+            Defines event information for <see cref="P:OpenTK.Windowing.Common.MouseButtonEventArgs.Action"/>.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.InputAction.Release">
+            <summary>
+            The key or mouse button was released.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.InputAction.Press">
+            <summary>
+            The key or mouse button was pressed.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.InputAction.Repeat">
+            <summary>
+            The key was held down until it repeated.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.FileDropEventArgs">
+            <summary>
+            Defines the event data for files being dropped onto the window.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.FileDropEventArgs.#ctor(System.String[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.FileDropEventArgs"/> struct.
+            </summary>
+            <param name="paths">
+            The <see cref="T:System.Array" /> of strings giving the names of all files dropped.
+            </param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.FileDropEventArgs.FileNames">
+            <summary>
+            Gets the names of the files.
+            </summary>
+            <value>An <see cref="T:System.Array" /> of strings giving the names of all files dropped.</value>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.FocusedChangedEventArgs">
+            <summary>
+            Defines the event data for the window focus changing.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.FocusedChangedEventArgs.#ctor(System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.FocusedChangedEventArgs"/> struct.
+            </summary>
+            <param name="isFocused">A value indicating whether the window is focused.</param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.FocusedChangedEventArgs.IsFocused">
+            <summary>
+            Gets a value indicating whether the window is focused.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.FrameEventArgs">
+            <summary>
+            Defines the arguments for frame events.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.FrameEventArgs.#ctor(System.Double)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.FrameEventArgs"/> struct.
+            </summary>
+            <param name="elapsed">The amount of time that has elapsed since the previous event, in seconds.</param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.FrameEventArgs.Time">
+            <summary>
+            Gets how many seconds of time elapsed since the previous event.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.JoystickEventArgs">
+            <summary>
+            Defines the event data for the <see cref="!:IWindowEvents.JoystickConnected"/> event.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.JoystickEventArgs.#ctor(System.Int32,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.JoystickEventArgs"/> struct.
+            </summary>
+            <param name="joystickId">The Id of the joystick which triggered this event.</param>
+            <param name="isConnected">
+            A value indicating whether the joystick which triggered this event was connected.
+            </param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.JoystickEventArgs.JoystickId">
+            <summary>
+            Gets the Id of the joystick which triggered this event.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.JoystickEventArgs.IsConnected">
+            <summary>
+            Gets a value indicating whether the joystick which triggered this event was connected.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.KeyboardKeyEventArgs">
+            <summary>
+            Defines the event data for <see cref="!:IWindowEvents.KeyDown"/> and <see cref="!:IWindowEvents.KeyUp"/> events.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.KeyboardKeyEventArgs.#ctor(OpenTK.Windowing.Common.Input.Key,System.Int32,OpenTK.Windowing.Common.Input.KeyModifiers,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.KeyboardKeyEventArgs"/> struct.
+            </summary>
+            <param name="key">The key that generated this event.</param>
+            <param name="scanCode">The scan code of the key that generated this event.</param>
+            <param name="modifiers">The key modifiers that were active when this event was generated.</param>
+            <param name="isRepeat">Whether this event is a repeat from the user holding the key down.</param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.KeyboardKeyEventArgs.Key">
+            <summary>
+            Gets the key that generated this event.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.KeyboardKeyEventArgs.ScanCode">
+            <summary>
+            Gets the keyboard scan code of the key that generated this event.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.KeyboardKeyEventArgs.Modifiers">
+            <summary>
+            Gets a bitwise combination representing the key modifiers were active when this event was generated.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.KeyboardKeyEventArgs.IsRepeat">
+            <summary>
+            Gets a value indicating whether
+            this key event is a repeat.
+            </summary>
+            <value>
+            true, if this event was caused by the user holding down
+            a key; false, if this was caused by the user pressing a
+            key for the first time.
+            </value>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.KeyboardKeyEventArgs.Alt">
+            <summary>
+            Gets a value indicating whether <see cref="F:OpenTK.Windowing.Common.Input.KeyModifiers.Alt" /> is pressed.
+            </summary>
+            <value><c>true</c> if pressed; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.KeyboardKeyEventArgs.Control">
+            <summary>
+            Gets a value indicating whether <see cref="F:OpenTK.Windowing.Common.Input.KeyModifiers.Control" /> is pressed.
+            </summary>
+            <value><c>true</c> if pressed; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.KeyboardKeyEventArgs.Shift">
+            <summary>
+            Gets a value indicating whether <see cref="F:OpenTK.Windowing.Common.Input.KeyModifiers.Shift" /> is pressed.
+            </summary>
+            <value><c>true</c> if pressed; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.KeyboardKeyEventArgs.Command">
+            <summary>
+            Gets a value indicating whether <see cref="F:OpenTK.Windowing.Common.Input.KeyModifiers.Shift" /> is pressed.
+            </summary>
+            <value><c>true</c> if pressed; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.MinimizedEventArgs">
+            <summary>
+            Defines the event data for the window minimizing event.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.MinimizedEventArgs.#ctor(System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.MinimizedEventArgs"/> struct.
+            </summary>
+            <param name="isMinimized">
+            A value indicating whether the window is minimized.
+            </param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MinimizedEventArgs.IsMinimized">
+            <summary>
+            Gets a value indicating whether the window is minimized.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.MonitorEventArgs">
+            <summary>
+            Defines the event data for the <see cref="!:IWindowEvents.MonitorConnected"/> event.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.MonitorEventArgs.#ctor(OpenTK.Windowing.Common.Monitor,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.MonitorEventArgs"/> struct.
+            </summary>
+            <param name="monitor">The <see cref="P:OpenTK.Windowing.Common.MonitorEventArgs.Monitor"/> which triggered the event.</param>
+            <param name="isConnected">Whether the <see cref="P:OpenTK.Windowing.Common.MonitorEventArgs.Monitor"/> is connected.</param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MonitorEventArgs.Monitor">
+            <summary>
+            Gets the <see cref="P:OpenTK.Windowing.Common.MonitorEventArgs.Monitor"/> which triggered the event.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MonitorEventArgs.IsConnected">
+            <summary>
+            Gets a value indicating whether the <see cref="P:OpenTK.Windowing.Common.MonitorEventArgs.Monitor"/> that triggered this event is connected or not.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.MouseButtonEventArgs">
+            <summary>
+            Defines the event data for <see cref="!:IWindowEvents.MouseDown" />
+            and <see cref="!:IWindowEvents.MouseUp" /> events.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.MouseButtonEventArgs.#ctor(OpenTK.Windowing.Common.Input.MouseButton,OpenTK.Windowing.Common.InputAction,OpenTK.Windowing.Common.Input.KeyModifiers)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.MouseButtonEventArgs"/> struct.
+            </summary>
+            <param name="button">The mouse button for the event.</param>
+            <param name="action">The action of the mouse button.</param>
+            <param name="modifiers">The key modifiers held during the mouse button's action.</param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseButtonEventArgs.Button">
+            <summary>
+            Gets the <see cref="T:OpenTK.Windowing.Common.Input.MouseButton" /> that triggered this event.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseButtonEventArgs.Action">
+            <summary>
+            Gets the <see cref="T:OpenTK.Windowing.Common.InputAction"/> of the pressed button.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseButtonEventArgs.Modifiers">
+            <summary>
+            Gets the active <see cref="T:OpenTK.Windowing.Common.Input.KeyModifiers"/> of the pressed button.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseButtonEventArgs.IsPressed">
+            <summary>
+            Gets a value indicating whether the <see cref="P:OpenTK.Windowing.Common.MouseButtonEventArgs.Button"/> which triggered this event was pressed or released.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.MouseMoveEventArgs">
+            <summary>
+            Defines the event data for <see cref="!:IWindowEvents.MouseMove" /> events.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.MouseMoveEventArgs.#ctor(OpenTK.Mathematics.Vector2,OpenTK.Mathematics.Vector2)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.MouseMoveEventArgs"/> struct.
+            </summary>
+            <param name="position">The new mouse position.</param>
+            <param name="delta">The change in position produced by this event.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.MouseMoveEventArgs.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.MouseMoveEventArgs"/> struct.
+            </summary>
+            <param name="x">The new mouse X position.</param>
+            <param name="y">The new mouse Y position.</param>
+            <param name="deltaX">The change in X position produced by this event.</param>
+            <param name="deltaY">The change in Y position produced by this event.</param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseMoveEventArgs.X">
+            <summary>
+            Gets the new X position produced by this event.
+            This position is relative to the top-left corner of the contents of the window.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseMoveEventArgs.Y">
+            <summary>
+            Gets the new Y position produced by this event.
+            This position is relative to the top-left corner of the contents of the window.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseMoveEventArgs.Position">
+            <summary>
+            Gets the new position produced by this event.
+            This position is relative to the top-left corner of the contents of the window.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseMoveEventArgs.DeltaX">
+            <summary>
+            Gets the change in X position produced by this event.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseMoveEventArgs.DeltaY">
+            <summary>
+            Gets the change in Y position produced by this event.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseMoveEventArgs.Delta">
+            <summary>
+            Gets the change in position produced by this event.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.MouseWheelEventArgs">
+            <summary>
+            Defines the event data for <see cref="!:IWindowEvents.MouseWheel" /> events.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.MouseWheelEventArgs.#ctor(OpenTK.Mathematics.Vector2)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.MouseWheelEventArgs"/> struct.
+            </summary>
+            <param name="offset">The offset the mouse wheel was moved.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.MouseWheelEventArgs.#ctor(System.Single,System.Single)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.MouseWheelEventArgs"/> struct.
+            </summary>
+            <param name="offsetX">The offset on the X axis.</param>
+            <param name="offsetY">The offset on the Y axis.</param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseWheelEventArgs.Offset">
+            <summary>
+            Gets the offset the mouse wheel was moved.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseWheelEventArgs.OffsetX">
+            <summary>
+            Gets the offset on the X axis.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.MouseWheelEventArgs.OffsetY">
+            <summary>
+            Gets the offset on the Y axis.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.ResizeEventArgs">
+            <summary>
+            Defines the event data for the window resize event.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.ResizeEventArgs.#ctor(OpenTK.Mathematics.Vector2i)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.ResizeEventArgs"/> struct.
+            </summary>
+            <param name="size">The new window size.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.ResizeEventArgs.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.ResizeEventArgs"/> struct.
+            </summary>
+            <param name="width">The new window width.</param>
+            <param name="height">The new window height.</param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.ResizeEventArgs.Size">
+            <summary>
+            Gets the new window size.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.ResizeEventArgs.Width">
+            <summary>
+            Gets the new window width.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.ResizeEventArgs.Height">
+            <summary>
+            Gets the new window height.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.TextInputEventArgs">
+            <summary>
+                Raised when a single unicode code point is input.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.TextInputEventArgs.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.TextInputEventArgs"/> struct.
+            </summary>
+            <param name="unicode">The unicode code point that was input.</param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.TextInputEventArgs.Unicode">
+            <summary>
+                Gets the Unicode code point that was input.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.TextInputEventArgs.AsString">
+            <summary>
+                Gets the string representation of the input Unicode code point.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.WindowPositionEventArgs">
+            <summary>
+            Defines the event data for the window position event.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.WindowPositionEventArgs.#ctor(OpenTK.Mathematics.Vector2i)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.WindowPositionEventArgs"/> struct.
+            </summary>
+            <param name="position">The new window position.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.WindowPositionEventArgs.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.WindowPositionEventArgs"/> struct with given coordinate.
+            </summary>
+            <param name="x">The new window x position.</param>
+            <param name="y">The new window y position.</param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.WindowPositionEventArgs.Position">
+            <summary>
+            Gets the new window position, in pixels relative to the top left corner of the current monitor.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.WindowPositionEventArgs.X">
+            <summary>
+            Gets the new window x position.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.WindowPositionEventArgs.Y">
+            <summary>
+            Gets the new window y position.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.Input.Hat">
+            <summary>
+            Status of a joystick hat.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Hat.Centered">
+            <summary>
+            Hat is centered.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Hat.Up">
+            <summary>
+            Hat is pointing up.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Hat.Right">
+            <summary>
+            Hat is pointing right.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Hat.Down">
+            <summary>
+            Hat is pointing down.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Hat.Left">
+            <summary>
+            Hat is pointing left.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Hat.RightUp">
+            <summary>
+            Hat is pointing up and to the right.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Hat.RightDown">
+            <summary>
+            Hat is pointing down and to the right.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Hat.LeftUp">
+            <summary>
+            Hat is pointing up and to the left.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Hat.LeftDown">
+            <summary>
+            Hat is pointing down and to the left.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.Input.Key">
+            <summary>
+                The available keyboard keys.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Unknown">
+            <summary>
+            A key outside the known keys.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.ShiftLeft">
+            <summary>
+            The left shift key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.LShift">
+            <summary>
+            The left shift key (equivalent to ShiftLeft).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.ShiftRight">
+            <summary>
+            The right shift key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.RShift">
+            <summary>
+            The right shift key (equivalent to ShiftRight).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.ControlLeft">
+            <summary>
+            The left control key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.LControl">
+            <summary>
+            The left control key (equivalent to ControlLeft).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.ControlRight">
+            <summary>
+            The right control key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.RControl">
+            <summary>
+            The right control key (equivalent to ControlRight).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.AltLeft">
+            <summary>
+            The left alt key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.LAlt">
+            <summary>
+            The left alt key (equivalent to AltLeft.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.AltRight">
+            <summary>
+            The right alt key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.RAlt">
+            <summary>
+            The right alt key (equivalent to AltRight).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.WinLeft">
+            <summary>
+            The left win key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.LWin">
+            <summary>
+            The left win key (equivalent to WinLeft).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.WinRight">
+            <summary>
+            The right win key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.RWin">
+            <summary>
+            The right win key (equivalent to WinRight).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Menu">
+            <summary>
+            The menu key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Command">
+            <summary>The Command key.</summary>
+            <remarks>Valid on OS-X only</remarks>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F1">
+            <summary>
+            The F1 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F2">
+            <summary>
+            The F2 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F3">
+            <summary>
+            The F3 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F4">
+            <summary>
+            The F4 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F5">
+            <summary>
+            The F5 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F6">
+            <summary>
+            The F6 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F7">
+            <summary>
+            The F7 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F8">
+            <summary>
+            The F8 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F9">
+            <summary>
+            The F9 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F10">
+            <summary>
+            The F10 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F11">
+            <summary>
+            The F11 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F12">
+            <summary>
+            The F12 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F13">
+            <summary>
+            The F13 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F14">
+            <summary>
+            The F14 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F15">
+            <summary>
+            The F15 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F16">
+            <summary>
+            The F16 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F17">
+            <summary>
+            The F17 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F18">
+            <summary>
+            The F18 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F19">
+            <summary>
+            The F19 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F20">
+            <summary>
+            The F20 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F21">
+            <summary>
+            The F21 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F22">
+            <summary>
+            The F22 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F23">
+            <summary>
+            The F23 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F24">
+            <summary>
+            The F24 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F25">
+            <summary>
+            The F25 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F26">
+            <summary>
+            The F26 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F27">
+            <summary>
+            The F27 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F28">
+            <summary>
+            The F28 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F29">
+            <summary>
+            The F29 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F30">
+            <summary>
+            The F30 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F31">
+            <summary>
+            The F31 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F32">
+            <summary>
+            The F32 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F33">
+            <summary>
+            The F33 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F34">
+            <summary>
+            The F34 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F35">
+            <summary>
+            The F35 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Up">
+            <summary>
+            The up arrow key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Down">
+            <summary>
+            The down arrow key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Left">
+            <summary>
+            The left arrow key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Right">
+            <summary>
+            The right arrow key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Enter">
+            <summary>
+            The enter key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Escape">
+            <summary>
+            The escape key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Space">
+            <summary>
+            The space key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Tab">
+            <summary>
+            The tab key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.BackSpace">
+            <summary>
+            The backspace key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Back">
+            <summary>
+            The backspace key (equivalent to BackSpace).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Insert">
+            <summary>
+            The insert key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Delete">
+            <summary>
+            The delete key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.PageUp">
+            <summary>
+            The page up key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.PageDown">
+            <summary>
+            The page down key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Home">
+            <summary>
+            The home key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.End">
+            <summary>
+            The end key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.CapsLock">
+            <summary>
+            The caps lock key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.ScrollLock">
+            <summary>
+            The scroll lock key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.PrintScreen">
+            <summary>
+            The print screen key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Pause">
+            <summary>
+            The pause key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.NumLock">
+            <summary>
+            The num lock key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Clear">
+            <summary>
+            The clear key (Keypad5 with NumLock disabled, on typical keyboards).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Sleep">
+            <summary>
+            The sleep key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Keypad0">
+            <summary>
+            The keypad 0 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Keypad1">
+            <summary>
+            The keypad 1 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Keypad2">
+            <summary>
+            The keypad 2 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Keypad3">
+            <summary>
+            The keypad 3 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Keypad4">
+            <summary>
+            The keypad 4 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Keypad5">
+            <summary>
+            The keypad 5 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Keypad6">
+            <summary>
+            The keypad 6 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Keypad7">
+            <summary>
+            The keypad 7 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Keypad8">
+            <summary>
+            The keypad 8 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Keypad9">
+            <summary>
+            The keypad 9 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.KeypadDivide">
+            <summary>
+            The keypad divide key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.KeypadMultiply">
+            <summary>
+            The keypad multiply key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.KeypadSubtract">
+            <summary>
+            The keypad subtract key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.KeypadMinus">
+            <summary>
+            The keypad minus key (equivalent to KeypadSubtract).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.KeypadAdd">
+            <summary>
+            The keypad add key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.KeypadEqual">
+            <summary>
+            The keypad equal key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.KeypadPlus">
+            <summary>
+            The keypad plus key (equivalent to KeypadAdd).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.KeypadDecimal">
+            <summary>
+            The keypad decimal key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.KeypadPeriod">
+            <summary>
+            The keypad period key (equivalent to KeypadDecimal).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.KeypadEnter">
+            <summary>
+            The keypad enter key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.A">
+            <summary>
+            The A key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.B">
+            <summary>
+            The B key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.C">
+            <summary>
+            The C key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.D">
+            <summary>
+            The D key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.E">
+            <summary>
+            The E key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.F">
+            <summary>
+            The F key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.G">
+            <summary>
+            The G key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.H">
+            <summary>
+            The H key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.I">
+            <summary>
+            The I key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.J">
+            <summary>
+            The J key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.K">
+            <summary>
+            The K key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.L">
+            <summary>
+            The L key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.M">
+            <summary>
+            The M key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.N">
+            <summary>
+            The N key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.O">
+            <summary>
+            The O key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.P">
+            <summary>
+            The P key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Q">
+            <summary>
+            The Q key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.R">
+            <summary>
+            The R key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.S">
+            <summary>
+            The S key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.T">
+            <summary>
+            The T key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.U">
+            <summary>
+            The U key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.V">
+            <summary>
+            The V key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.W">
+            <summary>
+            The W key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.X">
+            <summary>
+            The X key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Y">
+            <summary>
+            The Y key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Z">
+            <summary>
+            The Z key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Number0">
+            <summary>
+            The number 0 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Number1">
+            <summary>
+            The number 1 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Number2">
+            <summary>
+            The number 2 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Number3">
+            <summary>
+            The number 3 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Number4">
+            <summary>
+            The number 4 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Number5">
+            <summary>
+            The number 5 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Number6">
+            <summary>
+            The number 6 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Number7">
+            <summary>
+            The number 7 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Number8">
+            <summary>
+            The number 8 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Number9">
+            <summary>
+            The number 9 key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Tilde">
+            <summary>
+            The tilde key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Grave">
+            <summary>
+            The grave key (equivaent to Tilde).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Minus">
+            <summary>
+            The minus key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Plus">
+            <summary>
+            The plus key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.BracketLeft">
+            <summary>
+            The left bracket key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.LBracket">
+            <summary>
+            The left bracket key (equivalent to BracketLeft).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.BracketRight">
+            <summary>
+            The right bracket key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.RBracket">
+            <summary>
+            The right bracket key (equivalent to BracketRight).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Semicolon">
+            <summary>
+            The semicolon key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Quote">
+            <summary>
+            The quote key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Comma">
+            <summary>
+            The comma key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Period">
+            <summary>
+            The period key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.Slash">
+            <summary>
+            The slash key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.BackSlash">
+            <summary>
+            The backslash key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.NonUSBackSlash">
+            <summary>
+            The secondary backslash key.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.Key.LastKey">
+            <summary>
+            Indicates the last available keyboard key.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.Input.KeyModifiers">
+            <summary>
+            Enumerates modifier keys.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.KeyModifiers.Alt">
+            <summary>
+            The alt key modifier (option on Mac).
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.KeyModifiers.Control">
+            <summary>
+            The control key modifier.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.KeyModifiers.Shift">
+            <summary>
+            The shift key modifier.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.KeyModifiers.Command">
+            <summary>
+            The command key modifier on a Mac
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.KeyModifiers.CapsLock">
+            <summary>
+            If the caps lock is enabled.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.KeyModifiers.NumLock">
+            <summary>
+            If the num lock is enabled.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.Input.MouseButton">
+            <summary>
+            Enumerates all possible mouse buttons.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseButton.Left">
+            <summary>
+            The left mouse button. Equivalent to Button1.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseButton.Middle">
+            <summary>
+            The middle mouse button. Equivalent to Button2.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseButton.Right">
+            <summary>
+            The right mouse button. Equivalent to Button3.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseButton.Button1">
+            <summary>
+            The first mouse button. Equivalent to Left.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseButton.Button2">
+            <summary>
+            The second mouse button. Equivalent to Right.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseButton.Button3">
+            <summary>
+            The third mouse button. Equivalent to Middle.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseButton.Button4">
+            <summary>
+            The fourth mouse button.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseButton.Button5">
+            <summary>
+            The fifth mouse button.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseButton.Button6">
+            <summary>
+            The sixth mouse button.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseButton.Button7">
+            <summary>
+            The seventh mouse button.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseButton.Button8">
+            <summary>
+            The eigth mouse button.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseButton.LastButton">
+            <summary>
+            Indicates the last available mouse button.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.Input.Image">
+            <summary>
+            Stores a window icon. A window icon is defined
+            as a 2-dimensional buffer of RGBA values.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.Image.#ctor(System.Int32,System.Int32,System.Byte[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.Input.Image" /> class.
+            </summary>
+            <param name="width">The icon pixel width.</param>
+            <param name="height">The icon pixel height.</param>
+            <param name="data">The RGBA pixel data of the icon.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.Image.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.Input.Image"/> class.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.Image.Width">
+            <summary>
+            Gets the icon pixel width.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.Image.Height">
+            <summary>
+            Gets the icon pixel height.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.Image.Data">
+            <summary>
+            Gets the RGBA pixel data of the icon.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.Input.JoystickState">
+            <summary>
+            Encapsulates the state of a joystick device.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.JoystickState.Id">
+            <summary>
+            Gets the identity of the joystick this state describes.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.JoystickState.Name">
+            <summary>
+            Gets the name of the joystick this state describes.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.JoystickState.IsConnected">
+            <summary>
+            Gets a value indicating whether the joystick is active and connected.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.Input.JoystickState"/> struct.
+            </summary>
+            <param name="hatCount">The amount of hats.</param>
+            <param name="axesCount">The amount of axes.</param>
+            <param name="buttonCount">The amount of buttons.</param>
+            <param name="id">The id of the joystick.</param>
+            <param name="name">The name of the joystick.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.#ctor(OpenTK.Windowing.Common.Input.Hat[],System.Single[],System.Boolean[],System.Int32,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.Input.JoystickState"/> struct.
+            </summary>
+            <param name="hats">The hats belonging to the joystick.</param>
+            <param name="axes">The axes belonging to the joystick.</param>
+            <param name="buttons">The buttons belonging to the joystick.</param>
+            <param name="id">The id of the joystick.</param>
+            <param name="name">The name of the joystick.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.GetHat(System.Int32)">
+            <summary>
+            Gets a <see cref="T:OpenTK.Windowing.Common.Input.Hat"/> describing the state of a hat.
+            </summary>
+            <param name="index">The index of the hat to check.</param>
+            <returns>A <see cref="T:OpenTK.Windowing.Common.Input.Hat"/> describing the hat state.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.SetHat(System.Int32,OpenTK.Windowing.Common.Input.Hat)">
+            <summary>
+            Sets the state of a hat depending on the given value.
+            </summary>
+            <param name="index">The hat which position should be changed.</param>
+            <param name="value">The new state the hat should be changed to.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.IsButtonDown(System.Int32)">
+            <summary>
+            Gets a <see cref="T:System.Boolean"/> describing the state of a button.
+            </summary>
+            <param name="index">The index of the button to check.</param>
+            <returns><c>true</c> if the button is down; <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.SetButtonDown(System.Int32,System.Boolean)">
+            <summary>
+            Sets the state of a button depending on the given value.
+            </summary>
+            <param name="index">The index of the button which should be changed.</param>
+            <param name="value"><c>true</c> if the button is down; <c>false</c> otherwise.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.GetAxis(System.Int32)">
+            <summary>
+            Gets a <see cref="T:System.Single"/> between -1 and 1 describing the position of an axis.
+            </summary>
+            <param name="index">The index of the Axis to check.</param>
+            <returns>A <see cref="T:System.Single"/> between -1 and 1 describing the position of the axis.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.SetAxis(System.Int32,System.Single)">
+            <summary>
+            Sets the state of an axis depending on the given value.
+            </summary>
+            <param name="index">The index of the axis which position should be changed.</param>
+            <param name="value">The new state the key should be changed to.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.op_Equality(OpenTK.Windowing.Common.Input.JoystickState,OpenTK.Windowing.Common.Input.JoystickState)">
+            <summary>
+            Checks wether two <see cref="T:OpenTK.Windowing.Common.Input.JoystickState"/> instances are equal.
+            </summary>
+            <param name="left">The first <see cref="T:OpenTK.Windowing.Common.Input.JoystickState"/> instance to compare.</param>
+            <param name="right">The second <see cref="T:OpenTK.Windowing.Common.Input.JoystickState"/> instance to compare.</param>
+            <returns><c>true</c> if both left is equal to right; <c>false</c>otherwise.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.op_Inequality(OpenTK.Windowing.Common.Input.JoystickState,OpenTK.Windowing.Common.Input.JoystickState)">
+            <summary>
+            Checks wether two <see cref="T:OpenTK.Windowing.Common.Input.JoystickState"/> instances are not equal.
+            </summary>
+            <param name="left">The first <see cref="T:OpenTK.Windowing.Common.Input.JoystickState"/> instance to compare.</param>
+            <param name="right">The second <see cref="T:OpenTK.Windowing.Common.Input.JoystickState"/> instance to compare.</param>
+            <returns><c>true</c> if both left is not equal to right; <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.Equals(System.Object)">
+            <summary>
+            Compares to an object instance for equality.
+            </summary>
+            <param name="obj">The <see cref="T:System.Object"/> to compare to.</param>
+            <returns><c>true</c> if this instance is equal to obj; <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.Equals(OpenTK.Windowing.Common.Input.JoystickState)">
+            <summary>
+            Compares to <see cref="T:OpenTK.Windowing.Common.Input.JoystickState"/> instances.
+            </summary>
+            <param name="other">The instance to compare to.</param>
+            <returns><c>true</c> if both instances are equal; <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.GetHashCode">
+            <summary>
+            Generates a hashcode for the current instance.
+            </summary>
+            <returns>A <see cref="T:System.Int32"/> representing the hashcode for this instance.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.JoystickState.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.Input.KeyboardState">
+            <summary>
+            Encapsulates the state of a Keyboard device.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.KeyboardState.Item(OpenTK.Windowing.Common.Input.Key)">
+            <summary>
+            Gets a <see cref="T:System.Boolean" /> indicating whether the specified
+             <see cref="T:OpenTK.Windowing.Common.Input.Key" /> is currently down.
+            </summary>
+            <param name="key">The <see cref="T:OpenTK.Windowing.Common.Input.Key" /> to check.</param>
+            <returns><c>true</c> if key is down; <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.KeyboardState.IsKeyDown(OpenTK.Windowing.Common.Input.Key)">
+            <summary>
+            Gets a <see cref="T:System.Boolean" /> indicating whether this key is currently down.
+            </summary>
+            <param name="key">The <see cref="T:OpenTK.Windowing.Common.Input.Key" /> to check.</param>
+            <returns><c>true</c> if <paramref name="key"/> is in the down state; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.KeyboardState.IsKeyUp(OpenTK.Windowing.Common.Input.Key)">
+            <summary>
+            Gets a <see cref="T:System.Boolean" /> indicating whether this key is currently up.
+            </summary>
+            <param name="key">The <see cref="T:OpenTK.Windowing.Common.Input.Key" /> to check.</param>
+            <returns><c>true</c> if <paramref name="key"/> is in the up state; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.KeyboardState.IsAnyKeyDown">
+            <summary>
+            Gets a value indicating whether any key is currently down.
+            </summary>
+            <value><c>true</c> if any key is down; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.KeyboardState.SetKeyState(OpenTK.Windowing.Common.Input.Key,System.Boolean)">
+            <summary>
+            Sets the key state of the <paramref name="key"/> depending on the given <paramref name="down"/> value.
+            </summary>
+            <param name="key">The <see cref="T:OpenTK.Windowing.Common.Input.Key"/> which state should be changed.</param>
+            <param name="down">The new state the key should be changed to.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.KeyboardState.op_Equality(OpenTK.Windowing.Common.Input.KeyboardState,OpenTK.Windowing.Common.Input.KeyboardState)">
+            <summary>
+            Checks whether two <see cref="T:OpenTK.Windowing.Common.Input.KeyboardState" /> instances are equal.
+            </summary>
+            <param name="left">
+            The first <see cref="T:OpenTK.Windowing.Common.Input.KeyboardState" /> instance to compare.
+            </param>
+            <param name="right">
+            The second <see cref="T:OpenTK.Windowing.Common.Input.KeyboardState" /> instance to compare.
+            </param>
+            <returns>
+            <c>true</c> if both left is equal to right; <c>false</c> otherwise.
+            </returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.KeyboardState.op_Inequality(OpenTK.Windowing.Common.Input.KeyboardState,OpenTK.Windowing.Common.Input.KeyboardState)">
+            <summary>
+            Checks whether two <see cref="T:OpenTK.Windowing.Common.Input.KeyboardState" /> instances are not equal.
+            </summary>
+            <param name="left">
+            The first <see cref="T:OpenTK.Windowing.Common.Input.KeyboardState" /> instance to compare.
+            </param>
+            <param name="right">
+            The second <see cref="T:OpenTK.Windowing.Common.Input.KeyboardState" /> instance to compare.
+            </param>
+            <returns>
+            <c>true</c> if both left is not equal to right; <c>false</c> otherwise.
+            </returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.KeyboardState.Equals(System.Object)">
+            <summary>
+            Compares to an object instance for equality.
+            </summary>
+            <param name="obj">
+            The <see cref="T:System.Object" /> to compare to.
+            </param>
+            <returns>
+            <c>true</c> if this instance is equal to obj; <c>false</c> otherwise.
+            </returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.KeyboardState.Equals(OpenTK.Windowing.Common.Input.KeyboardState)">
+            <summary>
+            Compares two KeyboardState instances.
+            </summary>
+            <param name="other">The instance to compare two.</param>
+            <returns><c>true</c>, if both instances are equal; <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.KeyboardState.GetHashCode">
+            <summary>
+            Generates a hashcode for the current instance.
+            </summary>
+            <returns>
+            A <see cref="T:System.Int32" /> representing the hashcode for this instance.
+            </returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.KeyboardState.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:OpenTK.Windowing.Common.Input.MouseCursor">
+            <summary>
+            Represents a predefined or custom mouse cursor.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseCursor.Default">
+            <summary>
+            Gets the default mouse cursor for this platform.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseCursor.IBeam">
+            <summary>
+            Gets the default I beam cursor for this platform.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseCursor.Crosshair">
+            <summary>
+            Gets the default crosshair cursor for this platform.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseCursor.Hand">
+            <summary>
+            Gets the default hand cursor for this platform.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseCursor.VResize">
+            <summary>
+            Gets the default vertical resize cursor for this platform.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseCursor.HResize">
+            <summary>
+            Gets the default horizontal cursor for this platform.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseCursor.Empty">
+            <summary>
+            Gets an empty (invisible) mouse cursor.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.MouseCursor.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Byte[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.Input.MouseCursor" /> class from a
+            contiguous array of RGBA pixels.
+            Each pixel is composed of 4 bytes, representing R, G, B and A values,
+            respectively. On some backends, the R, G, and B components should be premultiplied with the A component
+            for correct antialiasing of translucent cursors:
+            <code>
+            B = (byte)((B * A) / 255)
+            G = (byte)((G * A) / 255)
+            R = (byte)((R * A) / 255)
+            </code>
+            </summary>
+            <param name="hotX">The x-coordinate of the cursor hotspot, in the range [0, width].</param>
+            <param name="hotY">The y-coordinate of the cursor hotspot, in the range [0, height].</param>
+            <param name="width">The width of the cursor data, in pixels.</param>
+            <param name="height">The height of the cursor data, in pixels.</param>
+            <param name="data">
+            A byte array representing the cursor image,
+            laid out as a contiguous array of RGBA pixels.
+            </param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseCursor.Shape">
+            <summary>
+                Gets the shape for standard preset cursors.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseCursor.X">
+            <summary>
+            Gets the x-coordinate of the cursor hotspot.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseCursor.Y">
+            <summary>
+            Gets the y-coordinate of the cursor hotspot.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.Input.MouseCursor.StandardShape">
+            <summary>
+                Standard cursor shapes.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseCursor.StandardShape.CustomShape">
+            <summary>
+                Default standard shape for user-created cursors.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.Input.MouseState">
+            <summary>
+            Encapsulates the state of a mouse device.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.Input.MouseState.MaxButtons">
+            <summary>
+            The maximal number of buttons a <see cref="T:OpenTK.Windowing.Common.Input.MouseState"/> can represent.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseState.Position">
+            <summary>
+            Gets or sets or a <see cref="T:OpenTK.Mathematics.Vector2"/> representing the absolute position of the pointer,
+            relative to the top-left corner of the contents of the window.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseState.Item(OpenTK.Windowing.Common.Input.MouseButton)">
+            <summary>
+            Gets a <see cref="T:System.Boolean" /> indicating whether the specified
+             <see cref="T:OpenTK.Windowing.Common.Input.MouseButton" /> is pressed.
+            </summary>
+            <param name="button">The <see cref="T:OpenTK.Windowing.Common.Input.MouseButton" /> to check.</param>
+            <returns><c>true</c> if key is pressed; <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.MouseState.IsButtonDown(OpenTK.Windowing.Common.Input.MouseButton)">
+            <summary>
+            Gets a <see cref="T:System.Boolean" /> indicating whether this button is down.
+            </summary>
+            <param name="button">The <see cref="T:OpenTK.Windowing.Common.Input.MouseButton" /> to check.</param>
+            <returns><c>true</c> if the <paramref name="button"/> is down, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.MouseState.IsButtonUp(OpenTK.Windowing.Common.Input.MouseButton)">
+            <summary>
+            Gets a <see cref="T:System.Boolean" /> indicating whether this button is up.
+            </summary>
+            <param name="button">The <see cref="T:OpenTK.Windowing.Common.Input.MouseButton" /> to check.</param>
+            <returns><c>true</c> if the <paramref name="button"/> is up, otherwise <c>false</c>.</returns>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseState.X">
+            <summary>
+            Gets an integer representing the absolute x position of the pointer, in window pixel coordinates.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseState.Y">
+            <summary>
+            Gets an integer representing the absolute y position of the pointer, in window pixel coordinates.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.MouseState.IsAnyButtonDown">
+            <summary>
+            Gets a value indicating whether any button is down.
+            </summary>
+            <value><c>true</c> if any button is down; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.MouseState.op_Equality(OpenTK.Windowing.Common.Input.MouseState,OpenTK.Windowing.Common.Input.MouseState)">
+            <summary>
+            Checks whether two <see cref="T:OpenTK.Windowing.Common.Input.MouseState" /> instances are equal.
+            </summary>
+            <param name="left">
+            The first <see cref="T:OpenTK.Windowing.Common.Input.MouseState" /> instance to compare.
+            </param>
+            <param name="right">
+            The second <see cref="T:OpenTK.Windowing.Common.Input.MouseState" /> instance to compare.
+            </param>
+            <returns>
+            True if both left is equal to right; false otherwise.
+            </returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.MouseState.op_Inequality(OpenTK.Windowing.Common.Input.MouseState,OpenTK.Windowing.Common.Input.MouseState)">
+            <summary>
+            Checks whether two <see cref="T:OpenTK.Windowing.Common.Input.MouseState" /> instances are not equal.
+            </summary>
+            <param name="left">
+            The first <see cref="T:OpenTK.Windowing.Common.Input.MouseState" /> instance to compare.
+            </param>
+            <param name="right">
+            The second <see cref="T:OpenTK.Windowing.Common.Input.MouseState" /> instance to compare.
+            </param>
+            <returns>
+            True if both left is not equal to right; false otherwise.
+            </returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.MouseState.Equals(System.Object)">
+            <summary>
+            Compares to an object instance for equality.
+            </summary>
+            <param name="obj">
+            The <see cref="T:System.Object" /> to compare to.
+            </param>
+            <returns>
+            True if this instance is equal to obj; false otherwise.
+            </returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.MouseState.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.MouseState.ToString">
+            <summary>
+            Returns a <see cref="T:System.String" /> that represents the current <see cref="T:OpenTK.Windowing.Common.Input.MouseState" />.
+            </summary>
+            <returns>A <see cref="T:System.String" /> that represents the current <see cref="T:OpenTK.Windowing.Common.Input.MouseState" />.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.MouseState.ReadBit(System.Int32)">
+            <summary>
+            Gets whether a single button is pressed using an offset corresponding to a <see cref="T:OpenTK.Windowing.Common.Input.MouseButton"/>.
+            </summary>
+            <param name="offset">The offset corresponding to a <see cref="T:OpenTK.Windowing.Common.Input.MouseButton"/>.</param>
+            <returns>
+            <c>true</c> when the button given by <paramref name="offset"/> is pressed; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.MouseState.EnableBit(System.Int32)">
+            <summary>
+            Enables a single button using an offset corresponding to a <see cref="T:OpenTK.Windowing.Common.Input.MouseButton"/>.
+            </summary>
+            <param name="offset">The offset corresponding to a <see cref="T:OpenTK.Windowing.Common.Input.MouseButton"/>.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.MouseState.DisableBit(System.Int32)">
+            <summary>
+            Disables a single button using an offset corresponding to a <see cref="T:OpenTK.Windowing.Common.Input.MouseButton"/>.
+            </summary>
+            <param name="offset">The offset corresponding to a <see cref="T:OpenTK.Windowing.Common.Input.MouseButton"/>.</param>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.MouseState.Equals(OpenTK.Windowing.Common.Input.MouseState)">
+            <summary>
+            Compares two MouseState instances.
+            </summary>
+            <param name="other">The instance to compare two.</param>
+            <returns>True, if both instances are equal; false otherwise.</returns>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.Input.WindowIcon">
+            <summary>
+            Stores an array of <see cref="T:OpenTK.Windowing.Common.Input.Image" />s, meant for use as window icons.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.WindowIcon.#ctor(OpenTK.Windowing.Common.Input.Image[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.Input.WindowIcon" /> class.
+            </summary>
+            <param name="images">An array of <see cref="T:OpenTK.Windowing.Common.Input.Image" />s, which will be used as the window icons.</param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Input.WindowIcon.Images">
+            <summary>
+            Gets or sets the array of <see cref="T:OpenTK.Windowing.Common.Input.Image" />s to use.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Input.WindowIcon.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.Input.WindowIcon" /> class.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.IGameWindow">
+            <summary>
+            Defines the interface for a GameWindow.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.IGameWindow.Run">
+            <summary>
+            Initialize the update thread (if using a multi-threaded contex, and enter the game loop of the GameWindow.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.IGameWindow.SwapBuffers">
+            <summary>
+            Swaps the front and back buffers of the current GraphicsContext, presenting the rendered scene to the user.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.IGameWindow.RenderTime">
+            <summary>
+            Gets a double representing the time spent in the RenderFrame function, in seconds.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.IGameWindow.VSync">
+            <summary>
+            Gets or sets the VSyncMode.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.IGameWindow.IsMultiThreaded">
+            <summary>
+            Gets a value indicating whether or not the GameWindow should use a separate thread for rendering.
+            </summary>
+            <remarks>
+              <para>
+                If this is true, render frames will be processed in a separate thread.
+                Do not enable this unless your code is thread safe.
+              </para>
+            </remarks>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.IGameWindow.RenderFrequency">
+            <summary>
+            Gets or sets a double representing the render frequency, in hertz.
+            </summary>
+            <remarks>
+             <para>
+            A value of 0.0 indicates that RenderFrame events are generated at the maximum possible frequency (i.e. only
+            limited by the hardware's capabilities).
+             </para>
+             <para>Values lower than 1.0Hz are clamped to 0.0. Values higher than 500.0Hz are clamped to 200.0Hz.</para>
+            </remarks>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.IGameWindow.UpdateFrequency">
+            <summary>
+            Gets or sets a double representing the update frequency, in hertz.
+            </summary>
+            <remarks>
+             <para>
+            A value of 0.0 indicates that UpdateFrame events are generated at the maximum possible frequency (i.e. only
+            limited by the hardware's capabilities).
+             </para>
+             <para>Values lower than 1.0Hz are clamped to 0.0. Values higher than 500.0Hz are clamped to 500.0Hz.</para>
+            </remarks>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.IGameWindow.RenderThreadStarted">
+            <summary>
+            If game window is configured to run with a dedicated update thread (by passing isSingleThreaded = false in the
+            constructor),
+            occurs when the update thread has started. This would be a good place to initialize thread specific stuff (like
+            setting a synchronization context).
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.IGameWindow.Load">
+            <summary>
+            Occurs before the window is displayed for the first time.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.IGameWindow.Unload">
+            <summary>
+            Occurs before the window is destroyed.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.IGameWindow.UpdateFrame">
+            <summary>
+            Occurs when it is time to update a frame.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.IGameWindow.RenderFrame">
+            <summary>
+            Occurs when it is time to render a frame.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.IGraphicsContext">
+            <summary>
+            Defines the interface for OpenGL context management.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.IGraphicsContext.IsCurrent">
+            <summary>
+            Gets a value indicating whether the context is the current active on of the current thread.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.IGraphicsContext.NativeContex">
+            <summary>
+            Gets a handle or pointer that represents the opengl context in the API used to create it.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.IGraphicsContext.SwapBuffers">
+            <summary>
+            Swaps the front and back buffers of the current GraphicsContext, presenting the rendered scene to the user.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.IGraphicsContext.MakeCurrent">
+            <summary>
+            Makes the GraphicsContext current on the calling thread.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.IGraphicsContext.MakeNoneCurrent">
+            <summary>
+            Makes no GraphicsContext current one on the calling thread.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.INativeWindow">
+            <summary>
+            Defines the interface for a NativeWindow.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.IsExiting">
+            <summary>
+            Gets a value indicating whether the shutdown sequence has been initiated
+            for this window, by calling GameWindow.Exit() or hitting the 'close' button.
+            If this property is true, it is no longer safe to use any OpenTK.Input or
+            OpenTK.Graphics.OpenGL functions or properties.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.ClipboardString">
+            <summary>
+            Gets or sets the clipboard string.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.Exists">
+            <summary>
+            Gets a value indicating whether the window has been created and has not been destroyed.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.Icon">
+            <summary>
+            Gets or sets the current <see cref="T:OpenTK.Windowing.Common.Input.WindowIcon" /> for this window.
+            </summary>
+            <remarks>
+            <para>
+            This does nothing on macOS; on that platform, the icon is determined by the application bundle.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.IsEventDriven">
+            <summary>
+            Gets or sets a value indicating whether or not this window is event-driven.
+            An event-driven window will wait for events before updating/rendering. It is useful for non-game applications,
+            where the program only needs to do any processing after the user inputs something.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.CurrentMonitor">
+            <summary>
+            Gets or sets the current monitor.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.API">
+            <summary>
+            Gets a value representing the current graphics API.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.Profile">
+            <summary>
+            Gets a value representing the current graphics API profile.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.Flags">
+            <summary>
+            Gets a value representing the current graphics profile flags.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.APIVersion">
+            <summary>
+            Gets a value representing the current version of the graphics API.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.Context">
+            <summary>
+            Gets the graphics context associated with this NativeWindow.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.Title">
+            <summary>
+            Gets or sets the title of the window.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.IsFocused">
+            <summary>
+            Gets or sets a value indicating whether this window has input focus.
+            </summary>
+            <remarks>
+            A window cannot be manually unfocused by setting this to false.
+            </remarks>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.IsVisible">
+            <summary>
+            Gets or sets a value indicating whether the window is visible.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.WindowState">
+            <summary>
+            Gets or sets the <see cref="P:OpenTK.Windowing.Common.INativeWindow.WindowState" /> for this window.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.WindowBorder">
+            <summary>
+            Gets or sets the <see cref="P:OpenTK.Windowing.Common.INativeWindow.WindowBorder" /> for this window.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.Bounds">
+            <summary>
+            Gets or sets a <see cref="T:OpenTK.Mathematics.Box2i" /> structure the contains the external bounds of this window,
+            in screen coordinates.
+            External bounds include the title bar, borders and drawing area of the window.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.Location">
+            <summary>
+            Gets or sets a <see cref="T:OpenTK.Mathematics.Vector2i" /> structure that contains the location of this window on the
+            desktop.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.Size">
+            <summary>
+            Gets or sets a <see cref="T:OpenTK.Mathematics.Vector2i" /> structure that contains the external size of this window.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.ClientRectangle">
+            <summary>
+            Gets or sets a <see cref="T:OpenTK.Mathematics.Box2i" /> structure that contains the internal bounds of this window,
+            in client coordinates.
+            The internal bounds include the drawing area of the window, but exclude the titlebar and window borders.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.ClientSize">
+            <summary>
+            Gets a <see cref="T:OpenTK.Mathematics.Vector2i" /> structure that contains the internal size this window.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.IsFullscreen">
+            <summary>
+            Gets or sets a value indicating whether the window is fullscreen or not.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.Cursor">
+            <summary>
+            Gets or sets the <see cref="T:OpenTK.Windowing.Common.Input.MouseCursor" /> for this window.
+            </summary>
+            <value>The cursor.</value>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.CursorVisible">
+            <summary>
+            Gets or sets a value indicating whether the mouse cursor is visible.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.CursorGrabbed">
+            <summary>
+            Gets or sets a value indicating whether the mouse cursor is confined inside the window size.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.JoystickStates">
+            <summary>
+            Gets the current state of the joysticks as of the last time the window processed events.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.LastJoystickStates">
+            <summary>
+            Gets the previous joystick state.
+            This value is updated with the new state every time the window processes events.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.KeyboardState">
+            <summary>
+                Gets the current state of the keyboard as of the last time the window processed events.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.LastKeyboardState">
+            <summary>
+                Gets the previous keyboard state.
+                This value is updated with the new state every time the window processes events.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.MousePosition">
+            <summary>
+                Gets or sets the position of the mouse relative to the content area of this window.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.MouseDelta">
+            <summary>
+                Gets the amount that the mouse moved since the last frame.
+            </summary>
+            <summary>
+                This does not necessarily correspond to pixels, for example in the case of raw input.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.MouseState">
+            <summary>
+                Gets the current state of the mouse as of the last time the window processed events.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.LastMouseState">
+            <summary>
+                Gets the previous keyboard state.
+                This value is updated with the new state every time the window processes events.
+            </summary>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.IsAnyKeyDown">
+            <summary>
+            Gets a value indicating whether any key is down.
+            </summary>
+            <value><c>true</c> if any key is down; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.INativeWindow.IsAnyMouseButtonDown">
+            <summary>
+            Gets a value indicating whether any mouse button is pressed.
+            </summary>
+            <value><c>true</c> if any button is pressed; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.Close">
+            <summary>
+            Closes this window.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.ProcessEvents">
+            <summary>
+            Processes pending window events.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.ProcessEvents(System.Double)">
+            <summary>
+            Processes pending window events and waits <paramref cref="!:timeout"/> seconds for events.
+            </summary>
+            <param name="timeout">The timeout in seconds.</param>
+            <returns><c>true</c> if events where processed; otherwise <c>false</c>
+            (Event processing not possible anymore, window is about to be destroyed).</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.MakeCurrent">
+            <summary>
+            Makes the GraphicsContext current on the calling thread.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.PointToClient(OpenTK.Mathematics.Vector2i)">
+            <summary>
+            Transforms the specified point from screen to client coordinates.
+            </summary>
+            <param name="point">
+            A <see cref="T:OpenTK.Mathematics.Vector2" /> to transform.
+            </param>
+            <returns>
+            The point transformed to client coordinates.
+            </returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.PointToScreen(OpenTK.Mathematics.Vector2i)">
+            <summary>
+            Transforms the specified point from client to screen coordinates.
+            </summary>
+            <param name="point">
+            A <see cref="T:OpenTK.Mathematics.Vector2" /> to transform.
+            </param>
+            <returns>
+            The point transformed to screen coordinates.
+            </returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.TryGetCurrentMonitorScale(System.Single@,System.Single@)">
+            <summary>
+            Gets the current monitor scale.
+            </summary>
+            <param name="horizontalScale">Horizontal scale.</param>
+            <param name="verticalScale">Vertical scale.</param>
+            <returns><c>true</c>, if current monitor scale was gotten correctly, <c>false</c> otherwise.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.TryGetCurrentMonitorDpi(System.Single@,System.Single@)">
+            <summary>
+            Gets the dpi of the current monitor.
+            </summary>
+            <param name="horizontalDpi">Horizontal dpi.</param>
+            <param name="verticalDpi">Vertical dpi.</param>
+            <returns><c>true</c>, if current monitor's dpi was gotten correctly, <c>false</c> otherwise.</returns>
+            <remarks>
+            This methods approximates the dpi of the monitor by multiplying
+            the monitor scale recieved from <see cref="M:OpenTK.Windowing.Common.INativeWindow.TryGetCurrentMonitorScale(System.Single@,System.Single@)"/>
+            by each platforms respective default dpi (72 for macOS and 96 for other systems).
+            </remarks>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.TryGetCurrentMonitorDpiRaw(System.Single@,System.Single@)">
+            <summary>
+            Gets the raw dpi of current monitor.
+            </summary>
+            <param name="horizontalDpi">Horizontal dpi.</param>
+            <param name="verticalDpi">Vertical dpi.</param>
+            <returns><c>true</c>, if current monitor's raw dpi was gotten correctly, <c>false</c> otherwise.</returns>
+            <remarks>
+            This method calculates dpi by retrieving monitor dimensions and resolution.
+            However on certain platforms (such as Windows) these values may not
+            be scaled correctly.
+            </remarks>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.IsKeyDown(OpenTK.Windowing.Common.Input.Key)">
+            <summary>
+            Gets a <see cref="T:System.Boolean" /> indicating whether this key is currently down.
+            </summary>
+            <param name="key">The <see cref="T:OpenTK.Windowing.Common.Input.Key" /> to check.</param>
+            <returns><c>true</c> if <paramref name="key"/> is in the down state; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.IsKeyUp(OpenTK.Windowing.Common.Input.Key)">
+            <summary>
+            Gets a <see cref="T:System.Boolean" /> indicating whether this key is currently up.
+            </summary>
+            <param name="key">The <see cref="T:OpenTK.Windowing.Common.Input.Key" /> to check.</param>
+            <returns><c>true</c> if <paramref name="key"/> is in the up state; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.IsKeyPressed(OpenTK.Windowing.Common.Input.Key)">
+            <summary>
+                Gets whether the specified key is pressed in the current frame but released in the previous frame.
+            </summary>
+            <remarks>
+                "Frame" refers to invocations of <see cref="M:OpenTK.Windowing.Common.INativeWindow.ProcessEvents"/> here.
+            </remarks>
+            <param name="key">The key to check.</param>
+            <returns>True if the key is pressed in this frame, but not the last frame.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.IsKeyReleased(OpenTK.Windowing.Common.Input.Key)">
+            <summary>
+                Gets whether the specified key is released in the current frame but pressed in the previous frame.
+            </summary>
+            <remarks>
+                "Frame" refers to invocations of <see cref="M:OpenTK.Windowing.Common.INativeWindow.ProcessEvents"/> here.
+            </remarks>
+            <param name="key">The key to check.</param>
+            <returns>True if the key is released in this frame, but pressed the last frame.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.IsMouseButtonDown(OpenTK.Windowing.Common.Input.MouseButton)">
+            <summary>
+            Gets a <see cref="T:System.Boolean" /> indicating whether this button is currently down.
+            </summary>
+            <param name="button">The <see cref="T:OpenTK.Windowing.Common.Input.MouseButton" /> to check.</param>
+            <returns><c>true</c> if <paramref name="button"/> is in the down state; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.IsMouseButtonUp(OpenTK.Windowing.Common.Input.MouseButton)">
+            <summary>
+            Gets a <see cref="T:System.Boolean" /> indicating whether this mouse button is currently up.
+            </summary>
+            <param name="button">The <see cref="T:OpenTK.Windowing.Common.Input.MouseButton" /> to check.</param>
+            <returns><c>true</c> if <paramref name="button"/> is in the up state; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.IsMouseButtonPressed(OpenTK.Windowing.Common.Input.MouseButton)">
+            <summary>
+                Gets whether the specified mouse button is pressed in the current frame but released in the previous frame.
+            </summary>
+            <remarks>
+                "Frame" refers to invocations of <see cref="M:OpenTK.Windowing.Common.INativeWindow.ProcessEvents"/> here.
+            </remarks>
+            <param name="button">The button to check.</param>
+            <returns>True if the button is pressed in this frame, but not the last frame.</returns>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.INativeWindow.IsMouseButtonReleased(OpenTK.Windowing.Common.Input.MouseButton)">
+            <summary>
+                Gets whether the specified mouse button is released in the current frame but pressed in the previous frame.
+            </summary>
+            <remarks>
+                "Frame" refers to invocations of <see cref="M:OpenTK.Windowing.Common.INativeWindow.ProcessEvents"/> here.
+            </remarks>
+            <param name="button">The button to check.</param>
+            <returns>True if the button is released in this frame, but pressed the last frame.</returns>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.Move">
+            <summary>
+            Occurs whenever the window is moved.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.Resize">
+            <summary>
+            Occurs whenever the window is resized.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.Refresh">
+            <summary>
+            Occurs whenever the window is refreshed.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.Closing">
+            <summary>
+            Occurs when the window is about to close.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.Closed">
+            <summary>
+            Occurs after the window has closed.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.Minimized">
+            <summary>
+            Occurs when the window is minimized.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.JoystickConnected">
+            <summary>
+            Occurs when a joystick is connected or disconnected.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.FocusedChanged">
+            <summary>
+            Occurs when the <see cref="!:INativeWindowProperties.IsFocused" /> property of the window changes.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.KeyDown">
+            <summary>
+            Occurs whenever a keyboard key is pressed.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.TextInput">
+            <summary>
+            Occurs whenever a Unicode code point is typed.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.KeyUp">
+            <summary>
+            Occurs whenever a keyboard key is released.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.MonitorConnected">
+            <summary>
+            Occurs when a <see cref="T:OpenTK.Windowing.Common.Monitor"/> is connected or disconnected.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.MouseLeave">
+            <summary>
+            Occurs whenever the mouse cursor leaves the window <see cref="!:INativeWindowProperties.Bounds" />.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.MouseEnter">
+            <summary>
+            Occurs whenever the mouse cursor enters the window <see cref="!:INativeWindowProperties.Bounds" />.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.MouseDown">
+            <summary>
+            Occurs whenever a <see cref="T:OpenTK.Windowing.Common.Input.MouseButton" /> is clicked.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.MouseUp">
+            <summary>
+            Occurs whenever a <see cref="T:OpenTK.Windowing.Common.Input.MouseButton" /> is released.
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.MouseMove">
+            <summary>
+            Occurs whenever the mouse cursor is moved;
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.MouseWheel">
+            <summary>
+            Occurs whenever a mouse wheel is moved;
+            </summary>
+        </member>
+        <member name="E:OpenTK.Windowing.Common.INativeWindow.FileDrop">
+            <summary>
+            Occurs whenever one or more files are dropped on the window.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.Monitor">
+            <summary>
+            Wrapper around an implementation-defined monitor struct.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Monitor.#ctor(System.IntPtr)">
+            <summary>
+            Initializes a new instance of the <see cref="T:OpenTK.Windowing.Common.Monitor"/> struct.
+            </summary>
+            <param name="ptr">A pointer to the underlying native Monitor.</param>
+        </member>
+        <member name="P:OpenTK.Windowing.Common.Monitor.Pointer">
+            <summary>
+            Gets a pointer to the underlying native Monitor.
+            </summary>
+        </member>
+        <member name="M:OpenTK.Windowing.Common.Monitor.ToUnsafePtr``1">
+            <summary>
+            Converts the underlying <see cref="P:OpenTK.Windowing.Common.Monitor.Pointer"/> to a unmanaged pointer.
+            </summary>
+            <typeparam name="T">The type of the object found at the <see cref="P:OpenTK.Windowing.Common.Monitor.Pointer"/> memory address.</typeparam>
+            <returns>A unmanaged pointer to the underlying native Monitor.</returns>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.VSyncMode">
+            <summary>
+            Enumerates available VSync modes.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.VSyncMode.Off">
+            <summary>
+            Vsync disabled.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.VSyncMode.On">
+            <summary>
+            VSync enabled.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.VSyncMode.Adaptive">
+            <summary>
+            VSync enabled, unless framerate falls below one half of target framerate.
+            If no target framerate is specified, this behaves exactly like <see cref="F:OpenTK.Windowing.Common.VSyncMode.On" />.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.WindowBorder">
+            <summary>
+            Enumerates available window borders.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.WindowBorder.Resizable">
+            <summary>
+            The window has a resizable border. A window with a resizable border can be resized by the user or programmatically.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.WindowBorder.Fixed">
+            <summary>
+            The window has a fixed border. A window with a fixed border can only be resized programmatically.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.WindowBorder.Hidden">
+            <summary>
+            The window does not have a border. A window with a hidden border can only be resized programmatically.
+            </summary>
+        </member>
+        <member name="T:OpenTK.Windowing.Common.WindowState">
+            <summary>
+            Enumerates available window states.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.WindowState.Normal">
+            <summary>
+            The window is in its normal state.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.WindowState.Minimized">
+            <summary>
+            The window is minimized to the taskbar (also known as 'iconified').
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.WindowState.Maximized">
+            <summary>
+            The window covers the whole working area, which includes the desktop but not the taskbar and/or panels.
+            </summary>
+        </member>
+        <member name="F:OpenTK.Windowing.Common.WindowState.Fullscreen">
+            <summary>
+            The window covers the whole screen, including all taskbars and/or panels.
+            </summary>
+        </member>
+    </members>
+</doc>
