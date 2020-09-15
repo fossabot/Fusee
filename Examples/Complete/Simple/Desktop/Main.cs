@@ -12,7 +12,7 @@ namespace Fusee.Examples.Simple.Desktop
 
             var isInit = Lib.IsAppInitialized();
 
-            while(!isInit)
+            while (!isInit)
                 isInit = Lib.IsAppInitialized();
 
             Thread.Sleep(2000);
