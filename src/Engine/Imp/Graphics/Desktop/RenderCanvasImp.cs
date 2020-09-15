@@ -12,6 +12,7 @@ using Fusee.Engine.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 namespace Fusee.Engine.Imp.Graphics.Desktop
 {
@@ -337,6 +338,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         private bool _windowBorderHidden = false;
 
         /// <summary>
+        /// Window handle for the window the engine renders to.
+        /// </summary>
+        public IWindowHandle WindowHandle { get; }
+
+        /// <summary>
         /// Implementation Tasks: Gets and sets the width(pixel units) of the Canvas.
         /// </summary>
         /// <value>
@@ -497,21 +503,22 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <param name="appIcon">The icon for the render window.</param>
         public RenderCanvasImp(Icon appIcon)
         {
-            const int width = 1280;
-            var height = 720;
-
             try
             {
-                _gameWindow = new RenderCanvasGameWindow(this, width, height, false);
+                _gameWindow = new RenderCanvasGameWindow(this, false);
             }
             catch
             {
-                _gameWindow = new RenderCanvasGameWindow(this, width, height, false);
+                _gameWindow = new RenderCanvasGameWindow(this, false);
             }
             if (appIcon != null)
                 _gameWindow.Icon = new WindowIcon(new OpenTK.Windowing.Common.Input.Image(appIcon.Width, appIcon.Height, SwapColors(appIcon.ToBitmap(), ChangeColors.SwapBlueAndRed)));
 
-            _gameWindow.Size = new Vector2i(width, height);
+            WindowHandle = new WindowHandle()
+            {
+                Handle = _gameWindow.Handle
+            };
+
         }
 
         #region Swap Icon colors
@@ -676,11 +683,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             {
                 _gameWindow = new RenderCanvasGameWindow(this, width, height, false);
             }
-            //_gameWindow.Visible = false;
             _gameWindow.MakeCurrent();
-
             _gameWindow.Size = new Vector2i(0, 0);
-
         }
 
         /// <summary>
@@ -700,8 +704,6 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             if (!_videoWallMode)
             {
                 _gameWindow.WindowBorder = _windowBorderHidden ? WindowBorder.Hidden : WindowBorder.Resizable;
-                //_gameWindow.Bounds = new System.Drawing.Rectangle(BaseLeft, BaseTop, BaseWidth, BaseHeight);
-
                 _gameWindow.Bounds = new Box2i(BaseLeft, BaseTop - BaseHeight, BaseLeft + BaseWidth, BaseTop);
             }
             else
@@ -751,8 +753,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             BaseWidth = width;
             BaseHeight = height;
 
-            //BaseLeft = (posx == -1) ? DisplayDevice.Default.Bounds.Width / 2 - width / 2 : posx;
-            //BaseTop = (posy == -1) ? DisplayDevice.Default.Bounds.Height / 2 - height / 2 : posy;
+            //BaseLeft = (posx == -1) ? (int)_gameWindow.DisplayDeviceResolution.X / 2 - width / 2 : posx;
+            //BaseTop = (posy == -1) ? (int)_gameWindow.DisplayDeviceResolution.Y / 2 - height / 2 : posy;
 
             BaseLeft = (posx == -1) ? 0 : posx;
             BaseTop = (posy == -1) ? 0 : posy;
@@ -771,7 +773,10 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         public void CloseGameWindow()
         {
             if (_gameWindow != null)
+            {
                 _gameWindow.Close();
+                _gameWindow.Dispose();
+            }
         }
 
         /// <summary>
@@ -900,8 +905,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </summary>
         internal protected void DoInit()
         {
-            if (Init != null)
-                Init(this, new InitEventArgs());
+            Init?.Invoke(this, new InitEventArgs());
         }
 
         /// <summary>
@@ -909,8 +913,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </summary>
         internal protected void DoUnLoad()
         {
-            if (UnLoad != null)
-                UnLoad(this, new InitEventArgs());
+            UnLoad?.Invoke(this, new InitEventArgs());
         }
 
         /// <summary>
@@ -977,18 +980,58 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         {
             get
             {
-                IntPtr handle;
+                IntPtr hwnd;
                 unsafe
                 {
-                    handle = (IntPtr)WindowPtr;
+                    hwnd = GLFW.GlfwGetWin32Window(WindowPtr);
                 }
-                return handle;
+                return hwnd;
+            }
+        }
+
+        public Vector2 DisplayDeviceResolution
+        {
+            get
+            {
+                Vector2 res;
+                unsafe
+                {
+                    var monitor = CurrentMonitor.ToUnsafePtr<OpenTK.Windowing.GraphicsLibraryFramework.Monitor>();
+                    var videoMode = *GLFW.GetVideoMode(monitor);
+                    res = new Vector2(videoMode.Width, videoMode.Height);
+                }
+                return res;
             }
         }
 
         #endregion
 
         #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RenderCanvasGameWindow"/> class.
+        /// </summary>
+        /// <param name="renderCanvasImp">The render canvas implementation.</param>
+        /// <param name="antiAliasing">if set to <c>true</c> [anti aliasing] is on.</param>
+        public RenderCanvasGameWindow(RenderCanvasImp renderCanvasImp, bool antiAliasing)
+            : base(GameWindowSettings.Default, new NativeWindowSettings()
+            {
+                Title = "Fusee Engine",
+                APIVersion = new Version(4, 2),
+                API = ContextAPI.OpenGL
+            })
+        {
+            MakeCurrent(); //Needed with OpenTK 4.0 prev 9.2 and above. See https://github.com/opentk/opentk/issues/1118
+            GL.LoadBindings(new GLFWBindingsContext());
+
+            _renderCanvasImp = renderCanvasImp;
+
+            Size = new Vector2i(((int)DisplayDeviceResolution.X) / 2, ((int)DisplayDeviceResolution.Y) / 2);
+
+            _renderCanvasImp.BaseWidth = Size.X;
+            _renderCanvasImp.BaseHeight = Size.Y;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderCanvasGameWindow"/> class.
         /// </summary>
@@ -1001,7 +1044,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             {
                 Size = new Vector2i(width, height),
                 Title = "Fusee Engine",
-                APIVersion = new Version(4, 2)
+                APIVersion = new Version(4, 2),
+                API = ContextAPI.OpenGL
             })
         {
             MakeCurrent(); //Needed with OpenTK 4.0 prev 9.2 and above. See https://github.com/opentk/opentk/issues/1118
@@ -1019,9 +1063,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         protected override void OnLoad()
         {
             // Check for necessary capabilities
-            var version = GL.GetString(StringName.Version).Split("."); //TODO: OpenTK4.0 - should be accessable via OpenTK.GameWindow.APIVersion which doesn't seem to be setup correctly at the moment.
-            int.TryParse(version[0], out int major);
-            if (major < 2)
+            if (APIVersion.Major < 2)
                 throw new InvalidOperationException("You need at least OpenGL 2.0 to run this example. GLSL not supported.");
 
             GL.ClearColor(Color.MidnightBlue);
@@ -1049,30 +1091,32 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 _renderCanvasImp.BaseHeight = e.Height;
                 _renderCanvasImp.DoResize(e.Width, e.Height);
             }
-
-            /*
-            GL.Viewport(0, 0, Width, Height);
-
-            float aspect_ratio = Width / (float)Height;
-            Matrix4 perspective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspect_ratio, 1, 64);
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref perspective);
-             * */
+            else
+                throw new NullReferenceException("_randerCanvasImp is not initialized!");
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            //if (Keyboard[OpenTK.Input.Key.Escape])
-            //this.Exit();
+            //TODO: OpenTK4.0 - esc will lead to NullReference on Input properties
+            //if (KeyboardState[Key.Escape])
+            //{
+            //    Close();
+            //    Dispose();
+            //}
 
-
-            //if (OpenTK.Input.Keyboard.GetState()[OpenTK.Input.Key.F11])
             if (KeyboardState[Key.F11])
                 WindowState = (WindowState != WindowState.Fullscreen) ? WindowState.Fullscreen : WindowState.Normal;
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
+            if (KeyboardState[Key.Escape])
+            {
+                Close();
+                Dispose();
+                return;
+            }
+
             DeltaTime = (float)e.Time;
 
             if (_renderCanvasImp != null)

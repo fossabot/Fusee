@@ -9,7 +9,6 @@ using Fusee.Math.Core;
 using Fusee.Xene;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using static Fusee.Engine.Core.Input;
 using static Fusee.Engine.Core.Time;
 
@@ -19,6 +18,11 @@ namespace Fusee.Examples.Simple.Core
     public class Simple : RenderCanvas
     {
         public bool IsInitialized = false;
+
+        public bool IsRenderPauseRequested = false;
+        public bool IsClosingRequested = false;
+
+        public IWindowHandle WindowHandle;
 
         // angle variables
         private static float _angleHorz = M.PiOver3, _angleVert = -M.PiOver6 * 0.5f, _angleVelHorz, _angleVelVert;
@@ -67,6 +71,9 @@ namespace Fusee.Examples.Simple.Core
             // Clear the backbuffer
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
 
+            if (IsRenderPauseRequested)
+                return;
+
             RC.Viewport(0, 0, Width, Height);
 
             // Mouse and keyboard movement
@@ -87,6 +94,11 @@ namespace Fusee.Examples.Simple.Core
                 var touchVel = Touch.GetVelocity(TouchPoints.Touchpoint_0);
                 _angleVelHorz = -RotationSpeed * touchVel.x * DeltaTime * 0.0005f;
                 _angleVelVert = -RotationSpeed * touchVel.y * DeltaTime * 0.0005f;
+            }
+            else if (SpaceMouse.IsConnected && SpaceMouse.Rotation.y != 0 || SpaceMouse.IsConnected && SpaceMouse.Rotation.x != 0)
+            {
+                _angleVelHorz = -RotationSpeed * SpaceMouse.Rotation.y * DeltaTime * 0.0005f;
+                _angleVelVert = RotationSpeed * SpaceMouse.Rotation.x * DeltaTime * 0.0005f;
             }
             else
             {
@@ -133,6 +145,9 @@ namespace Fusee.Examples.Simple.Core
 
             // Swap buffers: Show the contents of the backbuffer (containing the currently rendered frame) on the front buffer.
             Present();
+
+            if (IsClosingRequested)
+                CloseGameWindow();
         }
 
         private SceneContainer CreateGui()

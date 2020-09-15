@@ -20,6 +20,11 @@ namespace Fusee.Engine.Imp.Graphics.Android
         #region Fields
 
         /// <summary>
+        /// Window handle for the window the engine renders to.
+        /// </summary>
+        public IWindowHandle WindowHandle { get; }
+
+        /// <summary>
         /// Implementation Tasks: Gets and sets the width(pixel units) of the Canvas.
         /// </summary>
         /// <value>
@@ -171,6 +176,7 @@ namespace Fusee.Engine.Imp.Graphics.Android
         public RenderCanvasImp(Context context, IAttributeSet attrs, Action run)
         {
             _gameView = new RenderCanvasGameView(this, true, context, attrs, run);
+            WindowHandle = new WindowHandle() { WinId = _gameView.WindowId };
         }
 
         /// <summary>
@@ -326,7 +332,7 @@ namespace Fusee.Engine.Imp.Graphics.Android
         #endregion Internal Members
     }
 
-    public class RenderCanvasGameView : AndroidGameView
+    internal class RenderCanvasGameView : AndroidGameView
     {
         #region Fields
 
