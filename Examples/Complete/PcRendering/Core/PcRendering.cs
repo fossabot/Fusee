@@ -31,6 +31,8 @@ namespace Fusee.Examples.PcRendering.Core
         public bool ReadyToLoadNewFile { get; private set; }
         public bool IsInitialized { get; private set; } = false;
         public bool IsAlive { get; private set; }
+        public bool IsRenderPauseRequested { get; set; }
+        public bool IsClosingRequested { get; set; }
 
         // angle variables
         private static float _angleHorz = 0, _angleVert = 0, _angleVelHorz, _angleVelVert, _angleRoll, _angleRollInit;
@@ -138,6 +140,9 @@ namespace Fusee.Examples.PcRendering.Core
 
             // Clear the backbuffer
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
+
+            if (IsRenderPauseRequested)
+                return;
 
             if (IsSceneLoaded)
             {
@@ -261,6 +266,9 @@ namespace Fusee.Examples.PcRendering.Core
             Present();
 
             ReadyToLoadNewFile = true;
+
+            if (IsClosingRequested)
+                CloseGameWindow();
         }
 
         // Is called when the window was resized
@@ -337,8 +345,8 @@ namespace Fusee.Examples.PcRendering.Core
             var root = OocFileReader.GetScene(ShaderCodeBuilder.Default/*PtRenderingParams.DepthPassEf*/);
 
             var ptOctantComp = root.GetComponent<Octant>();
-            InitCameraPos = _camTransform.Translation = new float3((float)ptOctantComp.Octant.Center.x, (float)ptOctantComp.Octant.Center.y, (float)(ptOctantComp.Octant.Center.z - (ptOctantComp.Octant.Size * 2f)));
-
+            InitCameraPos = _camTransform.Translation = new float3((float)ptOctantComp.PayloadOctant.Center.x, (float)ptOctantComp.PayloadOctant.Center.y, (float)(ptOctantComp.PayloadOctant.Center.z - (ptOctantComp.PayloadOctant.Size)));
+            
             _scene.Children.Add(root);
 
             OocLoader.RootNode = root;
@@ -352,8 +360,8 @@ namespace Fusee.Examples.PcRendering.Core
             octreeTexImgData.PixelData = new byte[byteSize];
 
             var ptRootComponent = root.GetComponent<Octant>();
-            _octreeRootCenter = ptRootComponent.Octant.Center;
-            _octreeRootLength = ptRootComponent.Octant.Size;
+            _octreeRootCenter = ptRootComponent.PayloadOctant.Center;
+            _octreeRootLength = ptRootComponent.PayloadOctant.Size;
 
             PtRenderingParams.DepthPassEf = PtRenderingParams.CreateDepthPassEffect(new float2(Width, Height), InitCameraPos.z, _octreeTex, _octreeRootCenter, _octreeRootLength);
             PtRenderingParams.ColorPassEf = PtRenderingParams.CreateColorPassEffect(new float2(Width, Height), InitCameraPos.z, new float2(ZNear, ZFar), _depthTex, _octreeTex, _octreeRootCenter, _octreeRootLength);

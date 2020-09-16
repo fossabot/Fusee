@@ -1450,7 +1450,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                         GL.Enable(EnableCap.PointSprite);
                         GL.Enable(EnableCap.VertexProgramPointSize);
                     }
-                    GL.DrawElements(BeginMode.Triangles, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, AttributeLocations.VertexAttribLocation);
+                    GL.DrawElements(BeginMode.Points, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, AttributeLocations.VertexAttribLocation);
                     break;
                 case OpenGLPrimitiveType.Lines:
                     if (!_isLineSmoothEnabled)

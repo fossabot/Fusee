@@ -11,7 +11,7 @@ namespace Fusee.Examples.PcRendering.Core
     {
         public static ConcurrentDictionary<string, object> ShaderParamsToUpdate = new ConcurrentDictionary<string, object>();
         public static int MaxNoOfVisiblePoints = 500000;
-        public static string PathToOocFile = "C://Users//sbuse//Desktop//Fraunhofer//MultiVis//Punktwolken//HolbeinPferdOctree";
+        public static string PathToOocFile = "C://Users//busert//Desktop//Baugrube8m";
 
         public static ShaderEffect DepthPassEf;
         public static ShaderEffect ColorPassEf;
@@ -49,7 +49,7 @@ namespace Fusee.Examples.PcRendering.Core
             }
         }
 
-        private static ColorMode _colorMode = ColorMode.Single;
+        private static ColorMode _colorMode = ColorMode.Point;
         public static ColorMode ColorMode
         {
             get { return _colorMode; }
@@ -60,7 +60,7 @@ namespace Fusee.Examples.PcRendering.Core
             }
         }
 
-        private static int _size = 10;
+        private static int _size = 1;
         public static int Size
         {
             get { return _size; }

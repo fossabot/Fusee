@@ -12,6 +12,16 @@ namespace Fusee.Pointcloud.Common
     public interface IPcRendering
     {
         /// <summary>
+        /// Needed to pause the rendering when the fus window isn't in focus.
+        /// </summary>
+        bool IsRenderPauseRequested { get; set; }
+
+        /// <summary>
+        /// Needed to close the fus thread and the game window.
+        /// </summary>
+        bool IsClosingRequested { get; set; }
+
+        /// <summary>
         /// Needed when using UI / WPF. Set to false on DeInit().
         /// </summary>
         bool IsAlive { get;}
