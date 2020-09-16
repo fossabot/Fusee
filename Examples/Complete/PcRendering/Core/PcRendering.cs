@@ -346,7 +346,7 @@ namespace Fusee.Examples.PcRendering.Core
 
             var ptOctantComp = root.GetComponent<Octant>();
             InitCameraPos = _camTransform.Translation = new float3((float)ptOctantComp.PayloadOctant.Center.x, (float)ptOctantComp.PayloadOctant.Center.y, (float)(ptOctantComp.PayloadOctant.Center.z - (ptOctantComp.PayloadOctant.Size)));
-            
+
             _scene.Children.Add(root);
 
             OocLoader.RootNode = root;

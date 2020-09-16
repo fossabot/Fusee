@@ -796,10 +796,10 @@ namespace Fusee.Test.Serialization.V1
                                PosInParent = 5,
                                Size = 20,
                            },
-                           Guid = new Guid(1, 2, 3, new byte[] { 4, 4, 4, 4, 4, 4, 4, 4 }),                           
+                           Guid = new Guid(1, 2, 3, new byte[] { 4, 4, 4, 4, 4, 4, 4, 4 }),
                            Name = "MyOctant",
                            NumberOfPointsInNode = 2,
-                           PosInHierarchyTex = 0,                           
+                           PosInHierarchyTex = 0,
                            VisibleChildIndices = 1,
                            WasLoaded = true
                        },
