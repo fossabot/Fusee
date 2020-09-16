@@ -461,17 +461,23 @@ namespace Fusee.Engine.Core
             if (_currentNode.Components == null)
                 _currentNode.Components = new List<SceneComponent>();
 
-            _currentNode.AddComponent(new Octant
+            _currentNode.AddComponent(
+            new Octant()
             {
-                Center = cc.Center,
+                PayloadOctant = new OctantD
+                {
+                    Center = cc.Center,
+
+                    IsLeaf = cc.IsLeaf,
+                    Level = cc.Level,
+                    PosInParent = cc.PosInParent,
+                    Size = cc.Size,
+
+                },
                 Guid = cc.Guid,
-                IsLeaf = cc.IsLeaf,
-                Level = cc.Level,
                 Name = cc.Name,
                 NumberOfPointsInNode = cc.NumberOfPointsInNode,
                 PosInHierarchyTex = cc.PosInHierarchyTex,
-                PosInParent = cc.PosInParent,
-                Size = cc.Size,
                 VisibleChildIndices = cc.VisibleChildIndices,
                 WasLoaded = cc.WasLoaded
             });
@@ -631,7 +637,6 @@ namespace Fusee.Engine.Core
             Traverse(sc.Children);
             return _convertedScene;
         }
-
 
         #region Visitors
 
@@ -921,7 +926,7 @@ namespace Fusee.Engine.Core
                 Name = cam.Name,
                 ClippingPlanes = cam.ClippingPlanes,
                 Fov = cam.Fov,
-                ProjectionMethod = cam.ProjectionMethod == Fusee.Engine.Core.Scene.ProjectionMethod.Orthographic ? Serialization.V1.ProjectionMethod.Orthographic : Serialization.V1.ProjectionMethod.Perspective
+                ProjectionMethod = cam.ProjectionMethod == Scene.ProjectionMethod.Orthographic ? Serialization.V1.ProjectionMethod.Orthographic : Serialization.V1.ProjectionMethod.Perspective
             });
         }
 
@@ -934,15 +939,15 @@ namespace Fusee.Engine.Core
         {
             _currentNode.AddComponent(new FusOctant
             {
-                Center = oct.Center,
+                Center = oct.PayloadOctant.Center,
                 Guid = oct.Guid,
-                IsLeaf = oct.IsLeaf,
-                Level = oct.Level,
+                IsLeaf = oct.PayloadOctant.IsLeaf,
+                Level = oct.PayloadOctant.Level,
                 Name = oct.Name,
                 NumberOfPointsInNode = oct.NumberOfPointsInNode,
                 PosInHierarchyTex = oct.PosInHierarchyTex,
-                PosInParent = oct.PosInParent,
-                Size = oct.Size,
+                PosInParent = oct.PayloadOctant.PosInParent,
+                Size = oct.PayloadOctant.Size,
                 VisibleChildIndices = oct.VisibleChildIndices,
                 WasLoaded = oct.WasLoaded
             });
