@@ -273,7 +273,6 @@ namespace Fusee.Examples.PcRendering.Core
         {
             IsAlive = false;
             base.DeInit();
-
         }
 
         private bool HasUserMoved()

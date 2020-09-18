@@ -33,7 +33,7 @@ namespace Fusee.Examples.PcRendering.Desktop
 
         #endregion
 
-        private static Pointcloud.Common.IPcRendering _app;
+        public static Pointcloud.Common.IPcRendering App { get; private set; }
         private static IWindowHandle _windowHandle;
         public static Task FusTask { get; private set; }
 
@@ -48,46 +48,50 @@ namespace Fusee.Examples.PcRendering.Desktop
         /// Will create and run a new instance of Core.Simple.
         /// Note that we can only call this from the main thread at the moment, due to glfw limitations.
         /// </summary>
-        public static void ExecFusAppInNewThread()
+        public static void ExecFusAppInNewThread(bool useExtUi)
         {
             _cts = new CancellationTokenSource();
             CancellationToken ct = _cts.Token;
             FusTask = Task.Run(() =>
             {
-                InitAndRunApp();
+                Diagnostics.Debug(FusTask.Id);
+                InitAndRunApp(useExtUi);
 
             }, ct);
 
-            SpinWait.SpinUntil(() => _app != null && _app.IsInitialized);
+            SpinWait.SpinUntil(() => App != null && App.IsInitialized);
         }
 
-        public static void ExecFusApp()
+        public static void ExecFusApp(bool useExtUi)
         {
-            InitAndRunApp();
+            InitAndRunApp(useExtUi);
         }
 
         public static bool IsAppInitialized()
         {
-            if (_app != null)
-                return _app.IsInitialized;
+            if (App != null)
+                return App.IsInitialized;
             return false;
         }
 
         public static void CloseGameWindow()
         {
-            _app.IsClosingRequested = true;
-            _cts.Cancel();
+            if(App != null)
+                App.IsClosingRequested = true;
+            
             FusTask.Wait();
+            _cts.Cancel();
             _cts.Dispose();
+            App = null;   
         }
 
         public static void SetRenderPause(bool isRenderPauseRequested)
         {
-            if (_app != null)
-                _app.IsRenderPauseRequested = isRenderPauseRequested;
+            if (App != null)
+                App.IsRenderPauseRequested = isRenderPauseRequested;
         }
 
-        private static void InitAndRunApp()
+        private static void InitAndRunApp(bool useExtUi)
         {
             // Inject Fusee.Engine.Base InjectMe dependencies
             IO.IOImp = new IOImp();
@@ -126,20 +130,21 @@ namespace Fusee.Examples.PcRendering.Desktop
             var objectType = typeof(PcRendering<>);
             var objWithGenType = objectType.MakeGenericType(genericType);
 
-            _app = (Pointcloud.Common.IPcRendering)Activator.CreateInstance(objWithGenType);
-            AppSetup.DoSetup(_app, ptType, PtRenderingParams.MaxNoOfVisiblePoints, PtRenderingParams.PathToOocFile);
+            App = (Pointcloud.Common.IPcRendering)Activator.CreateInstance(objWithGenType);
+            App.UseExtUi = useExtUi;
+            AppSetup.DoSetup(App, ptType, PtRenderingParams.MaxNoOfVisiblePoints, PtRenderingParams.PathToOocFile);
 
             // Inject Fusee.Engine InjectMe dependencies (hard coded)
             System.Drawing.Icon appIcon = System.Drawing.Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
-            _app.CanvasImplementor = new Engine.Imp.Graphics.Desktop.RenderCanvasImp(appIcon);
-            _app.ContextImplementor = new Engine.Imp.Graphics.Desktop.RenderContextImp(_app.CanvasImplementor);
-            Input.AddDriverImp(new Engine.Imp.Graphics.Desktop.RenderCanvasInputDriverImp(_app.CanvasImplementor));
-            Input.AddDriverImp(new Engine.Imp.Graphics.Desktop.WindowsTouchInputDriverImp(_app.CanvasImplementor));
+            App.CanvasImplementor = new Engine.Imp.Graphics.Desktop.RenderCanvasImp(appIcon);
+            App.ContextImplementor = new Engine.Imp.Graphics.Desktop.RenderContextImp(App.CanvasImplementor);
+            Input.AddDriverImp(new Engine.Imp.Graphics.Desktop.RenderCanvasInputDriverImp(App.CanvasImplementor));
+            Input.AddDriverImp(new Engine.Imp.Graphics.Desktop.WindowsTouchInputDriverImp(App.CanvasImplementor));
 
-            _windowHandle = _app.CanvasImplementor.WindowHandle;
+            _windowHandle = App.CanvasImplementor.WindowHandle;
 
             // Start the app
-            _app.Run();
+            App.Run();
         }
 
     }

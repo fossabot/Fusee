@@ -63,6 +63,7 @@
     <ProjectReference Include="$(FuseeEngineRoot)\src\Pointcloud\PointAccessorCollection\Fusee.Pointcloud.PointAccessorCollections.csproj" />
     <ProjectReference Include="$(FuseeEngineRoot)\src\Pointcloud\OoCFileGen\Fusee.Pointcloud.OoCFileReaderWriter.csproj" />
     <ProjectReference Include="..\..\Core\Fusee.Examples.PcRendering.Core.csproj" />
+    <ProjectReference Include="..\..\Desktop\Fusee.Examples.PcRendering.Desktop.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -7,7 +7,7 @@ namespace Fusee.Examples.PcRendering.Desktop
     {
         public static void Main()
         {
-            Lib.ExecFusApp();
+            Lib.ExecFusApp(false);
 
             //Lib.ExecFusAppInNewThread();
 
