@@ -11,6 +11,7 @@ using Fusee.Serialization;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Path = Fusee.Base.Common.Path;
@@ -24,12 +25,13 @@ namespace Fusee.Examples.PcRendering.Desktop
     {
         #region Delegates - entry points when hosting a dotnet runtime with host fxr
 
-        public delegate void ExecFusAppInNewThreadDelegate();
-        public delegate void ExecFusAppDelegate();
+        public delegate void ExecFusAppInNewThreadDelegate(bool useExtUi);
+        public delegate void ExecFusAppDelegate(bool useExtUi);
         public delegate bool IsAppInitializedDelegate();
         public delegate IntPtr GetWindowHandleDelegate();
         public delegate void CloseGameWindowDelegate();
         public delegate void SetRenderPauseDelegate(bool isRenderPauseRequested);
+        public delegate void SetPathToOocFileDel(IntPtr path);
 
         #endregion
 
@@ -89,6 +91,11 @@ namespace Fusee.Examples.PcRendering.Desktop
         {
             if (App != null)
                 App.IsRenderPauseRequested = isRenderPauseRequested;
+        }
+
+        public static void SetPathToOocFile(IntPtr path)
+        {
+            PtRenderingParams.PathToOocFile = Marshal.PtrToStringUni(path);
         }
 
         private static void InitAndRunApp(bool useExtUi)
