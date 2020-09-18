@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
-		<OutputPath>$(BaseOutputPath)\Examples\SimpleDeferred\Core\</OutputPath>
+		<OutputPath>$(BaseOutputPath)\Examples\PcRendering\Core\</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
