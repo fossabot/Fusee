@@ -119,7 +119,7 @@ namespace Fusee.Examples.PcRendering.Core
 
             // Wrap a SceneRenderer around the model.
             _sceneRenderer = new SceneRendererForward(_scene);
-            
+
             IsInitialized = true;
         }
 

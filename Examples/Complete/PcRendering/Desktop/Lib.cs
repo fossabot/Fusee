@@ -76,13 +76,13 @@ namespace Fusee.Examples.PcRendering.Desktop
 
         public static void CloseGameWindow()
         {
-            if(App != null)
+            if (App != null)
                 App.IsClosingRequested = true;
-            
+
             FusTask.Wait();
             _cts.Cancel();
             _cts.Dispose();
-            App = null;   
+            App = null;
         }
 
         public static void SetRenderPause(bool isRenderPauseRequested)
