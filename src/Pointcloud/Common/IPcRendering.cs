@@ -2,7 +2,6 @@
 using Fusee.Engine.Core;
 using Fusee.Engine.Core.Scene;
 using Fusee.Math.Core;
-using Fusee.Serialization;
 
 namespace Fusee.Pointcloud.Common
 {
@@ -17,17 +16,17 @@ namespace Fusee.Pointcloud.Common
         bool IsRenderPauseRequested { get; set; }
 
         /// <summary>
-        /// Needed to close the fus thread and the game window.
+        /// Needed to close the fus thread and the game window. Can be set from an external UI.
         /// </summary>
         bool IsClosingRequested { get; set; }
 
         /// <summary>
-        /// Needed when using UI / WPF. Set to false on DeInit().
+        /// Needed when using an external UI. Set to false on DeInit() to notify the UI the engine window was closed.
         /// </summary>
         bool IsAlive { get; }
 
         /// <summary>
-        /// Needed when using UI / WPF. Determines if a new file can be loaded. E.g. when 
+        /// Needed when using an external UI. Determines if a new file can be loaded.
         /// </summary>
         bool ReadyToLoadNewFile { get; }
 
@@ -42,9 +41,9 @@ namespace Fusee.Pointcloud.Common
         bool IsSceneLoaded { get; }
 
         /// <summary>
-        /// Allows different logic if you use WPF (or another UI).
+        /// Allows different logic when using an external UI.
         /// </summary>
-        bool UseWPF { get; set; }
+        bool UseExtUi { get; set; }
 
         /// <summary>
         /// Allows to check if the app has finished its Init() call.

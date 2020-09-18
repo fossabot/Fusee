@@ -25,7 +25,7 @@ namespace Fusee.Examples.PcRendering.Core
 
         public PtOctreeFileReader<TPoint> OocFileReader { get; set; }
 
-        public bool UseWPF { get; set; }
+        public bool UseExtUi { get; set; }
         public bool DoShowOctants { get; set; }
         public bool IsSceneLoaded { get; private set; }
         public bool ReadyToLoadNewFile { get; private set; }
@@ -51,11 +51,6 @@ namespace Fusee.Examples.PcRendering.Core
         private const float ZFar = 1000;
 
         private readonly float _fovy = M.PiOver4;
-
-        private SceneRendererForward _guiRenderer;
-        private SceneContainer _gui;
-        private SceneInteractionHandler _sih;
-        private readonly CanvasRenderMode _canvasRenderMode = CanvasRenderMode.Screen;
 
         private float _maxPinchSpeed;
 
@@ -119,17 +114,12 @@ namespace Fusee.Examples.PcRendering.Core
 
             // Set the clear color for the back buffer to white (100% intensity in all color channels R, G, B, A).            
 
-            if (!UseWPF)
+            if (!UseExtUi)
                 LoadPointCloudFromFile();
-
-            _gui = CreateGui();
-            //Create the interaction handler
-            _sih = new SceneInteractionHandler(_gui);
 
             // Wrap a SceneRenderer around the model.
             _sceneRenderer = new SceneRendererForward(_scene);
-            _guiRenderer = new SceneRendererForward(_gui);
-
+            
             IsInitialized = true;
         }
 
@@ -236,7 +226,7 @@ namespace Fusee.Examples.PcRendering.Core
                 OocLoader.RC = RC;
                 OocLoader.UpdateScene(PtRenderingParams.PtMode, PtRenderingParams.DepthPassEf, PtRenderingParams.ColorPassEf);
 
-                if (UseWPF)
+                if (UseExtUi)
                 {
                     if (PtRenderingParams.ShaderParamsToUpdate.Count != 0)
                     {
@@ -251,16 +241,6 @@ namespace Fusee.Examples.PcRendering.Core
 
             //Render GUI
             RC.Projection = float4x4.CreateOrthographic(Width, Height, ZNear, ZFar);
-
-            // Constantly check for interactive objects.
-            _sih.CheckForInteractiveObjects(RC, Mouse.Position, Width, Height);
-
-            if (Touch.GetTouchActive(TouchPoints.Touchpoint_0) && !Touch.TwoPoint)
-            {
-                _sih.CheckForInteractiveObjects(RC, Touch.GetPosition(TouchPoints.Touchpoint_0), Width, Height);
-            }
-
-            //_guiRenderer.Render(RC);
 
             // Swap buffers: Show the contents of the backbuffer (containing the currently rendered frame) on the front buffer.
             Present();
@@ -427,94 +407,5 @@ namespace Fusee.Examples.PcRendering.Core
             PtRenderingParams.ShaderParamsToUpdate.Clear();
         }
 
-        #region UI
-
-        private SceneContainer CreateGui()
-        {
-            var vsTex = AssetStorage.Get<string>("texture.vert");
-            var psTex = AssetStorage.Get<string>("texture.frag");
-
-            var canvasWidth = Width / 100f;
-            var canvasHeight = Height / 100f;
-
-            var btnFuseeLogo = new GUIButton
-            {
-                Name = "Canvas_Button"
-            };
-            btnFuseeLogo.OnMouseEnter += BtnLogoEnter;
-            btnFuseeLogo.OnMouseExit += BtnLogoExit;
-            btnFuseeLogo.OnMouseDown += BtnLogoDown;
-
-            var guiFuseeLogo = new Texture(AssetStorage.Get<ImageData>("FuseeText.png"));
-            var fuseeLogo = new TextureNode(
-                "fuseeLogo",
-                vsTex,
-                psTex,
-                //Set the diffuse texture you want to use.
-                guiFuseeLogo,
-                //Define anchor points. They are given in percent, seen from the lower left corner, respectively to the width/height of the parent.
-                //In this setup the element will stretch horizontally but stay the same vertically if the parent element is scaled.
-                UIElementPosition.GetAnchors(AnchorPos.TopTopLeft),
-                //Define Offset and therefor the size of the element.
-                UIElementPosition.CalcOffsets(AnchorPos.TopTopLeft, new float2(0, canvasHeight - 0.5f), canvasHeight, canvasWidth, new float2(1.75f, 0.5f))
-                );
-            fuseeLogo.AddComponent(btnFuseeLogo);
-
-            var fontLato = AssetStorage.Get<Font>("Lato-Black.ttf");
-            var guiLatoBlack = new FontMap(fontLato, 18);
-
-            var text = new TextNode(
-                text: "FUSEE Simple Example",
-                name: "ButtonText",
-                vs: vsTex,
-                ps: psTex,
-                anchors: UIElementPosition.GetAnchors(AnchorPos.StretchHorizontal),
-                offsets: UIElementPosition.CalcOffsets(AnchorPos.StretchHorizontal, new float2(canvasWidth / 2 - 4, 0), canvasHeight, canvasWidth, new float2(8, 1)),
-                fontMap: guiLatoBlack,
-                color: ColorUint.Tofloat4(ColorUint.Greenery));
-
-            var canvas = new CanvasNode(
-                "Canvas",
-                _canvasRenderMode,
-                new MinMaxRect
-                {
-                    Min = new float2(-canvasWidth / 2, -canvasHeight / 2f),
-                    Max = new float2(canvasWidth / 2, canvasHeight / 2f)
-                })
-            {
-                Children = new ChildList()
-                {
-                    //Simple Texture Node, contains the fusee logo.
-                    fuseeLogo,
-                    text
-                }
-            };
-
-            return new SceneContainer
-            {
-                Children = new List<SceneNode>
-                {
-                    //Add canvas.
-                    canvas
-                }
-            };
-        }
-
-        public void BtnLogoEnter(CodeComponent sender)
-        {
-            _gui.Children.FindNodes(node => node.Name == "fuseeLogo").First().GetComponent<ShaderEffect>().SetEffectParam("DiffuseColor", new float4(0.8f, 0.8f, 0.8f, 1f));
-        }
-
-        public void BtnLogoExit(CodeComponent sender)
-        {
-            _gui.Children.FindNodes(node => node.Name == "fuseeLogo").First().GetComponent<ShaderEffect>().SetEffectParam("DiffuseColor", float4.One);
-        }
-
-        public void BtnLogoDown(CodeComponent sender)
-        {
-            OpenLink("http://fusee3d.org");
-        }
-
-        #endregion       
     }
 }

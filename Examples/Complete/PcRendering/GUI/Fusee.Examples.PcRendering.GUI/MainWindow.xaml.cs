@@ -531,7 +531,7 @@ namespace Fusee.Examples.PcRendering.WPF
                     var objWithGenType = objectType.MakeGenericType(genericType);
 
                     app = (IPcRendering)Activator.CreateInstance(objWithGenType);
-                    app.UseWPF = true;
+                    app.UseExtUi = true;
                     AppSetup.DoSetup(app, AppSetupHelper.GetPtType(pathToFile), th, pathToFile);
 
                     // Inject Fusee.Engine InjectMe dependencies (hard coded)
