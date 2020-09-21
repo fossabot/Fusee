@@ -495,7 +495,7 @@ namespace Fusee.Pointcloud.OoCFileReaderWriter
                 {
                     ptOctantComp.PosInHierarchyTex = nodePixelPos;
 
-                    if (node.Parent != null)
+                    if (node.GetComponent<Octant>().PayloadOctant.PosInParent != -1)
                     {
                         var parentPtOctantComp = node.Parent.GetComponent<Octant>();
 

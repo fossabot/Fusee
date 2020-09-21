@@ -35,7 +35,7 @@ namespace Fusee.Examples.PcRendering.Core
         public bool IsClosingRequested { get; set; }
 
         // angle variables
-        private static float _angleHorz = 0, _angleVert = 0, _angleVelHorz, _angleVelVert, _angleRoll, _angleRollInit;
+        private static float _angleHorz, _angleVert, _angleVelHorz, _angleVelVert, _zoomVel, _zoom;
         private static float2 _offset;
         private static float2 _offsetInit;
 
@@ -106,8 +106,6 @@ namespace Fusee.Examples.PcRendering.Core
 
             _scene.Children.Insert(0, mainCam);
 
-            _angleRoll = 0;
-            _angleRollInit = 0;
             _twoTouchRepeated = false;
             _offset = float2.Zero;
             _offsetInit = float2.Zero;
@@ -153,15 +151,21 @@ namespace Fusee.Examples.PcRendering.Core
                     if (!_twoTouchRepeated)
                     {
                         _twoTouchRepeated = true;
-                        _angleRollInit = Touch.TwoPointAngle - _angleRoll;
-                        _offsetInit = Touch.TwoPointMidPoint - _offset;
                         _maxPinchSpeed = 0;
                     }
 
-                    _angleRoll = Touch.TwoPointAngle - _angleRollInit;
-                    _offset = Touch.TwoPointMidPoint - _offsetInit;
+                    if (Touch.TwoPointGesture == TwoPointAction.Pinch)
+                        _zoomVel = Touch.TwoPointDistanceVel * -0.001f;
+                    else
+                    {
+                        float2 touchVel;
+                        touchVel = Touch.GetVelocity(TouchPoints.Touchpoint_0);
+                        _offset += touchVel * DeltaTime * -0.005f;
+                    }
+
                     float pinchSpeed = Touch.TwoPointDistanceVel;
                     if (pinchSpeed > _maxPinchSpeed) _maxPinchSpeed = pinchSpeed; // _maxPinchSpeed is used for debugging only.
+                    Diagnostics.Debug(Touch.TwoPointGesture);
                 }
                 else
                 {
@@ -172,7 +176,6 @@ namespace Fusee.Examples.PcRendering.Core
                 if (Mouse.LeftButton)
                 {
                     _keys = false;
-
                     _angleVelHorz = RotationSpeed * Mouse.XVel * DeltaTime * 0.0005f;
                     _angleVelVert = RotationSpeed * Mouse.YVel * DeltaTime * 0.0005f;
                 }
@@ -181,8 +184,8 @@ namespace Fusee.Examples.PcRendering.Core
                     _keys = false;
                     float2 touchVel;
                     touchVel = Touch.GetVelocity(TouchPoints.Touchpoint_0);
-                    _angleVelHorz = RotationSpeed * touchVel.x * DeltaTime * 0.0005f;
-                    _angleVelVert = RotationSpeed * touchVel.y * DeltaTime * 0.0005f;
+                    _angleVelHorz = RotationSpeed * touchVel.x * DeltaTime * -0.0005f;
+                    _angleVelVert = RotationSpeed * touchVel.y * DeltaTime * -0.0005f;
                 }
                 else
                 {
@@ -193,23 +196,47 @@ namespace Fusee.Examples.PcRendering.Core
                     }
                 }
 
+                _zoom += _zoomVel;
                 _angleHorz += _angleVelHorz;
                 _angleVert += _angleVelVert;
+                _zoomVel = 0;
                 _angleVelHorz = 0;
                 _angleVelVert = 0;
 
-                if (HasUserMoved() || _camTransform.Translation == InitCameraPos)
-                {
-                    _camTransform.FpsView(_angleHorz, _angleVert, Keyboard.WSAxis, Keyboard.ADAxis, DeltaTime * 20);
-                }
+                var currentRotationMtx = float4x4.CreateRotationYXZ(_camTransform.Rotation);
+                var rootTransform = _scene.Children[1].Children[0].GetComponent<Octant>();
+                var center = (float3)rootTransform.PayloadOctant.Center;
+
+                _camTransform.Translate(float4x4.CreateTranslation(new float3(_offset.x, _offset.y, -_zoom) * currentRotationMtx));
+                _zoom = 0;
+                _offset = float2.Zero;
+
+                var addRotationMtx = float4x4.CreateRotationYXZ(new float3(_angleVert, _angleHorz, 0)); // get the desired rotation
+                var dir = _camTransform.Translation - center; // find current direction relative to center
+                dir = addRotationMtx * dir; // rotate the direction
+                _camTransform.Translation = (center + dir); // define new position
+
+                // rotate object to keep looking at the center:
+                var invRot = float4x4.Invert(currentRotationMtx);
+                _camTransform.Rotate(float4x4.CreateFromAxisAngle(invRot * float3.UnitY, _angleHorz) * float4x4.CreateFromAxisAngle(invRot * float3.UnitX, _angleVert));
+                
+                _angleHorz = 0;
+                _angleVert = 0;
+
+                //Mouse / Keyboard Input only
+                //if (HasUserMoved() || _camTransform.Translation == InitCameraPos)
+                //{
+                //    _camTransform.FpsView(_angleHorz, _angleVert, Keyboard.WSAxis, Keyboard.ADAxis, DeltaTime * 20);
+                //}
+
 
                 //----------------------------  
 
                 if (PtRenderingParams.CalcSSAO || PtRenderingParams.Lighting != Lighting.Unlit)
                 {
                     //Render Depth-only pass                    
-                    _scene.Children[1].RemoveComponent<ShaderEffect>();
-                    _scene.Children[1].Components.Insert(1, PtRenderingParams.DepthPassEf);
+                    _scene.Children[1].Children[0].RemoveComponent<ShaderEffect>();
+                    _scene.Children[1].Children[0].Components.Insert(1, PtRenderingParams.DepthPassEf);
 
                     _cam.RenderTexture = _depthTex;
                     _sceneRenderer.Render(RC);
@@ -218,8 +245,8 @@ namespace Fusee.Examples.PcRendering.Core
 
                 //Render color pass
                 //Change shader effect in complete scene
-                _scene.Children[1].RemoveComponent<ShaderEffect>();
-                _scene.Children[1].Components.Insert(1, PtRenderingParams.ColorPassEf);
+                _scene.Children[1].Children[0].RemoveComponent<ShaderEffect>();
+                _scene.Children[1].Children[0].Components.Insert(1, PtRenderingParams.ColorPassEf);
                 _sceneRenderer.Render(RC);
 
                 //UpdateScene after Render / Traverse because there we calculate the view matrix (when using a camera) we need for the update.
@@ -326,7 +353,24 @@ namespace Fusee.Examples.PcRendering.Core
             var ptOctantComp = root.GetComponent<Octant>();
             InitCameraPos = _camTransform.Translation = new float3((float)ptOctantComp.PayloadOctant.Center.x, (float)ptOctantComp.PayloadOctant.Center.y, (float)(ptOctantComp.PayloadOctant.Center.z - (ptOctantComp.PayloadOctant.Size)));
 
-            _scene.Children.Add(root);
+            var pivote = new SceneNode()
+            {
+                Name = "Pivote",
+                Children = new ChildList() { root },
+                Components = new List<SceneComponent>()
+                {
+                    new Transform()
+                    {
+                        Scale = float3.One,
+                        //Translation = -(float3)root.GetComponent<Octant>().PayloadOctant.Center,
+                        Rotation = float3.Zero
+                    },
+                    new Cube()
+                },
+
+            };
+
+            _scene.Children.Add(pivote);
 
             OocLoader.RootNode = root;
             OocLoader.FileFolderPath = PtRenderingParams.PathToOocFile;
@@ -349,13 +393,13 @@ namespace Fusee.Examples.PcRendering.Core
 
             if (PtRenderingParams.CalcSSAO || PtRenderingParams.Lighting != Lighting.Unlit)
             {
-                _scene.Children[1].RemoveComponent<ShaderEffect>();
-                _scene.Children[1].AddComponent(PtRenderingParams.DepthPassEf);
+                _scene.Children[1].Children[0].RemoveComponent<ShaderEffect>();
+                _scene.Children[1].Children[0].AddComponent(PtRenderingParams.DepthPassEf);
             }
             else
             {
-                _scene.Children[1].RemoveComponent<ShaderEffect>();
-                _scene.Children[1].AddComponent(PtRenderingParams.ColorPassEf);
+                _scene.Children[1].Children[0].RemoveComponent<ShaderEffect>();
+                _scene.Children[1].Children[0].AddComponent(PtRenderingParams.ColorPassEf);
             }
 
             IsSceneLoaded = true;
