@@ -219,7 +219,7 @@ namespace Fusee.Examples.PcRendering.Core
                 // rotate object to keep looking at the center:
                 var invRot = float4x4.Invert(currentRotationMtx);
                 _camTransform.Rotate(float4x4.CreateFromAxisAngle(invRot * float3.UnitY, _angleHorz) * float4x4.CreateFromAxisAngle(invRot * float3.UnitX, _angleVert));
-                
+
                 _angleHorz = 0;
                 _angleVert = 0;
 
