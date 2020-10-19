@@ -339,7 +339,7 @@ namespace Fusee.Pointcloud.OoCFileReaderWriter
                 var meshes = GetMeshsForNode(ptAccessor, pts);
                 _loadedMeshs.AddOrUpdate(ptOctantComp.Guid, meshes, (key, val) => val);
             }
-                       
+
             orderdToLoad.TryRemove(orderdToLoad.ElementAt(0).Key, out var removedSortedNode);
             _globalLoadingCache.TryRemove(kvp.Key, out var removedNode);
 

@@ -248,7 +248,7 @@ namespace Fusee.Examples.PcRendering.Core
                     {
                         _camTransform.FpsView(_angleHorz, _angleVert, Keyboard.WSAxis, Keyboard.ADAxis, DeltaTime * 20);
                     }
-                }                
+                }
 
                 //----------------------------  
 
@@ -331,8 +331,8 @@ namespace Fusee.Examples.PcRendering.Core
 
 
 
-    // Is called when the window was resized
-    public override void Resize(ResizeEventArgs e)
+        // Is called when the window was resized
+        public override void Resize(ResizeEventArgs e)
         {
             if (!PtRenderingParams.CalcSSAO && PtRenderingParams.Lighting == Lighting.Unlit) return;
 

@@ -96,15 +96,15 @@ namespace Fusee.Pointcloud.OoCFileReaderWriter
                         //Translation = (float3) center
                     },
                     effect,
-                    new OctantComponent() 
-                    { 
+                    new OctantComponent()
+                    {
                         Octant = new OctantD()
                         {
                             PosInParent = -1, //root!
                             Center = center,
                             Size = size,
                             //Resolution = size/128
-                        } 
+                        }
                     }
 
                 }
@@ -165,7 +165,7 @@ namespace Fusee.Pointcloud.OoCFileReaderWriter
                 byte[] guidBytes = new byte[16];
                 binaryReader.Read(guidBytes, 0, 16);
                 octantcomp.Guid = new Guid(guidBytes);
-                octantcomp.Octant.Level = binaryReader.ReadInt32();                
+                octantcomp.Octant.Level = binaryReader.ReadInt32();
                 octantcomp.Octant.IsLeaf = binaryReader.ReadBoolean();
 
                 //node.StreamPosition = binaryReader.ReadInt64();
@@ -206,7 +206,7 @@ namespace Fusee.Pointcloud.OoCFileReaderWriter
                     {
                         Octant = new OctantD()
                         {
-                            PosInParent = posInParent 
+                            PosInParent = posInParent
                         }
                     },
                     new Transform
