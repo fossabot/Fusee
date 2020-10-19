@@ -6,12 +6,12 @@ namespace Fusee.Engine.Core.Scene
     /// <summary>
     /// Component that allows a SceneNode to save information usually associated with a "PtOctant".
     /// </summary>
-    public class Octant : SceneComponent
+    public class OctantComponent : SceneComponent
     {
         /// <summary>
         /// The payload-independent information about an octant.
         /// </summary>
-        public OctantD PayloadOctant;
+        public OctantD Octant;
 
         /// <summary>
         /// Unique identifier of the node.

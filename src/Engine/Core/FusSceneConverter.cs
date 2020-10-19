@@ -462,9 +462,9 @@ namespace Fusee.Engine.Core
                 _currentNode.Components = new List<SceneComponent>();
 
             _currentNode.AddComponent(
-            new Octant()
-            {
-                PayloadOctant = new OctantD
+            new OctantComponent() 
+            { 
+                Octant = new OctantD
                 {
                     Center = cc.Center,
 
@@ -472,7 +472,7 @@ namespace Fusee.Engine.Core
                     Level = cc.Level,
                     PosInParent = cc.PosInParent,
                     Size = cc.Size,
-
+                    
                 },
                 Guid = cc.Guid,
                 Name = cc.Name,
@@ -935,19 +935,19 @@ namespace Fusee.Engine.Core
         /// </summary>
         /// <param name="oct"></param>
         [VisitMethod]
-        public void ConvOctant(Octant oct)
+        public void ConvOctant(OctantComponent oct)
         {
             _currentNode.AddComponent(new FusOctant
             {
-                Center = oct.PayloadOctant.Center,
+                Center = oct.Octant.Center,
                 Guid = oct.Guid,
-                IsLeaf = oct.PayloadOctant.IsLeaf,
-                Level = oct.PayloadOctant.Level,
+                IsLeaf = oct.Octant.IsLeaf,
+                Level = oct.Octant.Level,
                 Name = oct.Name,
                 NumberOfPointsInNode = oct.NumberOfPointsInNode,
                 PosInHierarchyTex = oct.PosInHierarchyTex,
-                PosInParent = oct.PayloadOctant.PosInParent,
-                Size = oct.PayloadOctant.Size,
+                PosInParent = oct.Octant.PosInParent,
+                Size = oct.Octant.Size,
                 VisibleChildIndices = oct.VisibleChildIndices,
                 WasLoaded = oct.WasLoaded
             });

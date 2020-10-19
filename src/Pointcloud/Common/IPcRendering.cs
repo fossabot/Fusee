@@ -2,33 +2,24 @@
 using Fusee.Engine.Core;
 using Fusee.Engine.Core.Scene;
 using Fusee.Math.Core;
+using Fusee.Serialization;
 
 namespace Fusee.Pointcloud.Common
-{
+{ 
     /// <summary>
     /// Implement this interface into apps that use the ooc file converter.
     /// </summary>
     public interface IPcRendering
     {
         /// <summary>
-        /// Needed to pause the rendering when the fus window isn't in focus.
+        /// Needed when using UI / WPF. Set to false on DeInit().
         /// </summary>
-        bool IsRenderPauseRequested { get; set; }
+        bool IsAlive { get;}
 
         /// <summary>
-        /// Needed to close the fus thread and the game window. Can be set from an external UI.
+        /// Needed when using UI / WPF. Determines if a new file can be loaded. E.g. when 
         /// </summary>
-        bool IsClosingRequested { get; set; }
-
-        /// <summary>
-        /// Needed when using an external UI. Set to false on DeInit() to notify the UI the engine window was closed.
-        /// </summary>
-        bool IsAlive { get; }
-
-        /// <summary>
-        /// Needed when using an external UI. Determines if a new file can be loaded.
-        /// </summary>
-        bool ReadyToLoadNewFile { get; }
+        bool ReadyToLoadNewFile { get;}
 
         /// <summary>
         /// Set to true if the outlines of visible octants shall be rendered.
@@ -41,14 +32,14 @@ namespace Fusee.Pointcloud.Common
         bool IsSceneLoaded { get; }
 
         /// <summary>
-        /// Allows different logic when using an external UI.
+        /// Allows different logic if you use WPF (or another UI).
         /// </summary>
-        bool UseExtUi { get; set; }
+        bool UseWPF { get; set; }
 
         /// <summary>
         /// Allows to check if the app has finished its Init() call.
         /// </summary>
-        bool IsInitialized { get; }
+        bool IsInitialized { get;}        
 
         /// <summary>
         /// The initial camera position. E.g. for resetting the camera.
@@ -123,12 +114,12 @@ namespace Fusee.Pointcloud.Common
         /// <summary>
         /// <see cref="RenderCanvas.Run"/>
         /// </summary>
-        void Run();
+        void Run();       
 
         /// <summary>
         /// Wrapper to get the app's RenderContext.
         /// </summary>
         /// <returns></returns>
-        RenderContext GetRc();
+        RenderContext GetRc();               
     }
 }

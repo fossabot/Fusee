@@ -25,17 +25,15 @@ namespace Fusee.Examples.PcRendering.Core
 
         public PtOctreeFileReader<TPoint> OocFileReader { get; set; }
 
-        public bool UseExtUi { get; set; }
+        public bool UseWPF { get; set; }
         public bool DoShowOctants { get; set; }
         public bool IsSceneLoaded { get; private set; }
         public bool ReadyToLoadNewFile { get; private set; }
         public bool IsInitialized { get; private set; } = false;
         public bool IsAlive { get; private set; }
-        public bool IsRenderPauseRequested { get; set; }
-        public bool IsClosingRequested { get; set; }
 
         // angle variables
-        private static float _angleHorz, _angleVert, _angleVelHorz, _angleVelVert, _zoomVel, _zoom;
+        private static float _angleHorz = 0, _angleVert = 0, _angleVelHorz, _angleVelVert, _angleRoll, _angleRollInit;
         private static float2 _offset;
         private static float2 _offsetInit;
 
@@ -51,6 +49,11 @@ namespace Fusee.Examples.PcRendering.Core
         private const float ZFar = 1000;
 
         private readonly float _fovy = M.PiOver4;
+
+        private SceneRendererForward _guiRenderer;
+        private SceneContainer _gui;
+        private SceneInteractionHandler _sih;
+        private readonly CanvasRenderMode _canvasRenderMode = CanvasRenderMode.Screen;
 
         private float _maxPinchSpeed;
 
@@ -68,9 +71,13 @@ namespace Fusee.Examples.PcRendering.Core
         private Transform _camTransform;
         private Camera _cam;
 
+        private SixDOFDevice _spaceMouse;
+
         // Init is called on startup. 
         public override void Init()
         {
+            _spaceMouse = Input.GetDevice<SixDOFDevice>();
+
             _depthTex = new WritableTexture(RenderTargetTextureTypes.Depth, new ImagePixelFormat(ColorFormat.Depth16), Width, Height, false);
 
             IsAlive = true;
@@ -106,17 +113,24 @@ namespace Fusee.Examples.PcRendering.Core
 
             _scene.Children.Insert(0, mainCam);
 
+            _angleRoll = 0;
+            _angleRollInit = 0;
             _twoTouchRepeated = false;
             _offset = float2.Zero;
             _offsetInit = float2.Zero;
 
             // Set the clear color for the back buffer to white (100% intensity in all color channels R, G, B, A).            
 
-            if (!UseExtUi)
+            if (!UseWPF)
                 LoadPointCloudFromFile();
+
+            _gui = CreateGui();
+            //Create the interaction handler
+            _sih = new SceneInteractionHandler(_gui);
 
             // Wrap a SceneRenderer around the model.
             _sceneRenderer = new SceneRendererForward(_scene);
+            _guiRenderer = new SceneRendererForward(_gui);
 
             IsInitialized = true;
         }
@@ -128,9 +142,6 @@ namespace Fusee.Examples.PcRendering.Core
 
             // Clear the backbuffer
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
-
-            if (IsRenderPauseRequested)
-                return;
 
             if (IsSceneLoaded)
             {
@@ -151,21 +162,15 @@ namespace Fusee.Examples.PcRendering.Core
                     if (!_twoTouchRepeated)
                     {
                         _twoTouchRepeated = true;
+                        _angleRollInit = Touch.TwoPointAngle - _angleRoll;
+                        _offsetInit = Touch.TwoPointMidPoint - _offset;
                         _maxPinchSpeed = 0;
                     }
 
-                    if (Touch.TwoPointGesture == TwoPointAction.Pinch)
-                        _zoomVel = Touch.TwoPointDistanceVel * -0.001f;
-                    else
-                    {
-                        float2 touchVel;
-                        touchVel = Touch.GetVelocity(TouchPoints.Touchpoint_0);
-                        _offset += touchVel * DeltaTime * -0.005f;
-                    }
-
+                    _angleRoll = Touch.TwoPointAngle - _angleRollInit;
+                    _offset = Touch.TwoPointMidPoint - _offsetInit;
                     float pinchSpeed = Touch.TwoPointDistanceVel;
                     if (pinchSpeed > _maxPinchSpeed) _maxPinchSpeed = pinchSpeed; // _maxPinchSpeed is used for debugging only.
-                    Diagnostics.Debug(Touch.TwoPointGesture);
                 }
                 else
                 {
@@ -176,6 +181,7 @@ namespace Fusee.Examples.PcRendering.Core
                 if (Mouse.LeftButton)
                 {
                     _keys = false;
+
                     _angleVelHorz = RotationSpeed * Mouse.XVel * DeltaTime * 0.0005f;
                     _angleVelVert = RotationSpeed * Mouse.YVel * DeltaTime * 0.0005f;
                 }
@@ -184,8 +190,8 @@ namespace Fusee.Examples.PcRendering.Core
                     _keys = false;
                     float2 touchVel;
                     touchVel = Touch.GetVelocity(TouchPoints.Touchpoint_0);
-                    _angleVelHorz = RotationSpeed * touchVel.x * DeltaTime * -0.0005f;
-                    _angleVelVert = RotationSpeed * touchVel.y * DeltaTime * -0.0005f;
+                    _angleVelHorz = RotationSpeed * touchVel.x * DeltaTime * 0.0005f;
+                    _angleVelVert = RotationSpeed * touchVel.y * DeltaTime * 0.0005f;
                 }
                 else
                 {
@@ -196,47 +202,61 @@ namespace Fusee.Examples.PcRendering.Core
                     }
                 }
 
-                _zoom += _zoomVel;
-                _angleHorz += _angleVelHorz;
-                _angleVert += _angleVelVert;
-                _zoomVel = 0;
-                _angleVelHorz = 0;
-                _angleVelVert = 0;
+                if (SpaceMouseMoving(out float3 velPos, out float3 velRot))
+                {
+                    Diagnostics.Debug($"Spacemouse Pos: {velPos}; Spacemouse Rot: {velRot}");
 
-                var currentRotationMtx = float4x4.CreateRotationYXZ(_camTransform.Rotation);
-                var rootTransform = _scene.Children[1].Children[0].GetComponent<Octant>();
-                var center = (float3)rootTransform.PayloadOctant.Center;
+                    /*
+                    float4x4 rotMat = _camTransform.Matrix().RotationComponent();
+                    
+                    var camRight = rotMat.Column0.xyz;
+                    var camUp = rotMat.Column1.xyz;
+                    var camForward = rotMat.Column2.xyz;
 
-                _camTransform.Translate(float4x4.CreateTranslation(new float3(_offset.x, _offset.y, -_zoom) * currentRotationMtx));
-                _zoom = 0;
-                _offset = float2.Zero;
+                    tc.Translation += camForward * inputWSAxis * speed;
+                    tc.Translation += camRight * inputADAxis * speed;
+                    */
 
-                var addRotationMtx = float4x4.CreateRotationYXZ(new float3(_angleVert, _angleHorz, 0)); // get the desired rotation
-                var dir = _camTransform.Translation - center; // find current direction relative to center
-                dir = addRotationMtx * dir; // rotate the direction
-                _camTransform.Translation = (center + dir); // define new position
+                    _angleHorz -= velRot.y;
+                    _angleVert -= velRot.x;
 
-                // rotate object to keep looking at the center:
-                var invRot = float4x4.Invert(currentRotationMtx);
-                _camTransform.Rotate(float4x4.CreateFromAxisAngle(invRot * float3.UnitY, _angleHorz) * float4x4.CreateFromAxisAngle(invRot * float3.UnitX, _angleVert));
+                    float speed = DeltaTime * 12;
 
-                _angleHorz = 0;
-                _angleVert = 0;
+                    _camTransform.FpsView(_angleHorz, _angleVert, velPos.z, velPos.x, speed);
+                    _camTransform.Translation.y += velPos.y * speed;
 
-                //Mouse / Keyboard Input only
-                //if (HasUserMoved() || _camTransform.Translation == InitCameraPos)
-                //{
-                //    _camTransform.FpsView(_angleHorz, _angleVert, Keyboard.WSAxis, Keyboard.ADAxis, DeltaTime * 20);
-                //}
+                    /*
+                    float4x4 spaceMouseMat = float4x4.CreateTranslation(velPos) * float4x4.CreateRotationYXZ(velRot);
 
+                    float4x4 camMat = _camTransform.Matrix();
+                    float4x4 camMatInv = float4x4.Invert(camMat);
+
+                    camMat = camMat * spaceMouseMat * camMatInv;
+
+                    _camTransform.Rotation += velRot;
+                    _camTransform.Translation += camMat.Translation();
+                    */
+                }
+                else
+                {
+                    _angleHorz += _angleVelHorz;
+                    _angleVert += _angleVelVert;
+                    _angleVelHorz = 0;
+                    _angleVelVert = 0;
+
+                    if (HasUserMoved() || _camTransform.Translation == InitCameraPos)
+                    {
+                        _camTransform.FpsView(_angleHorz, _angleVert, Keyboard.WSAxis, Keyboard.ADAxis, DeltaTime * 20);
+                    }
+                }                
 
                 //----------------------------  
 
                 if (PtRenderingParams.CalcSSAO || PtRenderingParams.Lighting != Lighting.Unlit)
                 {
                     //Render Depth-only pass                    
-                    _scene.Children[1].Children[0].RemoveComponent<ShaderEffect>();
-                    _scene.Children[1].Children[0].Components.Insert(1, PtRenderingParams.DepthPassEf);
+                    _scene.Children[1].RemoveComponent<ShaderEffect>();
+                    _scene.Children[1].Components.Insert(1, PtRenderingParams.DepthPassEf);
 
                     _cam.RenderTexture = _depthTex;
                     _sceneRenderer.Render(RC);
@@ -245,15 +265,15 @@ namespace Fusee.Examples.PcRendering.Core
 
                 //Render color pass
                 //Change shader effect in complete scene
-                _scene.Children[1].Children[0].RemoveComponent<ShaderEffect>();
-                _scene.Children[1].Children[0].Components.Insert(1, PtRenderingParams.ColorPassEf);
+                _scene.Children[1].RemoveComponent<ShaderEffect>();
+                _scene.Children[1].Components.Insert(1, PtRenderingParams.ColorPassEf);
                 _sceneRenderer.Render(RC);
 
                 //UpdateScene after Render / Traverse because there we calculate the view matrix (when using a camera) we need for the update.
                 OocLoader.RC = RC;
                 OocLoader.UpdateScene(PtRenderingParams.PtMode, PtRenderingParams.DepthPassEf, PtRenderingParams.ColorPassEf);
 
-                if (UseExtUi)
+                if (UseWPF)
                 {
                     if (PtRenderingParams.ShaderParamsToUpdate.Count != 0)
                     {
@@ -269,17 +289,50 @@ namespace Fusee.Examples.PcRendering.Core
             //Render GUI
             RC.Projection = float4x4.CreateOrthographic(Width, Height, ZNear, ZFar);
 
+            // Constantly check for interactive objects.
+            _sih.CheckForInteractiveObjects(RC, Mouse.Position, Width, Height);
+
+            if (Touch.GetTouchActive(TouchPoints.Touchpoint_0) && !Touch.TwoPoint)
+            {
+                _sih.CheckForInteractiveObjects(RC, Touch.GetPosition(TouchPoints.Touchpoint_0), Width, Height);
+            }
+
+            //_guiRenderer.Render(RC);
+
             // Swap buffers: Show the contents of the backbuffer (containing the currently rendered frame) on the front buffer.
             Present();
 
             ReadyToLoadNewFile = true;
-
-            if (IsClosingRequested)
-                CloseGameWindow();
         }
 
-        // Is called when the window was resized
-        public override void Resize(ResizeEventArgs e)
+        private bool SpaceMouseMoving(out float3 velPos, out float3 velRot)
+        {
+            if (_spaceMouse != null && _spaceMouse.IsConnected)
+            {
+                bool spaceMouseMovement = false;
+                velPos = 0.001f * _spaceMouse.Translation;
+                if (velPos.LengthSquared < 0.01f)
+                    velPos = float3.Zero;
+                else
+                    spaceMouseMovement = true;
+                velRot = 0.0001f * _spaceMouse.Rotation;
+                velRot.z = 0;
+                if (velRot.LengthSquared < 0.000005f)
+                    velRot = float3.Zero;
+                else
+                    spaceMouseMovement = true;
+
+                return spaceMouseMovement;
+            }
+            velPos = float3.Zero;
+            velRot = float3.Zero;
+            return false;
+        }
+
+
+
+    // Is called when the window was resized
+    public override void Resize(ResizeEventArgs e)
         {
             if (!PtRenderingParams.CalcSSAO && PtRenderingParams.Lighting == Lighting.Unlit) return;
 
@@ -300,6 +353,7 @@ namespace Fusee.Examples.PcRendering.Core
         {
             IsAlive = false;
             base.DeInit();
+
         }
 
         private bool HasUserMoved()
@@ -350,27 +404,10 @@ namespace Fusee.Examples.PcRendering.Core
             //create Scene from octree structure
             var root = OocFileReader.GetScene(ShaderCodeBuilder.Default/*PtRenderingParams.DepthPassEf*/);
 
-            var ptOctantComp = root.GetComponent<Octant>();
-            InitCameraPos = _camTransform.Translation = new float3((float)ptOctantComp.PayloadOctant.Center.x, (float)ptOctantComp.PayloadOctant.Center.y, (float)(ptOctantComp.PayloadOctant.Center.z - (ptOctantComp.PayloadOctant.Size)));
+            var ptOctantComp = root.GetComponent<OctantComponent>();
+            InitCameraPos = _camTransform.Translation = new float3((float)ptOctantComp.Octant.Center.x, (float)ptOctantComp.Octant.Center.y, (float)(ptOctantComp.Octant.Center.z - (ptOctantComp.Octant.Size * 2f)));
 
-            var pivote = new SceneNode()
-            {
-                Name = "Pivote",
-                Children = new ChildList() { root },
-                Components = new List<SceneComponent>()
-                {
-                    new Transform()
-                    {
-                        Scale = float3.One,
-                        //Translation = -(float3)root.GetComponent<Octant>().PayloadOctant.Center,
-                        Rotation = float3.Zero
-                    },
-                    new Cube()
-                },
-
-            };
-
-            _scene.Children.Add(pivote);
+            _scene.Children.Add(root);
 
             OocLoader.RootNode = root;
             OocLoader.FileFolderPath = PtRenderingParams.PathToOocFile;
@@ -382,9 +419,9 @@ namespace Fusee.Examples.PcRendering.Core
             var byteSize = OocFileReader.NumberOfOctants * octreeTexImgData.PixelFormat.BytesPerPixel;
             octreeTexImgData.PixelData = new byte[byteSize];
 
-            var ptRootComponent = root.GetComponent<Octant>();
-            _octreeRootCenter = ptRootComponent.PayloadOctant.Center;
-            _octreeRootLength = ptRootComponent.PayloadOctant.Size;
+            var ptRootComponent = root.GetComponent<OctantComponent>();
+            _octreeRootCenter = ptRootComponent.Octant.Center;
+            _octreeRootLength = ptRootComponent.Octant.Size;
 
             PtRenderingParams.DepthPassEf = PtRenderingParams.CreateDepthPassEffect(new float2(Width, Height), InitCameraPos.z, _octreeTex, _octreeRootCenter, _octreeRootLength);
             PtRenderingParams.ColorPassEf = PtRenderingParams.CreateColorPassEffect(new float2(Width, Height), InitCameraPos.z, new float2(ZNear, ZFar), _depthTex, _octreeTex, _octreeRootCenter, _octreeRootLength);
@@ -393,13 +430,13 @@ namespace Fusee.Examples.PcRendering.Core
 
             if (PtRenderingParams.CalcSSAO || PtRenderingParams.Lighting != Lighting.Unlit)
             {
-                _scene.Children[1].Children[0].RemoveComponent<ShaderEffect>();
-                _scene.Children[1].Children[0].AddComponent(PtRenderingParams.DepthPassEf);
+                _scene.Children[1].RemoveComponent<ShaderEffect>();
+                _scene.Children[1].AddComponent(PtRenderingParams.DepthPassEf);
             }
             else
             {
-                _scene.Children[1].Children[0].RemoveComponent<ShaderEffect>();
-                _scene.Children[1].Children[0].AddComponent(PtRenderingParams.ColorPassEf);
+                _scene.Children[1].RemoveComponent<ShaderEffect>();
+                _scene.Children[1].AddComponent(PtRenderingParams.ColorPassEf);
             }
 
             IsSceneLoaded = true;
@@ -450,5 +487,94 @@ namespace Fusee.Examples.PcRendering.Core
             PtRenderingParams.ShaderParamsToUpdate.Clear();
         }
 
+        #region UI
+
+        private SceneContainer CreateGui()
+        {
+            var vsTex = AssetStorage.Get<string>("texture.vert");
+            var psTex = AssetStorage.Get<string>("texture.frag");
+
+            var canvasWidth = Width / 100f;
+            var canvasHeight = Height / 100f;
+
+            var btnFuseeLogo = new GUIButton
+            {
+                Name = "Canvas_Button"
+            };
+            btnFuseeLogo.OnMouseEnter += BtnLogoEnter;
+            btnFuseeLogo.OnMouseExit += BtnLogoExit;
+            btnFuseeLogo.OnMouseDown += BtnLogoDown;
+
+            var guiFuseeLogo = new Texture(AssetStorage.Get<ImageData>("FuseeText.png"));
+            var fuseeLogo = new TextureNode(
+                "fuseeLogo",
+                vsTex,
+                psTex,
+                //Set the diffuse texture you want to use.
+                guiFuseeLogo,
+                //Define anchor points. They are given in percent, seen from the lower left corner, respectively to the width/height of the parent.
+                //In this setup the element will stretch horizontally but stay the same vertically if the parent element is scaled.
+                UIElementPosition.GetAnchors(AnchorPos.TopTopLeft),
+                //Define Offset and therefor the size of the element.
+                UIElementPosition.CalcOffsets(AnchorPos.TopTopLeft, new float2(0, canvasHeight - 0.5f), canvasHeight, canvasWidth, new float2(1.75f, 0.5f))
+                );
+            fuseeLogo.AddComponent(btnFuseeLogo);
+
+            var fontLato = AssetStorage.Get<Font>("Lato-Black.ttf");
+            var guiLatoBlack = new FontMap(fontLato, 18);
+
+            var text = new TextNode(
+                text: "FUSEE Simple Example",
+                name: "ButtonText",
+                vs: vsTex,
+                ps: psTex,
+                anchors: UIElementPosition.GetAnchors(AnchorPos.StretchHorizontal),
+                offsets: UIElementPosition.CalcOffsets(AnchorPos.StretchHorizontal, new float2(canvasWidth / 2 - 4, 0), canvasHeight, canvasWidth, new float2(8, 1)),
+                fontMap: guiLatoBlack,
+                color: ColorUint.Tofloat4(ColorUint.Greenery));
+
+            var canvas = new CanvasNode(
+                "Canvas",
+                _canvasRenderMode,
+                new MinMaxRect
+                {
+                    Min = new float2(-canvasWidth / 2, -canvasHeight / 2f),
+                    Max = new float2(canvasWidth / 2, canvasHeight / 2f)
+                })
+            {
+                Children = new ChildList()
+                {
+                    //Simple Texture Node, contains the fusee logo.
+                    fuseeLogo,
+                    text
+                }
+            };
+
+            return new SceneContainer
+            {
+                Children = new List<SceneNode>
+                {
+                    //Add canvas.
+                    canvas
+                }
+            };
+        }
+
+        public void BtnLogoEnter(CodeComponent sender)
+        {
+            _gui.Children.FindNodes(node => node.Name == "fuseeLogo").First().GetComponent<ShaderEffect>().SetEffectParam("DiffuseColor", new float4(0.8f, 0.8f, 0.8f, 1f));
+        }
+
+        public void BtnLogoExit(CodeComponent sender)
+        {
+            _gui.Children.FindNodes(node => node.Name == "fuseeLogo").First().GetComponent<ShaderEffect>().SetEffectParam("DiffuseColor", float4.One);
+        }
+
+        public void BtnLogoDown(CodeComponent sender)
+        {
+            OpenLink("http://fusee3d.org");
+        }
+
+        #endregion       
     }
 }

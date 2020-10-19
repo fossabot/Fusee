@@ -25,7 +25,7 @@ namespace Fusee.Pointcloud.OoCFileReaderWriter
 
             Payload = new List<TPoint>();
         }
-        protected PtOctant() { }
+        protected PtOctant() {}
 
         public PtOctant<TPoint> CreateChild(int posInParent)
         {

@@ -96,15 +96,15 @@ namespace Fusee.Pointcloud.OoCFileReaderWriter
                         //Translation = (float3) center
                     },
                     effect,
-                    new Octant()
-                    {
-                        PayloadOctant = new OctantD()
+                    new OctantComponent() 
+                    { 
+                        Octant = new OctantD()
                         {
                             PosInParent = -1, //root!
                             Center = center,
                             Size = size,
                             //Resolution = size/128
-                        }
+                        } 
                     }
 
                 }
@@ -159,14 +159,14 @@ namespace Fusee.Pointcloud.OoCFileReaderWriter
         {
             try
             {
-                var octantcomp = nodeSnc.GetComponent<Octant>();
+                var octantcomp = nodeSnc.GetComponent<OctantComponent>();
 
                 // loadable properties
                 byte[] guidBytes = new byte[16];
                 binaryReader.Read(guidBytes, 0, 16);
                 octantcomp.Guid = new Guid(guidBytes);
-                octantcomp.PayloadOctant.Level = binaryReader.ReadInt32();
-                octantcomp.PayloadOctant.IsLeaf = binaryReader.ReadBoolean();
+                octantcomp.Octant.Level = binaryReader.ReadInt32();                
+                octantcomp.Octant.IsLeaf = binaryReader.ReadBoolean();
 
                 //node.StreamPosition = binaryReader.ReadInt64();
 
@@ -180,9 +180,9 @@ namespace Fusee.Pointcloud.OoCFileReaderWriter
                     if (childExists)
                     {
                         var childSnc = CreateSncForChildNode(index);
-                        var childOctantComp = childSnc.GetComponent<Octant>();
-                        childOctantComp.PayloadOctant.Size = octantcomp.PayloadOctant.Size / 2;
-                        childOctantComp.PayloadOctant.Center = PtOctant<TPoint>.CalcCildCenterAtPos(index, octantcomp.PayloadOctant.Size, octantcomp.PayloadOctant.Center);
+                        var childOctantComp = childSnc.GetComponent<OctantComponent>();
+                        childOctantComp.Octant.Size = octantcomp.Octant.Size / 2;
+                        childOctantComp.Octant.Center = PtOctant<TPoint>.CalcCildCenterAtPos(index, octantcomp.Octant.Size, octantcomp.Octant.Center);
                         nodeSnc.Children.Add(childSnc);
                         NumberOfOctants++;
 
@@ -202,11 +202,11 @@ namespace Fusee.Pointcloud.OoCFileReaderWriter
             {
                 Components = new List<SceneComponent>
                 {
-                    new Octant()
+                    new OctantComponent()
                     {
-                        PayloadOctant = new OctantD()
+                        Octant = new OctantD()
                         {
-                            PosInParent = posInParent
+                            PosInParent = posInParent 
                         }
                     },
                     new Transform
