@@ -18,7 +18,7 @@
         /// <summary>
         /// Used for Images containing a single grayscale value per-pixel. Each pixel consists of one byte.
         /// </summary>
-        R8,
+        Intensity,
 
         /// <summary>
         /// RGBA integer.
@@ -31,9 +31,14 @@
         fRGB32,
 
         /// <summary>
-        /// RGBA float, 16bit.
+        /// RGB float, 16bit.
         /// </summary>
         fRGB16,
+
+        /// <summary>
+        /// RGB float, 16bit.
+        /// </summary>
+        fRGBA16,
 
         /// <summary>
         /// Used for creating depth maps.

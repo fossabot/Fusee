@@ -25,7 +25,6 @@ namespace Fusee.Engine.Imp.Graphics.Android
         #region Internal Fields
 
         internal int VertexBufferObject;
-        internal int VertexArrayObject;
         internal int NormalBufferObject;
         internal int ColorBufferObject;
         internal int UVBufferObject;
@@ -34,8 +33,7 @@ namespace Fusee.Engine.Imp.Graphics.Android
         internal int ElementBufferObject;
         internal int TangentBufferObject;
         internal int BitangentBufferObject;
-        internal int TriangleIndices;
-        internal int Vertices;
+        internal int NElements;
 
         #endregion Internal Fields
 
@@ -163,7 +161,7 @@ namespace Fusee.Engine.Imp.Graphics.Android
         public void InvalidateTriangles()
         {
             ElementBufferObject = 0;
-            TriangleIndices = 0;
+            NElements = 0;
         }
         /// <summary>
         /// Gets a value indicating whether [triangles set].

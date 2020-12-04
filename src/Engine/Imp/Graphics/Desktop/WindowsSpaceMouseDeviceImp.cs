@@ -5,6 +5,10 @@ using Fusee.Engine.Common;
 using OpenTK.Windowing.Desktop;
 using Fusee.Base.Core;
 using Fusee.Engine.Imp.Graphics.Desktop._3DconnexionDriver;
+using OpenTK;
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Fusee.Engine.Imp.Graphics.Desktop
 {
@@ -259,7 +263,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             }
             catch (Exception ex)
             {
-                Diagnostics.Warn("Trouble initializing the SpaceMouse. Probably due to missing driver.\n" + ex);
+                Diagnostics.Verbose("Trouble initializing the SpaceMouse. Probably due to missing driver.\n" + ex);
                 _current3DConnexionDevice = null;
             }
 

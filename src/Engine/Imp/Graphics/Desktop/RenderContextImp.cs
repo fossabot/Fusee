@@ -55,7 +55,6 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             GL.GetInteger(GetPName.BlendEquationAlpha, out int blendEqA);
             GL.GetInteger(GetPName.BlendEquationRgb, out int blendEqRgb);
 
-
             _blendDstRgb = (BlendingFactorDest)blendDstRgb;
             _blendSrcRgb = (BlendingFactorSrc)blendSrcRgb;
             _blendSrcAlpha = (BlendingFactorSrc)blendSrcAlpha;
@@ -63,8 +62,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             _blendEquationAlpha = (BlendEquationMode)blendEqA;
             _blendEquationRgb = (BlendEquationMode)blendEqRgb;
 
-            Diagnostics.Debug(GetHardwareDescription());
-
+            Diagnostics.Debug(GL.GetString(StringName.Vendor) + " - " + GL.GetString(StringName.Renderer) + " - " + GL.GetString(StringName.Version));
+            Diagnostics.Verbose(GL.GetString(StringName.Extensions));
         }
 
         #region Image data related Members
@@ -191,9 +190,9 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
                     break;
                 // TODO: Handle Alpha-only / Intensity-only and AlphaIntensity correctly.
-                case ColorFormat.R8:
-                    internalFormat = PixelInternalFormat.R8;
-                    format = PixelFormat.Red;
+                case ColorFormat.Intensity:
+                    internalFormat = PixelInternalFormat.Alpha;
+                    format = PixelFormat.Alpha;
                     pxType = PixelType.UnsignedByte;
 
                     break;
@@ -226,6 +225,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                     format = PixelFormat.Rgb;
                     pxType = PixelType.Float;
                     break;
+                case ColorFormat.fRGBA16:
+                    internalFormat = PixelInternalFormat.Rgba16f;
+                    format = PixelFormat.Rgba;
+                    pxType = PixelType.Float;
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException("CreateTexture: Image pixel format not supported");
             }
@@ -235,14 +239,46 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 Format = format,
                 InternalFormat = internalFormat,
                 PxType = pxType
-
             };
+        }
+
+        /// <summary>
+        /// Creates a new Texture and binds it to the shader.
+        /// </summary>
+        /// <param name="img">A given ImageData object, containing all necessary information for the upload to the graphics card.</param>
+        /// <returns>An ITextureHandle that can be used for texturing in the shader. In this implementation, the handle is an integer-value which is necessary for OpenTK.</returns>
+        public ITextureHandle CreateTexture(IWritableArrayTexture img)
+        {
+            int id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2DArray, id);
+
+            var glMinMagFilter = GetMinMagFilter(img.FilterMode);
+            var minFilter = glMinMagFilter.Item1;
+            var magFilter = glMinMagFilter.Item2;
+            var glWrapMode = GetWrapMode(img.WrapMode);
+            var pxInfo = GetTexturePixelInfo(img);
+
+            GL.TexImage3D(TextureTarget.Texture2DArray, 0, pxInfo.InternalFormat, img.Width, img.Height, img.Layers, 0, pxInfo.Format, pxInfo.PxType, IntPtr.Zero);
+
+            if (img.DoGenerateMipMaps)
+                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureCompareMode, (int)GetTexComapreMode(img.CompareMode));
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureCompareFunc, (int)GetDepthCompareFunc(img.CompareFunc));
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)minFilter);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)magFilter);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)glWrapMode);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)glWrapMode);
+
+            ITextureHandle texID = new TextureHandle { TexHandle = id };
+
+            return texID;
         }
 
         /// <summary>
         /// Creates a new CubeMap and binds it to the shader.
         /// </summary>
-        /// <param name="img">A given ImageData object, containing all necessary information for the upload to the graphics card.</param>
+        /// <param name="img">A given IWritableCubeMap object, containing all necessary information for the upload to the graphics card.</param>
         /// <returns>An ITextureHandle that can be used for texturing in the shader. In this implementation, the handle is an integer-value which is necessary for OpenTK.</returns>
         public ITextureHandle CreateTexture(IWritableCubeMap img)
         {
@@ -270,11 +306,10 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             return texID;
         }
 
-
         /// <summary>
         /// Creates a new Texture and binds it to the shader.
         /// </summary>
-        /// <param name="img">A given ImageData object, containing all necessary information for the upload to the graphics card.</param>
+        /// <param name="img">A given ITexture object, containing all necessary information for the upload to the graphics card.</param>
         /// <returns>An ITextureHandle that can be used for texturing in the shader. In this implementation, the handle is an integer-value which is necessary for OpenTK.</returns>
         public ITextureHandle CreateTexture(ITexture img)
         {
@@ -289,10 +324,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
             var pxInfo = GetTexturePixelInfo(img);
 
+            GL.TexImage2D(TextureTarget.Texture2D, 0, pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, img.PixelData);
+
             if (img.DoGenerateMipMaps)
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
-            GL.TexImage2D(TextureTarget.Texture2D, 0, pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, img.PixelData);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)minFilter);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)magFilter);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)glWrapMode);
@@ -307,7 +343,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <summary>
         /// Creates a new Texture and binds it to the shader.
         /// </summary>
-        /// <param name="img">A given ImageData object, containing all necessary information for the upload to the graphics card.</param>
+        /// <param name="img">A given IWritableTexture object, containing all necessary information for the upload to the graphics card.</param>
         /// <returns>An ITextureHandle that can be used for texturing in the shader. In this implementation, the handle is an integer-value which is necessary for OpenTK.</returns>
         public ITextureHandle CreateTexture(IWritableTexture img)
         {
@@ -320,10 +356,10 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             var glWrapMode = GetWrapMode(img.WrapMode);
             var pxInfo = GetTexturePixelInfo(img);
 
+            GL.TexImage2D(TextureTarget.Texture2D, 0, pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, IntPtr.Zero);
+
             if (img.DoGenerateMipMaps)
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, IntPtr.Zero);
 
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareMode, (int)GetTexComapreMode(img.CompareMode));
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareFunc, (int)GetDepthCompareFunc(img.CompareFunc));
@@ -374,6 +410,33 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+        }
+
+        /// <summary>
+        /// Sets the textures filter mode (<see cref="TextureFilterMode"/> at runtime.
+        /// </summary>
+        /// <param name="tex">The handle of the texture.</param>
+        /// <param name="filterMode">The new filter mode.</param>
+        public void SetTextureFilterMode(ITextureHandle tex, TextureFilterMode filterMode)
+        {
+            GL.BindTexture(TextureTarget.Texture2D, ((TextureHandle)tex).TexHandle);
+            var glMinMagFilter = GetMinMagFilter(filterMode);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)glMinMagFilter.Item1);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)glMinMagFilter.Item2);
+        }
+
+        /// <summary>
+        /// Sets the textures filter mode (<see cref="Common.TextureWrapMode"/> at runtime.
+        /// </summary>
+        /// <param name="tex">The handle of the texture.</param>
+        ///<param name="wrapMode">The new wrap mode.</param>
+        public void SetTextureWrapMode(ITextureHandle tex, Common.TextureWrapMode wrapMode)
+        {
+            GL.BindTexture(TextureTarget.Texture2D, ((TextureHandle)tex).TexHandle);
+            var glWrapMode = GetWrapMode(wrapMode);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)glWrapMode);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)glWrapMode);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapR, (int)glWrapMode);
         }
 
         /// <summary>
@@ -448,7 +511,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
             // Compile geometry shader
             int geometryObject = -1;
-            if (gs != null)
+            if (!string.IsNullOrEmpty(gs))
             {
                 geometryObject = GL.CreateShader(ShaderType.GeometryShader);
                 GL.ShaderSource(geometryObject, gs);
@@ -479,13 +542,13 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
             // enable GLSL (ES) shaders to use fuVertex, fuColor and fuNormal attributes
             GL.BindAttribLocation(program, AttributeLocations.VertexAttribLocation, UniformNameDeclarations.Vertex);
-            GL.BindAttribLocation(program, AttributeLocations.ColorAttribLocation, UniformNameDeclarations.Color);
+            GL.BindAttribLocation(program, AttributeLocations.ColorAttribLocation, UniformNameDeclarations.VertexColor);
             GL.BindAttribLocation(program, AttributeLocations.UvAttribLocation, UniformNameDeclarations.TextureCoordinates);
             GL.BindAttribLocation(program, AttributeLocations.NormalAttribLocation, UniformNameDeclarations.Normal);
-            GL.BindAttribLocation(program, AttributeLocations.TangentAttribLocation, UniformNameDeclarations.TangentAttribName);
+            GL.BindAttribLocation(program, AttributeLocations.TangentAttribLocation, UniformNameDeclarations.Tangent);
             GL.BindAttribLocation(program, AttributeLocations.BoneIndexAttribLocation, UniformNameDeclarations.BoneIndex);
             GL.BindAttribLocation(program, AttributeLocations.BoneWeightAttribLocation, UniformNameDeclarations.BoneWeight);
-            GL.BindAttribLocation(program, AttributeLocations.BitangentAttribLocation, UniformNameDeclarations.BitangentAttribName);
+            GL.BindAttribLocation(program, AttributeLocations.BitangentAttribLocation, UniformNameDeclarations.Bitangent);
 
             GL.LinkProgram(program); //Must be called AFTER BindAttribLocation
 
@@ -608,6 +671,9 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                     case ActiveUniformType.SamplerCube:
                     case ActiveUniformType.SamplerCubeShadow:
                         paramInfo.Type = typeof(IWritableCubeMap);
+                        break;
+                    case ActiveUniformType.Sampler2DArray:
+                        paramInfo.Type = typeof(IWritableArrayTexture);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException($"ActiveUniformType {uType} unknown.");
@@ -765,8 +831,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 case TextureType.TextureCubeMap:
                     GL.BindTexture(TextureTarget.TextureCubeMap, ((TextureHandle)texId).TexHandle);
                     break;
-                default:
+                case TextureType.ArrayTexture:
+                    GL.BindTexture(TextureTarget.Texture2DArray, ((TextureHandle)texId).TexHandle);
                     break;
+                default:
+                    throw new ArgumentException($"Unknown texture target: {texTarget}.");
             }
         }
 
@@ -1021,30 +1090,15 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 throw new ArgumentException("Vertices must not be null or empty");
             }
 
-            ((MeshImp)mr).Vertices = vertices.Length;
-
-            // 1. Generate VAO if needed
-            if (((MeshImp)mr).VertexArrayObject == 0)
-                ((MeshImp)mr).VertexArrayObject = GL.GenVertexArray();
-
-            // 2. Bind VAO
-            GL.BindVertexArray(((MeshImp)mr).VertexArrayObject);
-
-            // 3. Generate VBO if needed
             int vertsBytes = vertices.Length * 3 * sizeof(float);
             if (((MeshImp)mr).VertexBufferObject == 0)
                 GL.GenBuffers(1, out ((MeshImp)mr).VertexBufferObject);
 
-            // 4. copy our vertices array in a buffer for OpenGL to use
             GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).VertexBufferObject);
-            GL.BufferData(BufferTarget.ArrayBuffer, vertsBytes, vertices, BufferUsageHint.StaticDraw);
-
-            GL.VertexAttribPointer(AttributeLocations.VertexAttribLocation, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-            GL.EnableVertexAttribArray(AttributeLocations.VertexAttribLocation);
-
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vertsBytes), vertices, BufferUsageHint.StaticDraw);
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out int vboBytes);
             if (vboBytes != vertsBytes)
-                throw new ApplicationException(string.Format("Problem uploading vertex buffer to VBO (vertices). Tried to upload {0} bytes, uploaded {1}.", vertsBytes, vboBytes));
+                throw new ApplicationException(String.Format("Problem uploading vertex buffer to VBO (vertices). Tried to upload {0} bytes, uploaded {1}.", vertsBytes, vboBytes));
         }
 
         /// <summary>
@@ -1061,24 +1115,15 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 throw new ArgumentException("Tangents must not be null or empty");
             }
 
-            if (((MeshImp)mr).VertexArrayObject == 0)
-                ((MeshImp)mr).VertexArrayObject = GL.GenVertexArray();
-
-            GL.BindVertexArray(((MeshImp)mr).VertexArrayObject);
-
             int tangentBytes = tangents.Length * 4 * sizeof(float);
             if (((MeshImp)mr).TangentBufferObject == 0)
                 GL.GenBuffers(1, out ((MeshImp)mr).TangentBufferObject);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).TangentBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tangentBytes), tangents, BufferUsageHint.StaticDraw);
-
-            GL.VertexAttribPointer(AttributeLocations.TangentAttribLocation, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-            GL.EnableVertexAttribArray(AttributeLocations.TangentAttribLocation);
-
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out int vboBytes);
             if (vboBytes != tangentBytes)
-                throw new ApplicationException(string.Format("Problem uploading vertex buffer to VBO (tangents). Tried to upload {0} bytes, uploaded {1}.", tangentBytes, vboBytes));
+                throw new ApplicationException(String.Format("Problem uploading vertex buffer to VBO (tangents). Tried to upload {0} bytes, uploaded {1}.", tangentBytes, vboBytes));
         }
 
         /// <summary>
@@ -1095,24 +1140,15 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 throw new ArgumentException("BiTangents must not be null or empty");
             }
 
-            if (((MeshImp)mr).VertexArrayObject == 0)
-                ((MeshImp)mr).VertexArrayObject = GL.GenVertexArray();
-
-            GL.BindVertexArray(((MeshImp)mr).VertexArrayObject);
-
             int bitangentBytes = bitangents.Length * 3 * sizeof(float);
             if (((MeshImp)mr).BitangentBufferObject == 0)
                 GL.GenBuffers(1, out ((MeshImp)mr).BitangentBufferObject);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).BitangentBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(bitangentBytes), bitangents, BufferUsageHint.StaticDraw);
-
-            GL.VertexAttribPointer(AttributeLocations.BitangentAttribLocation, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-            GL.EnableVertexAttribArray(AttributeLocations.BitangentAttribLocation);
-
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out int vboBytes);
             if (vboBytes != bitangentBytes)
-                throw new ApplicationException(string.Format("Problem uploading vertex buffer to VBO (bitangents). Tried to upload {0} bytes, uploaded {1}.", bitangentBytes, vboBytes));
+                throw new ApplicationException(String.Format("Problem uploading vertex buffer to VBO (bitangents). Tried to upload {0} bytes, uploaded {1}.", bitangentBytes, vboBytes));
         }
 
         /// <summary>
@@ -1129,24 +1165,15 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 throw new ArgumentException("Normals must not be null or empty");
             }
 
-            if (((MeshImp)mr).VertexArrayObject == 0)
-                ((MeshImp)mr).VertexArrayObject = GL.GenVertexArray();
-
-            GL.BindVertexArray(((MeshImp)mr).VertexArrayObject);
-
             int normsBytes = normals.Length * 3 * sizeof(float);
             if (((MeshImp)mr).NormalBufferObject == 0)
                 GL.GenBuffers(1, out ((MeshImp)mr).NormalBufferObject);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).NormalBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(normsBytes), normals, BufferUsageHint.StaticDraw);
-
-            GL.VertexAttribPointer(AttributeLocations.NormalAttribLocation, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-            GL.EnableVertexAttribArray(AttributeLocations.NormalAttribLocation);
-
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out int vboBytes);
             if (vboBytes != normsBytes)
-                throw new ApplicationException(string.Format("Problem uploading normal buffer to VBO (normals). Tried to upload {0} bytes, uploaded {1}.", normsBytes, vboBytes));
+                throw new ApplicationException(String.Format("Problem uploading normal buffer to VBO (normals). Tried to upload {0} bytes, uploaded {1}.", normsBytes, vboBytes));
         }
 
         /// <summary>
@@ -1163,24 +1190,15 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 throw new ArgumentException("BoneIndices must not be null or empty");
             }
 
-            if (((MeshImp)mr).VertexArrayObject == 0)
-                ((MeshImp)mr).VertexArrayObject = GL.GenVertexArray();
-
-            GL.BindVertexArray(((MeshImp)mr).VertexArrayObject);
-
             int indicesBytes = boneIndices.Length * 4 * sizeof(float);
             if (((MeshImp)mr).BoneIndexBufferObject == 0)
                 GL.GenBuffers(1, out ((MeshImp)mr).BoneIndexBufferObject);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).BoneIndexBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(indicesBytes), boneIndices, BufferUsageHint.StaticDraw);
-
-            GL.VertexAttribPointer(AttributeLocations.BoneIndexAttribLocation, 4, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-            GL.EnableVertexAttribArray(AttributeLocations.BoneIndexAttribLocation);
-
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out int vboBytes);
             if (vboBytes != indicesBytes)
-                throw new ApplicationException(string.Format("Problem uploading bone indices buffer to VBO (bone indices). Tried to upload {0} bytes, uploaded {1}.", indicesBytes, vboBytes));
+                throw new ApplicationException(String.Format("Problem uploading bone indices buffer to VBO (bone indices). Tried to upload {0} bytes, uploaded {1}.", indicesBytes, vboBytes));
         }
 
         /// <summary>
@@ -1197,24 +1215,15 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 throw new ArgumentException("BoneWeights must not be null or empty");
             }
 
-            if (((MeshImp)mr).VertexArrayObject == 0)
-                ((MeshImp)mr).VertexArrayObject = GL.GenVertexArray();
-
-            GL.BindVertexArray(((MeshImp)mr).VertexArrayObject);
-
             int weightsBytes = boneWeights.Length * 4 * sizeof(float);
             if (((MeshImp)mr).BoneWeightBufferObject == 0)
                 GL.GenBuffers(1, out ((MeshImp)mr).BoneWeightBufferObject);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).BoneWeightBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(weightsBytes), boneWeights, BufferUsageHint.StaticDraw);
-
-            GL.VertexAttribPointer(AttributeLocations.BoneWeightAttribLocation, 4, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-            GL.EnableVertexAttribArray(AttributeLocations.BoneWeightAttribLocation);
-
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out int vboBytes);
             if (vboBytes != weightsBytes)
-                throw new ApplicationException(string.Format("Problem uploading bone weights buffer to VBO (bone weights). Tried to upload {0} bytes, uploaded {1}.", weightsBytes, vboBytes));
+                throw new ApplicationException(String.Format("Problem uploading bone weights buffer to VBO (bone weights). Tried to upload {0} bytes, uploaded {1}.", weightsBytes, vboBytes));
         }
 
         /// <summary>
@@ -1231,11 +1240,6 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 throw new ArgumentException("UVs must not be null or empty");
             }
 
-            if (((MeshImp)mr).VertexArrayObject == 0)
-                ((MeshImp)mr).VertexArrayObject = GL.GenVertexArray();
-
-            GL.BindVertexArray(((MeshImp)mr).VertexArrayObject);
-
             int uvsBytes = uvs.Length * 2 * sizeof(float);
             if (((MeshImp)mr).UVBufferObject == 0)
                 GL.GenBuffers(1, out ((MeshImp)mr).UVBufferObject);
@@ -1243,12 +1247,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).UVBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(uvsBytes), uvs, BufferUsageHint.StaticDraw);
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out int vboBytes);
-
-            GL.VertexAttribPointer(AttributeLocations.UvAttribLocation, 2, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
-            GL.EnableVertexAttribArray(AttributeLocations.UvAttribLocation);
-
             if (vboBytes != uvsBytes)
-                throw new ApplicationException(string.Format("Problem uploading uv buffer to VBO (uvs). Tried to upload {0} bytes, uploaded {1}.", uvsBytes, vboBytes));
+                throw new ApplicationException(String.Format("Problem uploading uv buffer to VBO (uvs). Tried to upload {0} bytes, uploaded {1}.", uvsBytes, vboBytes));
         }
 
         /// <summary>
@@ -1265,24 +1265,15 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 throw new ArgumentException("colors must not be null or empty");
             }
 
-            if (((MeshImp)mr).VertexArrayObject == 0)
-                ((MeshImp)mr).VertexArrayObject = GL.GenVertexArray();
-
-            GL.BindVertexArray(((MeshImp)mr).VertexArrayObject);
-
             int colsBytes = colors.Length * sizeof(uint);
             if (((MeshImp)mr).ColorBufferObject == 0)
                 GL.GenBuffers(1, out ((MeshImp)mr).ColorBufferObject);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).ColorBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(colsBytes), colors, BufferUsageHint.StaticDraw);
-
-            GL.VertexAttribPointer(AttributeLocations.ColorAttribLocation, 4, VertexAttribPointerType.UnsignedByte, true, 0, IntPtr.Zero);
-            GL.EnableVertexAttribArray(AttributeLocations.ColorAttribLocation);
-
             GL.GetBufferParameter(BufferTarget.ArrayBuffer, BufferParameterName.BufferSize, out int vboBytes);
             if (vboBytes != colsBytes)
-                throw new ApplicationException(string.Format("Problem uploading color buffer to VBO (colors). Tried to upload {0} bytes, uploaded {1}.", colsBytes, vboBytes));
+                throw new ApplicationException(String.Format("Problem uploading color buffer to VBO (colors). Tried to upload {0} bytes, uploaded {1}.", colsBytes, vboBytes));
         }
 
         /// <summary>
@@ -1298,24 +1289,15 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             {
                 throw new ArgumentException("triangleIndices must not be null or empty");
             }
-
-            if (((MeshImp)mr).VertexArrayObject == 0)
-                ((MeshImp)mr).VertexArrayObject = GL.GenVertexArray();
-
-            GL.BindVertexArray(((MeshImp)mr).VertexArrayObject);
-
-            ((MeshImp)mr).TriangleIndices = triangleIndices.Length;
+            ((MeshImp)mr).NElements = triangleIndices.Length;
             int trisBytes = triangleIndices.Length * sizeof(short);
 
             if (((MeshImp)mr).ElementBufferObject == 0)
                 GL.GenBuffers(1, out ((MeshImp)mr).ElementBufferObject);
-
             // Upload the index buffer (elements inside the vertex buffer, not color indices as per the IndexPointer function!)
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, ((MeshImp)mr).ElementBufferObject);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(trisBytes), triangleIndices, BufferUsageHint.StaticDraw);
-
             GL.GetBufferParameter(BufferTarget.ElementArrayBuffer, BufferParameterName.BufferSize, out int vboBytes);
-
             if (vboBytes != trisBytes)
                 throw new ApplicationException(String.Format("Problem uploading vertex buffer to VBO (offsets). Tried to upload {0} bytes, uploaded {1}.", trisBytes, vboBytes));
         }
@@ -1326,8 +1308,6 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <param name="mr">The mesh which buffer respectively GPU memory should be deleted.</param>
         public void RemoveVertices(IMeshImp mr)
         {
-            GL.BindVertexArray(0);
-            GL.DeleteVertexArray(((MeshImp)mr).VertexArrayObject);
             GL.DeleteBuffer(((MeshImp)mr).VertexBufferObject);
             ((MeshImp)mr).InvalidateVertices();
         }
@@ -1418,76 +1398,112 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <param name="mr">The <see cref="IMeshImp" /> instance.</param>
         public void Render(IMeshImp mr)
         {
-            if (((MeshImp)mr).VertexArrayObject == 0) throw new ArgumentException("Cannot render Mesh without a VAO");
-            GL.BindVertexArray(((MeshImp)mr).VertexArrayObject);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ((MeshImp)mr).ElementBufferObject);
-
             if (((MeshImp)mr).VertexBufferObject != 0)
-                GL.EnableVertexAttribArray(AttributeLocations.VertexAttribLocation);
-            if (((MeshImp)mr).ColorBufferObject != 0)
-                GL.EnableVertexAttribArray(AttributeLocations.ColorAttribLocation);
-            if (((MeshImp)mr).NormalBufferObject != 0)
-                GL.EnableVertexAttribArray(AttributeLocations.NormalAttribLocation);
-            if (((MeshImp)mr).UVBufferObject != 0)
-                GL.EnableVertexAttribArray(AttributeLocations.UvAttribLocation);
-            if (((MeshImp)mr).TangentBufferObject != 0)
-                GL.EnableVertexAttribArray(AttributeLocations.TangentAttribLocation);
-            if (((MeshImp)mr).BitangentBufferObject != 0)
-                GL.EnableVertexAttribArray(AttributeLocations.TangentAttribLocation);
-
-            switch (((MeshImp)mr).MeshType)
             {
-                case OpenGLPrimitiveType.Triangles:
-                default:
-                    GL.DrawElements(BeginMode.Triangles, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, AttributeLocations.VertexAttribLocation);
-                    break;
-                case OpenGLPrimitiveType.Points:
-                    // enable gl_PointSize to set the point size
-                    if (!_isPtRenderingEnabled)
-                    {
-                        _isPtRenderingEnabled = true;
-                        GL.Enable(EnableCap.ProgramPointSize);
-                        GL.Enable(EnableCap.PointSprite);
-                        GL.Enable(EnableCap.VertexProgramPointSize);
-                    }
-                    GL.DrawElements(BeginMode.Points, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, AttributeLocations.VertexAttribLocation);
-                    break;
-                case OpenGLPrimitiveType.Lines:
-                    if (!_isLineSmoothEnabled)
-                    {
-                        GL.Enable(EnableCap.LineSmooth);
-                        _isLineSmoothEnabled = true;
-                    }
-                    GL.DrawElements(BeginMode.Lines, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, AttributeLocations.VertexAttribLocation);
-                    break;
-                case OpenGLPrimitiveType.LineLoop:
-                    if (!_isLineSmoothEnabled)
-                    {
-                        GL.Enable(EnableCap.LineSmooth);
-                        _isLineSmoothEnabled = true;
-                    }
-                    GL.DrawElements(BeginMode.LineLoop, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, AttributeLocations.VertexAttribLocation);
-                    break;
-                case OpenGLPrimitiveType.LineStrip:
-                    if (!_isLineSmoothEnabled)
-                    {
-                        GL.Enable(EnableCap.LineSmooth);
-                        _isLineSmoothEnabled = true;
-                    }
-                    GL.DrawElements(BeginMode.LineStrip, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, AttributeLocations.VertexAttribLocation);
-                    break;
-                case OpenGLPrimitiveType.Patches:
-                    GL.DrawElements(BeginMode.Patches, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, AttributeLocations.VertexAttribLocation);
-                    break;
-                case OpenGLPrimitiveType.QuadStrip:
-                    GL.DrawElements(BeginMode.QuadStrip, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, AttributeLocations.VertexAttribLocation);
-                    break;
-                case OpenGLPrimitiveType.TriangleFan:
-                    GL.DrawElements(BeginMode.TriangleFan, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, AttributeLocations.VertexAttribLocation);
-                    break;
-                case OpenGLPrimitiveType.TriangleStrip:
-                    GL.DrawElements(BeginMode.TriangleStrip, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, AttributeLocations.VertexAttribLocation);
-                    break;
+                GL.EnableVertexAttribArray(AttributeLocations.VertexAttribLocation);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).VertexBufferObject);
+                GL.VertexAttribPointer(AttributeLocations.VertexAttribLocation, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
+            }
+            if (((MeshImp)mr).ColorBufferObject != 0)
+            {
+                GL.EnableVertexAttribArray(AttributeLocations.ColorAttribLocation);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).ColorBufferObject);
+                GL.VertexAttribPointer(AttributeLocations.ColorAttribLocation, 4, VertexAttribPointerType.UnsignedByte, true, 0, IntPtr.Zero);
+            }
+            if (((MeshImp)mr).UVBufferObject != 0)
+            {
+                GL.EnableVertexAttribArray(AttributeLocations.UvAttribLocation);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).UVBufferObject);
+                GL.VertexAttribPointer(AttributeLocations.UvAttribLocation, 2, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
+            }
+            if (((MeshImp)mr).NormalBufferObject != 0)
+            {
+                GL.EnableVertexAttribArray(AttributeLocations.NormalAttribLocation);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).NormalBufferObject);
+                GL.VertexAttribPointer(AttributeLocations.NormalAttribLocation, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
+            }
+            if (((MeshImp)mr).TangentBufferObject != 0)
+            {
+                GL.EnableVertexAttribArray(AttributeLocations.TangentAttribLocation);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).TangentBufferObject);
+                GL.VertexAttribPointer(AttributeLocations.TangentAttribLocation, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
+            }
+            if (((MeshImp)mr).BitangentBufferObject != 0)
+            {
+                GL.EnableVertexAttribArray(AttributeLocations.BitangentAttribLocation);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).BitangentBufferObject);
+                GL.VertexAttribPointer(AttributeLocations.BitangentAttribLocation, 3, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
+            }
+            if (((MeshImp)mr).BoneIndexBufferObject != 0)
+            {
+                GL.EnableVertexAttribArray(AttributeLocations.BoneIndexAttribLocation);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).BoneIndexBufferObject);
+                GL.VertexAttribPointer(AttributeLocations.BoneIndexAttribLocation, 4, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
+            }
+            if (((MeshImp)mr).BoneWeightBufferObject != 0)
+            {
+                GL.EnableVertexAttribArray(AttributeLocations.BoneWeightAttribLocation);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).BoneWeightBufferObject);
+                GL.VertexAttribPointer(AttributeLocations.BoneWeightAttribLocation, 4, VertexAttribPointerType.Float, false, 0, IntPtr.Zero);
+            }
+            if (((MeshImp)mr).ElementBufferObject != 0)
+            {
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, ((MeshImp)mr).ElementBufferObject);
+
+                switch (((MeshImp)mr).MeshType)
+                {
+                    case OpenGLPrimitiveType.Triangles:
+                    default:
+                        GL.DrawElements(PrimitiveType.Triangles, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        break;
+                    case OpenGLPrimitiveType.Points:
+                        // enable gl_PointSize to set the point size
+                        if (!_isPtRenderingEnabled)
+                        {
+                            _isPtRenderingEnabled = true;
+                            GL.Enable(EnableCap.ProgramPointSize);
+                            GL.Enable(EnableCap.PointSprite);
+                            GL.Enable(EnableCap.VertexProgramPointSize);
+                        }
+                        GL.DrawElements(PrimitiveType.Points, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        break;
+                    case OpenGLPrimitiveType.Lines:
+                        if (!_isLineSmoothEnabled)
+                        {
+                            GL.Enable(EnableCap.LineSmooth);
+                            _isLineSmoothEnabled = true;
+                        }
+                        GL.DrawElements(PrimitiveType.Lines, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        break;
+                    case OpenGLPrimitiveType.LineLoop:
+                        if (!_isLineSmoothEnabled)
+                        {
+                            GL.Enable(EnableCap.LineSmooth);
+                            _isLineSmoothEnabled = true;
+                        }
+                        GL.DrawElements(PrimitiveType.LineLoop, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        break;
+                    case OpenGLPrimitiveType.LineStrip:
+                        if (!_isLineSmoothEnabled)
+                        {
+                            GL.Enable(EnableCap.LineSmooth);
+                            _isLineSmoothEnabled = true;
+                        }
+                        GL.DrawElements(PrimitiveType.LineStrip, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        break;
+                    case OpenGLPrimitiveType.Patches:
+                        GL.DrawElements(PrimitiveType.Patches, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        break;
+                    case OpenGLPrimitiveType.QuadStrip:
+                        GL.DrawElements(PrimitiveType.QuadStrip, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        break;
+                    case OpenGLPrimitiveType.TriangleFan:
+                        GL.DrawElements(PrimitiveType.TriangleFan, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        break;
+                    case OpenGLPrimitiveType.TriangleStrip:
+                        GL.DrawElements(PrimitiveType.TriangleStrip, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        break;
+                }
             }
 
             if (((MeshImp)mr).VertexBufferObject != 0)
@@ -1995,6 +2011,48 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         }
 
         /// <summary>
+        /// Renders into the given layer of the array texture.
+        /// </summary>
+        /// <param name="tex">The array texture.</param>
+        /// <param name="layer">The layer to render to.</param>
+        /// <param name="texHandle">The texture handle, associated with the given texture. Should be created by the TextureManager in the RenderContext.</param>
+        public void SetRenderTarget(IWritableArrayTexture tex, int layer, ITextureHandle texHandle)
+        {
+            if (((TextureHandle)texHandle).FrameBufferHandle == -1)
+            {
+                var fBuffer = GL.GenFramebuffer();
+                ((TextureHandle)texHandle).FrameBufferHandle = fBuffer;
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, fBuffer);
+
+                GL.BindTexture(TextureTarget.Texture2DArray, ((TextureHandle)texHandle).TexHandle);
+
+                if (tex.TextureType != RenderTargetTextureTypes.Depth)
+                {
+                    CreateDepthRenderBuffer(tex.Width, tex.Height);
+                    GL.FramebufferTextureLayer(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, ((TextureHandle)texHandle).TexHandle, 0, layer);
+                    GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
+                }
+                else
+                {
+                    GL.FramebufferTextureLayer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, ((TextureHandle)texHandle).TexHandle, 0, layer);
+                    GL.DrawBuffer(DrawBufferMode.None);
+                    GL.ReadBuffer(ReadBufferMode.None);
+                }
+            }
+            else
+            {
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, ((TextureHandle)texHandle).FrameBufferHandle);
+                GL.BindTexture(TextureTarget.Texture2DArray, ((TextureHandle)texHandle).TexHandle);
+                GL.FramebufferTextureLayer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, ((TextureHandle)texHandle).TexHandle, 0, layer);
+            }
+
+            if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
+                throw new Exception($"Error creating RenderTarget: {GL.GetError()}, {GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer)}");
+
+            GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
+        }
+
+        /// <summary>
         /// Renders into the given textures of the RenderTarget.
         /// </summary>
         /// <param name="renderTarget">The render target.</param>
@@ -2116,6 +2174,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             ChangeFramebufferTexture2D(renderTarget, attachment, 0, isDepthTex);
         }
 
+
         /// <summary>
         /// Attaches a texture to the frame buffer object, associated with the given render target.
         /// </summary>
@@ -2228,8 +2287,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <param name="color">The color of the DebugLine.</param>
         public void DebugLine(float3 start, float3 end, float4 color)
         {
+
             GL.Begin(PrimitiveType.Lines);
+            GL.Color4(color.x, color.y, color.z, color.w);
             GL.Vertex3(start.x, start.y, start.z);
+            GL.Color4(color.x, color.y, color.z, color.w);
             GL.Vertex3(end.x, end.y, end.z);
             GL.End();
         }

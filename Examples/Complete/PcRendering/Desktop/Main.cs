@@ -1,17 +1,15 @@
-﻿using System.IO;
-using System.Runtime.InteropServices;
-using Fusee.Base.Common;
+﻿using Fusee.Base.Common;
 using Fusee.Base.Core;
 using Fusee.Base.Imp.Desktop;
 using Fusee.Engine.Core;
-using Fusee.Serialization;
-using FileMode = Fusee.Base.Common.FileMode;
-using Path = Fusee.Base.Common.Path;
-using System.Reflection;
-using System;
-using Fusee.Pointcloud.PointAccessorCollections;
-using Fusee.Examples.PcRendering.Core;
 using Fusee.Engine.Core.Scene;
+using Fusee.Examples.PcRendering.Core;
+using Fusee.PointCloud.PointAccessorCollections;
+using Fusee.Serialization;
+using System;
+using System.IO;
+using System.Reflection;
+using Path = Fusee.Base.Common.Path;
 
 namespace Fusee.Examples.PcRendering.Desktop
 {
@@ -51,12 +49,12 @@ namespace Fusee.Examples.PcRendering.Desktop
             var ptType = AppSetupHelper.GetPtType(PtRenderingParams.PathToOocFile);
             var ptEnumName = Enum.GetName(typeof(PointType), ptType);
 
-            var genericType = Type.GetType("Fusee.Pointcloud.PointAccessorCollections." + ptEnumName + ", " + "Fusee.Pointcloud.PointAccessorCollections");
+            var genericType = Type.GetType("Fusee.PointCloud.PointAccessorCollections." + ptEnumName + ", " + "Fusee.PointCloud.PointAccessorCollections");
 
             var objectType = typeof(PcRendering<>);
             var objWithGenType = objectType.MakeGenericType(genericType);
 
-            var app = (Pointcloud.Common.IPcRendering)Activator.CreateInstance(objWithGenType);
+            var app = (PointCloud.Common.IPcRendering)Activator.CreateInstance(objWithGenType);
             AppSetup.DoSetup(app, ptType, PtRenderingParams.MaxNoOfVisiblePoints, PtRenderingParams.PathToOocFile);
 
             // Inject Fusee.Engine InjectMe dependencies (hard coded)

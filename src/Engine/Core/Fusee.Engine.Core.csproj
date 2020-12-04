@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Content Include="Assets\**\*" PackagePath="contentFiles\Assets\" CopyToOutputDirectory="PreserveNewest" />
+    <None Remove="Assets\Shader\BRDF.vert" />
     <Content Include="NuGet\Fusee.Engine.Core.targets" PackagePath="build\Fusee.Engine.Core.targets" />
   </ItemGroup>
 
@@ -43,5 +44,6 @@
     <ProjectReference Include="$(FuseeEngineRoot)\src\Serialization\Fusee.Serialization.csproj">
       <PrivateAssets>analyzers</PrivateAssets>
     </ProjectReference>
+    <ProjectReference Include="$(FuseeEngineRoot)\src\Structures\Fusee.Structures.csproj" />
   </ItemGroup>
 </Project>

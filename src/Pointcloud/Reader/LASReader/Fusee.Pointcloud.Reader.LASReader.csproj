@@ -1,17 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<RootNamespace>Fusee.Pointcloud.Reader.LASReader</RootNamespace>
 		<PackageId>Fusee.Pointcloud.Reader.LASReader</PackageId>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 
 	<PropertyGroup>
 		<OutputPath>$(BaseOutputPath)\Libraries\</OutputPath>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="$(FuseeEngineRoot)\src\Pointcloud\Common\Fusee.Pointcloud.Common.csproj" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="$(FuseeEngineRoot)\src\Math\Core\Fusee.Math.Core.csproj">
@@ -20,7 +16,9 @@
 		<ProjectReference Include="$(FuseeEngineRoot)\src\Pointcloud\Common\Fusee.Pointcloud.Common.csproj">
 			<PrivateAssets>analyzers</PrivateAssets>
 		</ProjectReference>
-		<ProjectReference Include="..\..\..\Base\Imp\Desktop\Fusee.Base.Imp.Desktop.csproj" />
+		<ProjectReference Include="$(FuseeEngineRoot)\src\Base\Imp\Desktop\Fusee.Base.Imp.Desktop.csproj">
+			<PrivateAssets>analyzers</PrivateAssets>
+		</ProjectReference>
 	</ItemGroup>
 	
 	<ItemGroup>

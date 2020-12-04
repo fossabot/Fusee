@@ -6,7 +6,7 @@ using Fusee.Engine.Core;
 using Fusee.Engine.Core.Scene;
 using Fusee.Engine.Imp.Graphics.Desktop;
 using Fusee.Examples.PcRendering.Core;
-using Fusee.Pointcloud.PointAccessorCollections;
+using Fusee.PointCloud.PointAccessorCollections;
 using Fusee.Serialization;
 using System;
 using System.IO;
@@ -35,7 +35,7 @@ namespace Fusee.Examples.PcRendering.Desktop
 
         #endregion
 
-        public static Pointcloud.Common.IPcRendering App { get; private set; }
+        public static PointCloud.Common.IPcRendering App { get; private set; }
         private static IWindowHandle _windowHandle;
         public static Task FusTask { get; private set; }
 
@@ -137,7 +137,7 @@ namespace Fusee.Examples.PcRendering.Desktop
             var objectType = typeof(PcRendering<>);
             var objWithGenType = objectType.MakeGenericType(genericType);
 
-            App = (Pointcloud.Common.IPcRendering)Activator.CreateInstance(objWithGenType);
+            App = (PointCloud.Common.IPcRendering)Activator.CreateInstance(objWithGenType);
             App.UseExtUi = useExtUi;
             AppSetup.DoSetup(App, ptType, PtRenderingParams.MaxNoOfVisiblePoints, PtRenderingParams.PathToOocFile);
 

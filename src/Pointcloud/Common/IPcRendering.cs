@@ -2,9 +2,8 @@
 using Fusee.Engine.Core;
 using Fusee.Engine.Core.Scene;
 using Fusee.Math.Core;
-using Fusee.Serialization;
 
-namespace Fusee.Pointcloud.Common
+namespace Fusee.PointCloud.Common
 {
     /// <summary>
     /// Implement this interface into apps that use the ooc file converter.
@@ -34,7 +33,7 @@ namespace Fusee.Pointcloud.Common
         /// <summary>
         /// Allows different logic if you use WPF (or another UI).
         /// </summary>
-        bool UseWPF { get; set; }
+        bool UseExtUi { get; set; }
 
         /// <summary>
         /// Allows to check if the app has finished its Init() call.
@@ -55,6 +54,16 @@ namespace Fusee.Pointcloud.Common
         /// <see cref="RenderCanvas.ContextImplementor"/>
         /// </summary>
         IRenderContextImp ContextImplementor { get; set; }
+
+        /// <summary>
+        /// Allows to check if the app needs to be closed.
+        /// </summary>
+        bool IsClosingRequested { get; set; }
+
+        /// <summary>
+        /// Allows to check if the app needs to pause rendering.
+        /// </summary>
+        bool IsRenderPauseRequested { get; set; }
 
         /// <summary>
         /// Wrapper to get the Root Node from the app's File Loader./>

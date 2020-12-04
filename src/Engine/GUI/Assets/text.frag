@@ -8,21 +8,33 @@ in vec2 vUV;
 in vec3 vMVNormal;
 
 uniform sampler2D AlbedoTexture;
-uniform vec4 AlbedoColor;
+uniform vec2 AlbedoTextureTiles;
+uniform vec4 Albedo;
 uniform float AlbedoMix;
 
 out vec4 outColor;
 
-//FontMaps are stored in PixelFormat Red8
+vec3 EncodeSRgb(vec3 linearRGB)
+{
+    vec3 a = 12.92 * linearRGB;
+    vec3 b = 1.055 * pow(linearRGB, vec3(1.0 / 2.4)) - 0.055;
+    vec3 c = step(vec3(0.0031308), linearRGB);
+    return mix(a, b, c);
+}
+
 void main()
 {
 	vec3 N = normalize(vMVNormal);
-	vec3 L = vec3(0.0,0.0,-1.0);
-	vec4 color = vec4(texture(AlbedoTexture,vUV).r * AlbedoMix);
+	vec3 L = vec3(0.0, 0.0, -1.0);
 
-	if(AlbedoMix == 0.0)
-		color = vec4(1.0, 1.0, 1.0, texture(AlbedoTexture, vUV).r);	
-	
-	float red = texture(AlbedoTexture, vUV).r;
-	outColor = color * AlbedoColor *  max(dot(N, L), 0.0);
+    vec3 lightColor = vec3(1.0, 1.0, 1.0);
+    vec4 objCol = vec4(0.0, 0.0, 0.0, 1.0);
+    vec4 texCol = texture(AlbedoTexture, vUV * AlbedoTextureTiles);
+    vec3 mixCol = mix(Albedo.xyz, texCol.xyz, AlbedoMix);    
+    objCol = vec4(mixCol, texCol.a);
+    vec4 Idif = vec4(max(dot(N, L), 0.0) * lightColor, 1.0);
+
+    vec4 linearOutCol = Idif * objCol;
+
+	outColor = vec4(EncodeSRgb(linearOutCol.rgb), linearOutCol.a);
 }
