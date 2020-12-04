@@ -1,5 +1,5 @@
-﻿using Fusee.Engine.Common;
-using Android.Views;
+﻿using Android.Views;
+using Fusee.Engine.Common;
 
 namespace Fusee.Engine.Imp.Graphics.Android
 {
