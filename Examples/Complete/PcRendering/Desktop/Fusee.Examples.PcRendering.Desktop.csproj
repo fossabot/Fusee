@@ -13,8 +13,8 @@
   <ItemGroup>
     <ProjectReference Include="$(FuseeEngineRoot)\src\Base\Imp\Desktop\Fusee.Base.Imp.Desktop.csproj" />
     <ProjectReference Include="$(FuseeEngineRoot)\src\Engine\Imp\Graphics\Desktop\Fusee.Engine.Imp.Graphics.Desktop.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Pointcloud\Common\Fusee.PointCloud.Common.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Pointcloud\PointAccessorCollection\Fusee.PointCloud.PointAccessorCollections.csproj" />
+    <ProjectReference Include="$(FuseeEngineRoot)\src\Pointcloud\Common\Fusee.PointCloud.Common.csproj" />
+    <ProjectReference Include="$(FuseeEngineRoot)\src\Pointcloud\PointAccessorCollection\Fusee.PointCloud.PointAccessorCollections.csproj" />
     <ProjectReference Include="..\Core\Fusee.Examples.PcRendering.Core.csproj" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
   </ItemGroup>

@@ -228,7 +228,7 @@ namespace Fusee.Engine.Imp.Graphics.Android
                     pxType = PixelType.UnsignedByte;
                     break;
                 // TODO: Handle Alpha-only / Intensity-only and AlphaIntensity correctly.
-                case ColorFormat.R8:
+                case ColorFormat.Intensity:
                     internalFormat = PixelInternalFormat.Alpha;
                     format = PixelFormat.Alpha;
                     pxType = PixelType.UnsignedByte;
@@ -1287,7 +1287,7 @@ namespace Fusee.Engine.Imp.Graphics.Android
             {
                 throw new ArgumentException("triangleIndices must not be null or empty");
             }
-            ((MeshImp)mr).TriangleIndices = triangleIndices.Length;
+            ((MeshImp)mr).NElements = triangleIndices.Length;
             int vboBytes;
             int trisBytes = triangleIndices.Length * sizeof(short);
 
@@ -1454,7 +1454,7 @@ namespace Fusee.Engine.Imp.Graphics.Android
             if (((MeshImp)mr).ElementBufferObject != 0)
             {
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, ((MeshImp)mr).ElementBufferObject);
-                GL.DrawElements(BeginMode.Triangles, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort,
+                GL.DrawElements(BeginMode.Triangles, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort,
                     IntPtr.Zero);
                 //GL.DrawArrays(GL.Enums.All.POINTS, 0, shape.Vertices.Length);
 
@@ -1462,7 +1462,7 @@ namespace Fusee.Engine.Imp.Graphics.Android
                 {
                     case OpenGLPrimitiveType.Triangles:
                     default:
-                        GL.DrawElements(BeginMode.Triangles, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        GL.DrawElements(BeginMode.Triangles, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
                         break;
 
                     case OpenGLPrimitiveType.Points:
@@ -1471,19 +1471,19 @@ namespace Fusee.Engine.Imp.Graphics.Android
                         //GL.Enable(EnableCap.DepthTest);
                         //GL.DepthMask(true);
                         //GL.Enable(All.VertexProgramPointSize);
-                        GL.DrawElements(BeginMode.Points, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        GL.DrawElements(BeginMode.Points, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
                         break;
 
                     case OpenGLPrimitiveType.Lines:
-                        GL.DrawElements(BeginMode.Lines, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        GL.DrawElements(BeginMode.Lines, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
                         break;
 
                     case OpenGLPrimitiveType.LineLoop:
-                        GL.DrawElements(BeginMode.LineLoop, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        GL.DrawElements(BeginMode.LineLoop, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
                         break;
 
                     case OpenGLPrimitiveType.LineStrip:
-                        GL.DrawElements(BeginMode.LineStrip, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        GL.DrawElements(BeginMode.LineStrip, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
                         break;
 
                     case OpenGLPrimitiveType.Patches:
@@ -1491,11 +1491,11 @@ namespace Fusee.Engine.Imp.Graphics.Android
                     case OpenGLPrimitiveType.QuadStrip:
                         throw new NotSupportedException("Quad strip is no valid primitive type within OpenGL ES 3.0");
                     case OpenGLPrimitiveType.TriangleFan:
-                        GL.DrawElements(BeginMode.TriangleFan, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        GL.DrawElements(BeginMode.TriangleFan, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
                         break;
 
                     case OpenGLPrimitiveType.TriangleStrip:
-                        GL.DrawElements(BeginMode.TriangleStrip, ((MeshImp)mr).TriangleIndices, DrawElementsType.UnsignedShort, IntPtr.Zero);
+                        GL.DrawElements(BeginMode.TriangleStrip, ((MeshImp)mr).NElements, DrawElementsType.UnsignedShort, IntPtr.Zero);
                         break;
                 }
             }
