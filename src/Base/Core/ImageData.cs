@@ -147,7 +147,7 @@ namespace Fusee.Base.Core
                                     }
                                 };
                                 break;
-                            case ColorFormat.R8:
+                            case ColorFormat.Intensity:
                                 copyLine = delegate (byte[] srcLineBytes, int destinationIndex)
                                 {
                                     for (int i = 0; i < srcLineBytes.Length; i++) // jump 1 unit per loop because we want to copy src Intensity to dst RGBA
@@ -180,7 +180,7 @@ namespace Fusee.Base.Core
                                 };
 
                                 break;
-                            case ColorFormat.R8:
+                            case ColorFormat.Intensity:
                                 copyLine = delegate (byte[] srcLineBytes, int destinationIndex)
                                 {
                                     for (int i = 0; i < srcLineBytes.Length; i++) // jump 1 unit per loop because we want to copy src Intensity to dst RGB
@@ -195,7 +195,7 @@ namespace Fusee.Base.Core
                                 throw new ArgumentOutOfRangeException(nameof(src), "Unknown source pixel format to copy to RGB");
                         }
                         break;
-                    case ColorFormat.R8:
+                    case ColorFormat.Intensity:
                         switch (src.PixelFormat.ColorFormat)
                         {
                             case ColorFormat.RGB:

@@ -1,12 +1,5 @@
-﻿using Fusee.Base.Common;
-using Fusee.Base.Core;
-using Fusee.Base.Imp.Desktop;
-using Fusee.Engine.Core;
-using Fusee.Engine.Core.Scene;
-using Fusee.Serialization;
-using System.IO;
-using System.Reflection;
-using Path = Fusee.Base.Common.Path;
+﻿using System;
+using System.Threading;
 
 namespace Fusee.Examples.Simple.Desktop
 {
@@ -16,29 +9,7 @@ namespace Fusee.Examples.Simple.Desktop
         {
             Lib.ExecFusAppInNewThread();
 
-            var fap = new Fusee.Base.Imp.Desktop.FileAssetProvider("Assets");
-            fap.RegisterTypeHandler(
-                new AssetHandler
-                {
-                    ReturnedType = typeof(Font),
-                    Decoder = (string id, object storage) =>
-                    {
-                        if (!Path.GetExtension(id).Contains("ttf", System.StringComparison.OrdinalIgnoreCase)) return null;
-                        return new Font { _fontImp = new FontImp((Stream)storage) };
-                    },
-                    Checker = id => Path.GetExtension(id).Contains("ttf", System.StringComparison.OrdinalIgnoreCase)
-                });
-            fap.RegisterTypeHandler(
-                new AssetHandler
-                {
-                    ReturnedType = typeof(SceneContainer),
-                    Decoder = (string id, object storage) =>
-                    {
-                        if (!Path.GetExtension(id).Contains("fus", System.StringComparison.OrdinalIgnoreCase)) return null;
-                        return FusSceneConverter.ConvertFrom(ProtoBuf.Serializer.Deserialize<FusFile>((Stream)storage), id);
-                    },
-                    Checker = id => Path.GetExtension(id).Contains("fus", System.StringComparison.OrdinalIgnoreCase)
-                });
+            var isInit = Lib.IsAppInitialized();
 
             while (!isInit)
                 isInit = Lib.IsAppInitialized();
