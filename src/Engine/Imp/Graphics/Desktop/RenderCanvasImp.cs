@@ -1,22 +1,20 @@
 using Fusee.Engine.Common;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Common.Input;
 using OpenTK.Windowing.Desktop;
-using OpenTK.Windowing.GraphicsLibraryFramework;
+using OpenTK.Mathematics;
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
 using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
 using SDPixelFormat = System.Drawing.Imaging.PixelFormat;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace Fusee.Engine.Imp.Graphics.Desktop
 {
-    //RenderCanvasWindowImp isn't working with the current version of OpenTk 4.0 because we cannot bind a GraphicsContext to an already existing window in GLWF right now.
-    //See: https://github.com/glfw/glfw/issues/25
     /*
     /// <summary>
     /// Use this class as a base class for implementing connectivity to whatever windows system you intend to support.
@@ -28,20 +26,15 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
     {
         #region Internal Fields
 
-        //internal IWindowInfo _wi;
+        internal IWindowInfo _wi;
         internal IGraphicsContext _context;
-        //internal GraphicsMode _mode;
+        internal GraphicsMode _mode;
         internal int _major, _minor;
-        internal ContextFlags _flags;
+        internal GraphicsContextFlags _flags;
 
         #endregion
 
         #region Fields
-        /// <summary>
-        /// Window handle for the window the engine renders to.
-        /// </summary>
-        public IWindowHandle WindowHandle { get; }
-
         /// <summary>
         /// Gets and sets the width.
         /// </summary>
@@ -100,7 +93,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
         private float _lastTimeTick;
         private float _deltaFrameTime;
-        private static Stopwatch _watch;
+        private static Stopwatch _daWatch;
 
         /// <summary>
         /// Gets the delta time.
@@ -127,19 +120,9 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public bool VerticalSync
         {
-            get => _vSync;
-            set
-            {
-
-                if (!value)
-                    GLFW.SwapInterval(0);
-                else
-                    GLFW.SwapInterval(1);
-
-                _vSync = value;
-            }
+            get { return _context.SwapInterval == 1; }
+            set { _context.SwapInterval = (value) ? 1 : 0; }
         }
-        private bool _vSync;
 
         /// <summary>
         /// Gets and sets a value indicating whether [enable blending].
@@ -168,12 +151,12 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         {
             get
             {
-                if (_watch == null)
+                if (_daWatch == null)
                 {
-                    _watch = new Stopwatch();
-                    _watch.Start();
+                    _daWatch = new Stopwatch();
+                    _daWatch.Start();
                 }
-                return ((float)_watch.ElapsedTicks) / ((float)Stopwatch.Frequency);
+                return ((float)_daWatch.ElapsedTicks) / ((float)Stopwatch.Frequency);
             }
         }
 
@@ -191,22 +174,22 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             _major = 1;
             _minor = 0;
 
-            _flags = ContextFlags.Default;
-            //_wi = Utilities.CreateWindowsWindowInfo(windowHandle);
+            _flags = GraphicsContextFlags.Default;
+            _wi = Utilities.CreateWindowsWindowInfo(windowHandle);
 
             try
             {
-                //_mode = new GraphicsMode(32, 24, 0, 8);
-                _context = new GLFWGraphicsContext();
+                _mode = new GraphicsMode(32, 24, 0, 8);
+                _context = new GraphicsContext(_mode, _wi, _major, _minor, _flags);
             }
             catch
             {
-                //_mode = new GraphicsMode(32, 24, 0, 8);
-                _context = new GLFWGraphicsContext();
+                _mode = new GraphicsMode(32, 24, 0, 8);
+                _context = new GraphicsContext(_mode, _wi, _major, _minor, _flags);
             }
 
-            _context.MakeCurrent();
-            //((IGraphicsContextInternal)_context).LoadAll();
+            _context.MakeCurrent(_wi);
+            ((IGraphicsContextInternal)_context).LoadAll();
 
             GL.ClearColor(Color.MidnightBlue);
 
@@ -214,7 +197,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             GL.Enable(EnableCap.CullFace);
 
             // Use VSync!
-            VerticalSync = true;
+            _context.SwapInterval = 1;
             _lastTimeTick = Timer;
 
             BaseWidth = width;
@@ -310,18 +293,18 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                     // Free other state (managed objects).
                 }
 
-                //Free your own state(unmanaged objects).
+                // Free your own state (unmanaged objects).
                 if (_context != null)
                 {
                     _context.Dispose();
                     _context = null;
                 }
 
-                //if (_wi != null)
-                //{
-                //    _wi.Dispose();
-                //    _wi = null;
-                //}
+                if (_wi != null)
+                {
+                    _wi.Dispose();
+                    _wi = null;
+                }
 
                 _disposed = true;
             }
@@ -346,16 +329,16 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
     {
         #region Fields
 
+        /// <summary>
+        /// Window handle for the window the engine renders to.
+        /// </summary>
+        public IWindowHandle WindowHandle { get; }
+
         //Some tryptichon related variables.
         private bool _videoWallMode = false;
         private int _videoWallMonitorsHor;
         private int _videoWallMonitorsVert;
         private bool _windowBorderHidden = false;
-
-        /// <summary>
-        /// Window handle for the window the engine renders to.
-        /// </summary>
-        public IWindowHandle WindowHandle { get; }
 
         /// <summary>
         /// Implementation Tasks: Gets and sets the width(pixel units) of the Canvas.
@@ -459,6 +442,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             set { _gameWindow.WindowState = (value) ? WindowState.Fullscreen : WindowState.Normal; }
         }
 
+
         /// <summary>
         /// Gets a value indicating whether [focused].
         /// This property is used to identify if this application is the active window of the user.
@@ -527,13 +511,12 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 _gameWindow = new RenderCanvasGameWindow(this, false);
             }
             if (appIcon != null)
-                _gameWindow.Icon = new WindowIcon(new OpenTK.Windowing.Common.Input.Image(appIcon.Width, appIcon.Height, SwapColors(appIcon.ToBitmap(), ChangeColors.SwapBlueAndRed)));
+                _gameWindow.Icon = new WindowIcon(new OpenTK.Windowing.Common.Input.Image(appIcon.Width, appIcon.Height, SwapColors(appIcon.ToBitmap(), ChangeColors.SwapBlueAndRed))); ;
 
             WindowHandle = new WindowHandle()
             {
                 Handle = _gameWindow.Handle
             };
-
         }
 
         #region Swap Icon colors
@@ -699,6 +682,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 _gameWindow = new RenderCanvasGameWindow(this, width, height, false);
             }
             _gameWindow.Size = new Vector2i(0, 0);
+
+            WindowHandle = new WindowHandle()
+            {
+                Handle = _gameWindow.Handle
+            };
         }
 
         /// <summary>
@@ -919,7 +907,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </summary>
         internal protected void DoInit()
         {
-            Init?.Invoke(this, new InitEventArgs());
+            if (Init != null)
+                Init(this, new InitEventArgs());
         }
 
         /// <summary>
@@ -927,7 +916,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </summary>
         internal protected void DoUnLoad()
         {
-            UnLoad?.Invoke(this, new InitEventArgs());
+            if (UnLoad != null)
+                UnLoad(this, new InitEventArgs());
         }
 
         /// <summary>
@@ -944,7 +934,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </summary>
         internal protected void DoResize(int width, int height)
         {
-            Resize?.Invoke(this, new Common.ResizeEventArgs(width, height));
+            if (Resize != null)
+                Resize(this, new Common.ResizeEventArgs(width, height));
         }
 
         #endregion
@@ -1021,7 +1012,6 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         #endregion
 
         #region Constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderCanvasGameWindow"/> class.
         /// </summary>
@@ -1077,8 +1067,15 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         protected override void OnLoad()
         {
             // Check for necessary capabilities
-            if (APIVersion.Major < 2)
+            string version = GL.GetString(StringName.Version);
+
+            int major = (int)version[0];
+            // int minor = (int)version[2];
+
+            if (major < 2)
+            {
                 throw new InvalidOperationException("You need at least OpenGL 2.0 to run this example. GLSL not supported.");
+            }
 
             GL.ClearColor(Color.MidnightBlue);
 
@@ -1105,18 +1102,21 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 _renderCanvasImp.BaseHeight = e.Height;
                 _renderCanvasImp.DoResize(e.Width, e.Height);
             }
-            else
-                throw new NullReferenceException("_randerCanvasImp is not initialized!");
+
+            /*
+            GL.Viewport(0, 0, Width, Height);
+
+            float aspect_ratio = Width / (float)Height;
+            Matrix4 perspective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspect_ratio, 1, 64);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadMatrix(ref perspective);
+             * */
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            //TODO: OpenTK4.0 - esc will lead to NullReference on Input properties
-            //if (KeyboardState[Key.Escape])
-            //{
-            //    Close();
-            //    Dispose();
-            //}
+            //if (Keyboard[OpenTK.Input.Key.Escape])
+            //this.Exit();
 
             if (KeyboardState[Key.F11])
                 WindowState = (WindowState != WindowState.Fullscreen) ? WindowState.Fullscreen : WindowState.Normal;
@@ -1124,13 +1124,6 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            if (KeyboardState[Key.Escape])
-            {
-                Close();
-                Dispose();
-                return;
-            }
-
             DeltaTime = (float)e.Time;
 
             if (_renderCanvasImp != null)

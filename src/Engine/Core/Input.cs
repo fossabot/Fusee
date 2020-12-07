@@ -87,6 +87,11 @@ namespace Fusee.Engine.Core
         /// </summary>
         public static IEnumerable<InputDevice> Devices => Instance._inputDevices.Values;
 
+        /// <summary>
+        /// The input of the space mouse.
+        /// </summary>
+        public readonly SixDOFDevice SpaceMouseInput;
+
         private readonly Dictionary<string, InputDevice> _inputDevices;
         private readonly List<SpecialDeviceCreator> _specialDeviceCreators;
 
@@ -101,7 +106,6 @@ namespace Fusee.Engine.Core
         /// to the same functionality.
         /// </remarks>
         public IEnumerable<TDevice> GetInputDevices<TDevice>() where TDevice : InputDevice => _inputDevices.Values.OfType<TDevice>();
-
         /// <summary>
         /// Gets the input devices of a certain type. Shortcut for
         /// <code>InputDevices.OfType&lt;TDevice&gt;()</code>
@@ -125,7 +129,6 @@ namespace Fusee.Engine.Core
         /// to the same functionality.
         /// </remarks>
         public TDevice GetInputDevice<TDevice>(int id = 0) where TDevice : InputDevice => _inputDevices.Values.OfType<TDevice>().ElementAtOrDefault(id);
-
         /// <summary>
         /// Gets the first input device of a certain type. Shortcut for
         /// <code>InputDevices.OfType&lt;TDevice&gt;().FirstOrDefault()</code>
@@ -149,7 +152,6 @@ namespace Fusee.Engine.Core
         /// to the same functionality.
         /// </remarks>
         public MouseDevice MouseInput => GetInputDevice<MouseDevice>(0);
-
         /// <summary>
         /// Retrieves the first mouse device (if present).
         /// </summary>
@@ -163,30 +165,6 @@ namespace Fusee.Engine.Core
         public static MouseDevice Mouse => Instance.MouseInput;
 
         /// <summary>
-        /// Retrieves the first space mouse device (if present).
-        /// </summary>        
-        /// <value>
-        /// The space mouse (or null).
-        /// </value>
-        /// <remarks>
-        /// This is an instance property. Use <see cref="SpaceMouse"/> for a static-over-singleton access
-        /// to the same functionality.
-        /// </remarks>
-        public SixDOFDevice SpaceMouseInput => GetInputDevice<SixDOFDevice>(0);
-
-        /// <summary>
-        /// Retrieves the first space mouse device (if present).
-        /// </summary>
-        /// <value>
-        /// The space mouse (or null).
-        /// </value>
-        /// <remarks>
-        /// This is a static property. Use <see cref="SpaceMouseInput"/> for an instance property 
-        /// to the same functionality.
-        /// </remarks>
-        public static SixDOFDevice SpaceMouse => Instance.SpaceMouseInput;
-
-        /// <summary>
         /// Retrieves the first keyboard device (if present).
         /// </summary>
         /// <value>
@@ -197,7 +175,6 @@ namespace Fusee.Engine.Core
         /// to the same functionality.
         /// </remarks>
         public KeyboardDevice KeyboardInput => GetInputDevice<KeyboardDevice>(0);
-
         /// <summary>
         /// Retrieves the first keyboard device (if present).
         /// </summary>
@@ -243,7 +220,6 @@ namespace Fusee.Engine.Core
         /// to the same functionality.
         /// </remarks>
         public event EventHandler<DeviceConnectionArgs> InputDeviceConnected;
-
         /// <summary>
         /// Occurs when a device such as a gamepad is connected.
         /// </summary>
@@ -277,7 +253,6 @@ namespace Fusee.Engine.Core
         /// to the same functionality.
         /// </remarks>
         public event EventHandler<DeviceConnectionArgs> InputDeviceDisconnected;
-
         /// <summary>
         /// Occurs when a device such as a gamepad is disconnected.
         /// </summary>
@@ -303,6 +278,7 @@ namespace Fusee.Engine.Core
             }
         }
 
+
         private Input()
         {
             _inputDrivers = new Dictionary<string, IInputDriverImp>();
@@ -313,13 +289,13 @@ namespace Fusee.Engine.Core
             RegisterInputDeviceType(imp => imp.Category == DeviceCategory.Mouse, imp => new MouseDevice(imp));
             RegisterInputDeviceType(imp => imp.Category == DeviceCategory.Keyboard, imp => new KeyboardDevice(imp));
             RegisterInputDeviceType(imp => imp.Category == DeviceCategory.Touch, imp => new TouchDevice(imp));
-
             // Users can register additional devices.
             RegisterInputDeviceType(imp => imp.Category == DeviceCategory.SixDOF, imp => new SixDOFDevice(imp));
             RegisterInputDeviceType(imp => imp.Category == DeviceCategory.GameController, imp => new GamePadDevice(imp));
             RegisterInputDeviceType(imp => imp.Category == DeviceCategory.GameController, imp => new GamePadDevice(imp));
             RegisterInputDeviceType(imp => imp.Category == DeviceCategory.GameController, imp => new GamePadDevice(imp));
             RegisterInputDeviceType(imp => imp.Category == DeviceCategory.GameController, imp => new GamePadDevice(imp));
+
         }
 
         private static Input _instance;
@@ -327,8 +303,7 @@ namespace Fusee.Engine.Core
         /// <summary>
         ///     Provides the singleton Instance of the Input Class.
         /// </summary>
-        public static Input Instance => _instance ??= new Input();
-
+        public static Input Instance => _instance ?? (_instance = new Input());
         /// <summary>
         /// Registers the type of input device available.
         /// </summary>
@@ -428,6 +403,8 @@ namespace Fusee.Engine.Core
         /// </remarks>
         public static void AddDriverImp(IInputDriverImp inputDriver) => Instance.AddInputDriverImp(inputDriver);
 
+
+
         private void OnNewDeviceImpConnected(object sender, NewDeviceImpConnectedArgs args)
         {
             if (sender == null) throw new ArgumentNullException(nameof(sender));
@@ -486,7 +463,6 @@ namespace Fusee.Engine.Core
                 inputDevice.PreRender();
             }
         }
-
         /// <summary>
         /// Should be called from the main (rendering-) loop. Typically not to be called by user code unless
         /// users implement their own rendering/application loop.

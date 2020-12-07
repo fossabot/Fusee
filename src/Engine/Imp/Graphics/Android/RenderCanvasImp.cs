@@ -1,4 +1,4 @@
-﻿using Android.Content;
+using Android.Content;
 using Android.Util;
 using Android.Views;
 using Fusee.Engine.Common;
@@ -332,7 +332,7 @@ namespace Fusee.Engine.Imp.Graphics.Android
         #endregion Internal Members
     }
 
-    internal class RenderCanvasGameView : AndroidGameView
+    public class RenderCanvasGameView : AndroidGameView
     {
         #region Fields
 
