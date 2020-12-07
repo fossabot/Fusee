@@ -1,17 +1,17 @@
 using Fusee.Engine.Common;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Common.Input;
 using OpenTK.Windowing.Desktop;
-using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
-using SDPixelFormat = System.Drawing.Imaging.PixelFormat;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using PixelFormat = OpenTK.Graphics.OpenGL.PixelFormat;
+using SDPixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace Fusee.Engine.Imp.Graphics.Desktop
 {
