@@ -3,6 +3,7 @@ using Fusee.Base.Core;
 using Fusee.Engine.Common;
 using Fusee.Engine.Core;
 using Fusee.Engine.Core.Effects;
+using Fusee.Engine.Core.Primitives;
 using Fusee.Engine.Core.Scene;
 using Fusee.Engine.Core.ShaderShards;
 using Fusee.Engine.GUI;
@@ -18,13 +19,6 @@ namespace Fusee.Examples.Simple.Core
     [FuseeApplication(Name = "FUSEE Simple Example", Description = "A very simple example.")]
     public class Simple : RenderCanvas
     {
-        public bool IsInitialized = false;
-
-        public bool IsRenderPauseRequested = false;
-        public bool IsClosingRequested = false;
-
-        public IWindowHandle WindowHandle;
-
         // angle variables
         private static float _angleHorz = M.PiOver3, _angleVert = -M.PiOver6 * 0.5f, _angleVelHorz, _angleVelVert;
 
@@ -45,9 +39,15 @@ namespace Fusee.Examples.Simple.Core
 
         private bool _keys;
 
+        public bool IsClosingRequested;
+        public bool IsInitialized { get; private set; }
+        public bool IsRenderPauseRequested;
+
         // Init is called on startup.
         public override void Init()
         {
+            IsInitialized = false;
+
             _gui = CreateGui();
 
             // Create the interaction handler
@@ -56,8 +56,30 @@ namespace Fusee.Examples.Simple.Core
             // Set the clear color for the backbuffer to white (100% intensity in all color channels R, G, B, A).
             RC.ClearColor = new float4(1, 1, 1, 1);
 
+            var ptFx = new PointCloudSurfaceEffect
+            {
+                PointSize = 2
+            };
+            ptFx.SurfaceInput.Albedo = new float4(1, 0, 0, 1);
+
+            var fx = MakeEffect.FromDiffuseSpecular(new float4(1, 0, 0, 1), float4.Zero, 255, 1f);
+
             // Load the rocket model
-            _rocketScene = AssetStorage.Get<SceneContainer>("RocketFus.fus");
+            _rocketScene = new SceneContainer()
+            {
+                Children = new List<SceneNode>()
+                {
+                    new SceneNode()
+                    {
+                        Components = new List<SceneComponent>()
+                        {
+                            ptFx,
+                            new Icosphere(5),
+
+                        }
+                    }
+                }
+            };
 
             // Wrap a SceneRenderer around the model.
             _sceneRenderer = new SceneRendererForward(_rocketScene);
@@ -69,11 +91,10 @@ namespace Fusee.Examples.Simple.Core
         // RenderAFrame is called once a frame
         public override void RenderAFrame()
         {
+            if (IsRenderPauseRequested) return;
+
             // Clear the backbuffer
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
-
-            if (IsRenderPauseRequested)
-                return;
 
             RC.Viewport(0, 0, Width, Height);
 
