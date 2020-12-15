@@ -348,7 +348,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public int Width
         {
-            get { return BaseWidth; }
+            get => BaseWidth;
             set
             {
                 _gameWindow.Size = new Vector2i(value, _gameWindow.Size.Y);
@@ -365,7 +365,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public int Height
         {
-            get { return BaseHeight; }
+            get => BaseHeight;
             set
             {
                 _gameWindow.Size = new Vector2i(_gameWindow.Size.X, value);
@@ -382,7 +382,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public string Caption
         {
-            get { return (_gameWindow == null) ? "" : _gameWindow.Title; }
+            get => (_gameWindow == null) ? "" : _gameWindow.Title;
             set { if (_gameWindow != null) _gameWindow.Title = value; }
         }
 
@@ -413,7 +413,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public bool VerticalSync
         {
-            get { return (_gameWindow != null) && (_gameWindow.VSync == VSyncMode.On || _gameWindow.VSync == VSyncMode.Adaptive); }
+            get => (_gameWindow != null) && (_gameWindow.VSync == VSyncMode.On || _gameWindow.VSync == VSyncMode.Adaptive);
             set { if (_gameWindow != null) _gameWindow.VSync = VSyncMode.On; }
         }
 
@@ -426,8 +426,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public bool EnableBlending
         {
-            get { return _gameWindow.Blending; }
-            set { _gameWindow.Blending = value; }
+            get => _gameWindow.Blending;
+            set => _gameWindow.Blending = value;
         }
 
         /// <summary>
@@ -438,8 +438,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public bool Fullscreen
         {
-            get { return (_gameWindow.WindowState == WindowState.Fullscreen); }
-            set { _gameWindow.WindowState = (value) ? WindowState.Fullscreen : WindowState.Normal; }
+            get => (_gameWindow.WindowState == WindowState.Fullscreen);
+            set => _gameWindow.WindowState = (value) ? WindowState.Fullscreen : WindowState.Normal;
         }
 
 
@@ -462,8 +462,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </summary>
         public bool VideoWallMode
         {
-            get { return _videoWallMode; }
-            set { _videoWallMode = value; }
+            get => _videoWallMode;
+            set => _videoWallMode = value;
         }
 
         /// <summary>
@@ -471,8 +471,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </summary>
         public int TryptMonitorSetupVertical
         {
-            get { return _videoWallMonitorsVert; }
-            set { _videoWallMonitorsVert = value; }
+            get => _videoWallMonitorsVert;
+            set => _videoWallMonitorsVert = value;
         }
 
         /// <summary>
@@ -480,8 +480,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </summary>
         public int TryptMonitorSetupHorizontal
         {
-            get { return _videoWallMonitorsHor; }
-            set { _videoWallMonitorsHor = value; }
+            get => _videoWallMonitorsHor;
+            set => _videoWallMonitorsHor = value;
         }
 
         internal RenderCanvasGameWindow _gameWindow;
@@ -835,9 +835,9 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <returns></returns>
         public Bitmap ShootCurrentFrame(int width, int height)
         {
-            this.DoInit();
-            this.DoRender();
-            this.DoResize(width, height);
+            DoInit();
+            DoRender();
+            DoResize(width, height);
 
             var bmp = new Bitmap(this.Width, this.Height, SDPixelFormat.Format32bppArgb);
             var mem = bmp.LockBits(new System.Drawing.Rectangle(0, 0, Width, Height), System.Drawing.Imaging.ImageLockMode.WriteOnly, SDPixelFormat.Format32bppArgb);
@@ -905,7 +905,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <summary>
         /// Does the initialize of this instance.
         /// </summary>
-        internal protected void DoInit()
+        protected internal void DoInit()
         {
             if (Init != null)
                 Init(this, new InitEventArgs());
@@ -914,7 +914,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <summary>
         /// Does the unload of this instance. 
         /// </summary>
-        internal protected void DoUnLoad()
+        protected internal void DoUnLoad()
         {
             if (UnLoad != null)
                 UnLoad(this, new InitEventArgs());
@@ -923,7 +923,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <summary>
         /// Does the render of this instance.
         /// </summary>
-        internal protected void DoRender()
+        protected internal void DoRender()
         {
             if (Render != null)
                 Render(this, new RenderEventArgs());
@@ -932,7 +932,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <summary>
         /// Does the resize on this instance.
         /// </summary>
-        internal protected void DoResize(int width, int height)
+        protected internal void DoResize(int width, int height)
         {
             if (Resize != null)
                 Resize(this, new Common.ResizeEventArgs(width, height));
@@ -941,11 +941,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         #endregion
     }
 
-    class RenderCanvasGameWindow : GameWindow
+    internal class RenderCanvasGameWindow : GameWindow
     {
         #region Fields
 
-        private RenderCanvasImp _renderCanvasImp;
+        private readonly RenderCanvasImp _renderCanvasImp;
 
         /// <summary>
         /// Gets the delta time.
@@ -966,7 +966,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public bool Blending
         {
-            get { return GL.IsEnabled(EnableCap.Blend); }
+            get => GL.IsEnabled(EnableCap.Blend);
             set
             {
                 if (value)
@@ -1022,7 +1022,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             {
                 Title = "Fusee Engine",
                 APIVersion = new Version(4, 2),
-                API = ContextAPI.OpenGL
+                API = ContextAPI.OpenGL,
+                Profile = ContextProfile.Compatability //If we choose Core the Profile requires a Vertex Array Object
             })
         {
             MakeCurrent(); //Needed with OpenTK 4.0 prev 9.2 and above. See https://github.com/opentk/opentk/issues/1118
@@ -1049,7 +1050,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 Size = new Vector2i(width, height),
                 Title = "Fusee Engine",
                 APIVersion = new Version(4, 2),
-                API = ContextAPI.OpenGL
+                API = ContextAPI.OpenGL,
+                Profile = ContextProfile.Compatability //If we choose Core the Profile requires a Vertex Array Object
             })
         {
             MakeCurrent(); //Needed with OpenTK 4.0 prev 9.2 and above. See https://github.com/opentk/opentk/issues/1118
@@ -1069,7 +1071,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             // Check for necessary capabilities
             string version = GL.GetString(StringName.Version);
 
-            int major = (int)version[0];
+            int major = version[0];
             // int minor = (int)version[2];
 
             if (major < 2)
@@ -1102,21 +1104,12 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 _renderCanvasImp.BaseHeight = e.Height;
                 _renderCanvasImp.DoResize(e.Width, e.Height);
             }
-
-            /*
-            GL.Viewport(0, 0, Width, Height);
-
-            float aspect_ratio = Width / (float)Height;
-            Matrix4 perspective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspect_ratio, 1, 64);
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref perspective);
-             * */
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            //if (Keyboard[OpenTK.Input.Key.Escape])
-            //this.Exit();
+            if (KeyboardState[Key.Escape])
+                Close();
 
             if (KeyboardState[Key.F11])
                 WindowState = (WindowState != WindowState.Fullscreen) ? WindowState.Fullscreen : WindowState.Normal;
