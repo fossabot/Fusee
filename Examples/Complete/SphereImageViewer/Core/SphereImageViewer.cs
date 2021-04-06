@@ -76,7 +76,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
 
             Mesh sphere = CreateSphere(10, 20, 50);
             Mesh plane = CreateGridPlane(20, 50, _planeHeight, _planeWidth, DistancePlaneCamera);
-            
+
             TextureInputSpecular colorInput = new TextureInputSpecular()
             {
                 Albedo = float4.One,
@@ -94,7 +94,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
 
             _animationEffect.PercentPerVertex = 1.0f;
             _animationEffect.PercentPerVertex1 = 0.0f;
-            
+
             //Creating CameraComponent and TransformComponent
             _mainCam.Viewport = new float4(0, 0, 100, 100);
             _mainCam.BackgroundColor = new float4(0f, 0f, 0f, 1);
@@ -182,7 +182,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
                 }
             };
 
-            
+
             //Debuggingtools
             //RC.SetRenderState(RenderState.CullMode, (uint)Cull.None);
             //RC.SetRenderState(RenderState.FillMode, (uint)FillMode.Wireframe);
@@ -190,8 +190,8 @@ namespace Fusee.Examples.SphereImageViewer.Core
             // Wrap a SceneRenderer around the model.
             _sceneRenderer = new SceneRendererForward(_animScene);
 
-            
-             _guiRenderer = new SceneRendererForward(_gui);
+
+            _guiRenderer = new SceneRendererForward(_gui);
         }
 
         // RenderAFrame is called once a frame
@@ -248,12 +248,12 @@ namespace Fusee.Examples.SphereImageViewer.Core
                     }
                     else
                     {
-                        
+
                         var curDamp = (float)System.Math.Exp(-Damping * DeltaTime);
                         _angleVelHorz *= curDamp;
                         _angleVelVert *= curDamp;
-                        
-                        
+
+
                     }
                 }
 
@@ -262,29 +262,29 @@ namespace Fusee.Examples.SphereImageViewer.Core
                     _mainCam.Fov += _zoom;
                 }
             }
-            
+
             else
             {
-                if(Keyboard.LeftRightAxis != 0 || Keyboard.UpDownAxis != 0)
+                if (Keyboard.LeftRightAxis != 0 || Keyboard.UpDownAxis != 0)
                 {
                     _keys = true;
-                    
+
                 }
 
                 //Zoom in/out
-                if(_zoom != 0)
+                if (_zoom != 0)
                 {
                     if (!(_mainCam.Fov + _zoom >= M.PiOver3) && !(_mainCam.Fov + _zoom <= 0.3))
                     {
                         _mainCam.Fov += _zoom;
-                        if(_mainCam.Fov > 0.75f)  //um bei weitem herauszoomen das flackern zwischen den Rändern zu verhindern
+                        if (_mainCam.Fov > 0.75f)  //um bei weitem herauszoomen das flackern zwischen den Rï¿½ndern zu verhindern
                         {
                             _planePositionY = 0;
                             _planePositionX = 0;
                         }
                     }
                 }
-                
+
 
                 if (Mouse.LeftButton)
                 {
@@ -324,13 +324,13 @@ namespace Fusee.Examples.SphereImageViewer.Core
                 float xMin = yMin * aspect;
                 float xMax = yMax * aspect;
 
-                if (yMax - _planePositionY - _planePosY > (_planeHeight / 2) || yMin - _planePositionY - _planePosY < -(_planeHeight / 2)) 
+                if (yMax - _planePositionY - _planePosY > (_planeHeight / 2) || yMin - _planePositionY - _planePosY < -(_planeHeight / 2))
                 {
                     if (_planePositionY > 0)
                     {
                         _planePositionY = (_planeHeight / 2) - yMax;
                     }
-                    else if(_planePositionY < 0)
+                    else if (_planePositionY < 0)
                     {
                         _planePositionY = -(_planeHeight / 2) + yMax;
                     }
@@ -343,7 +343,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
                 Diagnostics.Debug("planePositionX: " + _planePositionX);
                 Diagnostics.Debug("planePosX: " + _planePosX);
                 Diagnostics.Debug("planeWidth/2: " + _planeWidth / 2f);
-                if (xMax - _planePositionX - _planePosX > (_planeWidth / 2f) || xMin - _planePositionX - _planePosX < -(_planeWidth / 2f)) 
+                if (xMax - _planePositionX - _planePosX > (_planeWidth / 2f) || xMin - _planePositionX - _planePosX < -(_planeWidth / 2f))
                 {
 
                     if (_planePositionX > 0)
@@ -351,7 +351,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
                         Diagnostics.Debug("Bumper hit");
                         _planePositionX = (_planeWidth / 2) - xMax - 0.000001f;
                     }
-                    else if(_planePositionX < 0)
+                    else if (_planePositionX < 0)
                     {
                         Diagnostics.Debug("Bumper hit");
                         _planePositionX = -(_planeWidth / 2) + xMax - 0.000001f;
@@ -368,13 +368,13 @@ namespace Fusee.Examples.SphereImageViewer.Core
             Diagnostics.Debug("----------------------------");
 
             _angleHorz += _angleVelHorz;
-            if(!(_angleVert + _angleVelVert >= 1.5) && !(_angleVert + _angleVelVert <= -1.5))
+            if (!(_angleVert + _angleVelVert >= 1.5) && !(_angleVert + _angleVelVert <= -1.5))
             {
                 _angleVert += _angleVelVert;
             }
 
 
-            
+
             if (_sphereIsVisible)
             {
                 _mainCamTransform.Rotation = new float3(_angleVert, _angleHorz, 0);
@@ -584,7 +584,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
                 );
             zoomOutNode.Components.Add(_btnZoomOut);
 
-            
+
 
 
             var canvas = new CanvasNode(
@@ -646,7 +646,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
         //{
         //    OpenLink("http://fusee3d.org");
         //}
-        
+
         public void BtnZoomInDown(CodeComponent sender)
         {
             if (!(_mainCam.Fov - 0.001 <= 0.3))
@@ -664,25 +664,25 @@ namespace Fusee.Examples.SphereImageViewer.Core
                     _mainCam.Fov += 0.001f;
                 }
             }
-            
+
             else
             {
                 if (!(_mainCam.Fov + 0.001f >= M.PiOver3) && !(_mainCam.Fov + 0.001f <= 0.3))
                 {
                     _mainCam.Fov += 0.001f;
-                    if (_mainCam.Fov > 0.75f)  //um bei weitem herauszoomen das flackern zwischen den Rändern zu verhindern
+                    if (_mainCam.Fov > 0.75f)  //um bei weitem herauszoomen das flackern zwischen den Rï¿½ndern zu verhindern
                     {
                         _planePositionY = 0;
                         _planePositionX = 0;
                     }
                 }
             }
-            
+
         }
 
         public static Mesh CreateSphere(float radius, int longSegments, int latSegments)
         {
-            
+
             //Deklaration der Arrays
             float3[] verts = new float3[(longSegments + 1) * latSegments];
             float3[] norms = new float3[(longSegments + 1) * latSegments];
@@ -704,7 +704,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
                         norms[j] = -float3.UnitY;
                         uvs[j] = new float2((float)(j) / (float)(longSegments), 1);
                     }
-                    else if (i == latSegments - 1)   //Südpol
+                    else if (i == latSegments - 1)   //Sï¿½dpol
                     {
                         verts[(latSegments - 1) * (longSegments + 1) + j] = new float3(0, -radius, 0);
                         norms[(latSegments - 1) * (longSegments + 1) + j] = float3.UnitY;
@@ -715,7 +715,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
                         if (j == longSegments)
                         {
                             phi = 2 * (float)M.Pi / (longSegments - 1) * 0;
-                         }
+                        }
                         verts[i * longSegments + j + i * 1] = new float3(
                             (float)(radius * M.Sin(phi) * M.Sin(theta)),
                             (float)(radius * M.Cos(theta)),
@@ -733,7 +733,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
                 }
             }
 
-            for (int j = 0, k = 0; j < (latSegments - 1) * longSegments; j++, k++)   //j für die Array-Indices und k ist ein Punkt in den aktuellen Dreiecken
+            for (int j = 0, k = 0; j < (latSegments - 1) * longSegments; j++, k++)   //j fï¿½r die Array-Indices und k ist ein Punkt in den aktuellen Dreiecken
             {
                 if ((k + 1) % (longSegments + 1) == 0)
                 {
@@ -787,7 +787,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
                         norms[j] = -float3.UnitY;
                         uvs[j] = new float2((float)(j) / (float)(longSegments), 1);
                     }
-                    else if (i == latSegments - 1)   //Südpol
+                    else if (i == latSegments - 1)   //Sï¿½dpol
                     {
                         verts[(latSegments - 1) * (longSegments + 1) + j] = new float3(0, -radius, 0);
                         norms[(latSegments - 1) * (longSegments + 1) + j] = float3.UnitY;
@@ -817,7 +817,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
             }
 
             //Initialisierung der tris
-            for (int j = 0, k = 0; j < (latSegments - 1) * longSegments; j++, k++)   //j für die Array-Indices und k ist ein Punkt in den aktuellen Dreiecken
+            for (int j = 0, k = 0; j < (latSegments - 1) * longSegments; j++, k++)   //j fï¿½r die Array-Indices und k ist ein Punkt in den aktuellen Dreiecken
             {
                 if ((k + 1) % (longSegments + 1) == 0)
                 {
@@ -881,7 +881,7 @@ namespace Fusee.Examples.SphereImageViewer.Core
             {
                 for (int j = 0; j <= longSegments; j++)
                 {
-                    //Vektor wird um 45° um den Koordinatenursprung gedreht
+                    //Vektor wird um 45ï¿½ um den Koordinatenursprung gedreht
                     float x = M.Cos(M.Pi) * (startWidth + (j * columnWidth)) + M.Sin(M.Pi) * distancePlane;
                     float y = startHeight - (i * rowHeight);
                     float z = -M.Sin(M.Pi) * (startWidth + (j * columnWidth)) + M.Cos(M.Pi) * distancePlane;
