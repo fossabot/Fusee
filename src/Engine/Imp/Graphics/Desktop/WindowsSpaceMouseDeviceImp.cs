@@ -38,7 +38,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             if (!(renderCanvas is RenderCanvasImp))
                 throw new ArgumentException($"renderCanvas must be of type {typeof(RenderCanvasImp).FullName}", nameof(renderCanvas));
 
-            _gameWindow = ((RenderCanvasImp)renderCanvas)._gameWindow;
+            _gameWindow = ((RenderCanvasImp)renderCanvas).GameWindow;
             if (_gameWindow == null)
                 throw new ArgumentNullException(nameof(_gameWindow));
 

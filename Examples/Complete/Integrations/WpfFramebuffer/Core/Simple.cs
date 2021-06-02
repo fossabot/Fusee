@@ -14,7 +14,7 @@ using System.Linq;
 using static Fusee.Engine.Core.Input;
 using static Fusee.Engine.Core.Time;
 
-namespace Fusee.Examples.Simple.Core
+namespace Fusee.Examples.Integrations.WpfFramebuffer.Core
 {
     [FuseeApplication(Name = "FUSEE Simple Example", Description = "A very simple example.")]
     public class Simple : RenderCanvas

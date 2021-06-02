@@ -145,6 +145,7 @@ namespace Fusee.Engine.Core
         {
             _sc = sc;
             PrePassVisitor = new PrePassVisitor();
+            MakeEffect.Default = null;
             _state = new RendererState();
             InitAnimations(_sc);
         }

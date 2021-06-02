@@ -42,7 +42,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             get { return BaseWidth; }
             set
             {
-                _gameWindow.Size = new OpenTK.Mathematics.Vector2i(value, _gameWindow.Size.Y);
+                GameWindow.Size = new OpenTK.Mathematics.Vector2i(value, GameWindow.Size.Y);
                 BaseWidth = value;
                 ResizeWindow();
             }
@@ -59,7 +59,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             get { return BaseHeight; }
             set
             {
-                _gameWindow.Size = new OpenTK.Mathematics.Vector2i(_gameWindow.Size.X, value);
+                GameWindow.Size = new OpenTK.Mathematics.Vector2i(GameWindow.Size.X, value);
                 BaseHeight = value;
                 ResizeWindow();
             }
@@ -73,8 +73,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public string Caption
         {
-            get { return (_gameWindow == null) ? "" : _gameWindow.Title; }
-            set { if (_gameWindow != null) _gameWindow.Title = value; }
+            get { return (GameWindow == null) ? "" : GameWindow.Title; }
+            set { if (GameWindow != null) GameWindow.Title = value; }
         }
 
         /// <summary>
@@ -89,8 +89,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         {
             get
             {
-                if (_gameWindow != null)
-                    return _gameWindow.DeltaTime;
+                if (GameWindow != null)
+                    return GameWindow.DeltaTime;
                 return 0.01f;
             }
         }
@@ -104,8 +104,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public bool VerticalSync
         {
-            get { return (_gameWindow != null) && _gameWindow.VSync == OpenTK.Windowing.Common.VSyncMode.On; }
-            set { if (_gameWindow != null) _gameWindow.VSync = (value) ? OpenTK.Windowing.Common.VSyncMode.On : OpenTK.Windowing.Common.VSyncMode.Off; }
+            get { return (GameWindow != null) && GameWindow.VSync == OpenTK.Windowing.Common.VSyncMode.On; }
+            set { if (GameWindow != null) GameWindow.VSync = (value) ? OpenTK.Windowing.Common.VSyncMode.On : OpenTK.Windowing.Common.VSyncMode.Off; }
         }
 
         /// <summary>
@@ -117,8 +117,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public bool EnableBlending
         {
-            get { return _gameWindow.Blending; }
-            set { _gameWindow.Blending = value; }
+            get { return GameWindow.Blending; }
+            set { GameWindow.Blending = value; }
         }
 
         /// <summary>
@@ -129,8 +129,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public bool Fullscreen
         {
-            get { return (_gameWindow.WindowState == OpenTK.Windowing.Common.WindowState.Fullscreen); }
-            set { _gameWindow.WindowState = (value) ? OpenTK.Windowing.Common.WindowState.Fullscreen : OpenTK.Windowing.Common.WindowState.Normal; }
+            get { return (GameWindow.WindowState == OpenTK.Windowing.Common.WindowState.Fullscreen); }
+            set { GameWindow.WindowState = (value) ? OpenTK.Windowing.Common.WindowState.Fullscreen : OpenTK.Windowing.Common.WindowState.Normal; }
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public bool Focused
         {
-            get { return _gameWindow.IsFocused; }
+            get { return GameWindow.IsFocused; }
         }
 
         // Some tryptichon related Fields.
@@ -174,7 +174,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             set { _videoWallMonitorsHor = value; }
         }
 
-        internal RenderCanvasGameWindow _gameWindow;
+        public RenderCanvasGameWindow GameWindow { get; private set; }
 
         #endregion
 
@@ -206,19 +206,19 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
             try
             {
-                _gameWindow = new RenderCanvasGameWindow(this, width, height, false);
+                GameWindow = new RenderCanvasGameWindow(this, width, height, false);
             }
             catch
             {
-                _gameWindow = new RenderCanvasGameWindow(this, width, height, false);
+                GameWindow = new RenderCanvasGameWindow(this, width, height, false);
             }
 
             WindowHandle = new WindowHandle()
             {
-                Handle = _gameWindow.Handle
+                Handle = GameWindow.Handle
             };
 
-            _gameWindow.CenterWindow();
+            GameWindow.CenterWindow();
         }
 
         /// <summary>
@@ -231,20 +231,20 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         {
             try
             {
-                _gameWindow = new RenderCanvasGameWindow(this, width, height, true);
+                GameWindow = new RenderCanvasGameWindow(this, width, height, true);
             }
             catch
             {
-                _gameWindow = new RenderCanvasGameWindow(this, width, height, false);
+                GameWindow = new RenderCanvasGameWindow(this, width, height, false);
             }
 
             WindowHandle = new WindowHandle()
             {
-                Handle = _gameWindow.Handle
+                Handle = GameWindow.Handle
             };
 
-            _gameWindow.IsVisible = false;
-            _gameWindow.MakeCurrent();
+            GameWindow.IsVisible = false;
+            GameWindow.MakeCurrent();
         }
 
         /// <summary>
@@ -252,19 +252,29 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </summary>
         public void Dispose()
         {
-            _gameWindow.Dispose();
+            GameWindow.Dispose();
         }
 
         #endregion
 
         #region Members
 
+        /// <summary>
+        /// Manually resizes the window to the given width and hight."/>
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        public void ResizeWindow(int width, int height)
+        {
+            GameWindow.DoResize(width, height);
+        }
+
         private void ResizeWindow()
         {
             if (!_videoWallMode)
             {
-                _gameWindow.WindowBorder = _windowBorderHidden ? OpenTK.Windowing.Common.WindowBorder.Hidden : OpenTK.Windowing.Common.WindowBorder.Resizable;
-                _gameWindow.Bounds = new OpenTK.Mathematics.Box2i(BaseLeft, BaseTop, BaseWidth, BaseHeight);
+                GameWindow.WindowBorder = _windowBorderHidden ? OpenTK.Windowing.Common.WindowBorder.Hidden : OpenTK.Windowing.Common.WindowBorder.Resizable;
+                GameWindow.Bounds = new OpenTK.Mathematics.Box2i(BaseLeft, BaseTop, BaseWidth, BaseHeight);
             }
             else
             {
@@ -278,10 +288,10 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 var width = oneScreenWidth * _videoWallMonitorsHor;
                 var height = oneScreenHeight * _videoWallMonitorsVert;
 
-                _gameWindow.Bounds = new OpenTK.Mathematics.Box2i(0, 0, width, height);
+                GameWindow.Bounds = new OpenTK.Mathematics.Box2i(0, 0, width, height);
 
                 if (_windowBorderHidden)
-                    _gameWindow.WindowBorder = OpenTK.Windowing.Common.WindowBorder.Hidden;
+                    GameWindow.WindowBorder = OpenTK.Windowing.Common.WindowBorder.Hidden;
             }
         }
 
@@ -334,8 +344,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </summary>
         public void CloseGameWindow()
         {
-            if (_gameWindow != null)
-                _gameWindow.Close();
+            if (GameWindow != null)
+                GameWindow.Close();
         }
 
         /// <summary>
@@ -344,8 +354,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </summary>
         public void Present()
         {
-            if (_gameWindow != null)
-                _gameWindow.SwapBuffers();
+            if (GameWindow != null)
+                GameWindow.SwapBuffers();
         }
 
         /// <summary>
@@ -380,8 +390,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </summary>
         public void Run()
         {
-            if (_gameWindow != null)
-                _gameWindow.Run();
+            if (GameWindow != null)
+                GameWindow.Run();
         }
 
         /// <summary>
@@ -498,7 +508,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         #endregion
     }
 
-    class RenderCanvasGameWindow : GameWindow
+    public class RenderCanvasGameWindow : GameWindow
     {
         #region Fields
 
@@ -571,6 +581,16 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         }
 
         #endregion
+
+        /// <summary>
+        /// Manually calls <see cref="OnResize(OpenTK.Windowing.Common.ResizeEventArgs)"/>.
+        /// </summary>
+        /// <param name="width">The new width.</param>
+        /// <param name="height">The new height.</param>
+        internal void DoResize(int width, int height)
+        {
+            OnResize(new OpenTK.Windowing.Common.ResizeEventArgs(width, height));
+        }
 
         #region Overrides
 

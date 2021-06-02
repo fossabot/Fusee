@@ -1009,7 +1009,6 @@ namespace Fusee.Engine.Core
                 else
                 {
                     var surfEffect = (SurfaceEffect)ef;
-
                     var renderDependentShards = new List<KeyValuePair<ShardCategory, string>>();
 
                     //TODO: try to suppress adding these parameters if the effect is used only for deferred rendering.
@@ -1018,7 +1017,9 @@ namespace Fusee.Engine.Core
                     {
                         surfEffect.VertexShaderSrc.Add(new KeyValuePair<ShardCategory, string>(ShardCategory.Main, ShaderShards.Vertex.VertMain.VertexMain(surfEffect.LightingSetup)));
                         foreach (var dcl in SurfaceEffect.CreateForwardLightingParamDecls(ShaderShards.Fragment.Lighting.NumberOfLightsForward))
+                        {
                             surfEffect.ParamDecl.Add(dcl.Name, dcl);
+                        }
                     }
 
                     if (renderForward)

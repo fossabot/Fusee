@@ -1,7 +1,4 @@
-using Fusee.Base.Core;
 using Fusee.Engine.Common;
-using OpenTK;
-using OpenTK.Input;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -28,7 +25,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             if (!(renderCanvas is RenderCanvasImp))
                 throw new ArgumentException("renderCanvas must be of type RenderCanvasImp", "renderCanvas");
 
-            _gameWindow = ((RenderCanvasImp)renderCanvas)._gameWindow;
+            _gameWindow = ((RenderCanvasImp)renderCanvas).GameWindow;
             if (_gameWindow == null)
                 throw new ArgumentNullException(nameof(_gameWindow));
 

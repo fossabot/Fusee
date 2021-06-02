@@ -14,30 +14,13 @@ using System.Linq;
 using static Fusee.Engine.Core.Input;
 using static Fusee.Engine.Core.Time;
 
-namespace Fusee.Examples.Simple.Core
+namespace Fusee.Examples.Integrations.Wpf.Core
 {
     [FuseeApplication(Name = "FUSEE Simple Example", Description = "A very simple example.")]
-    public class Simple : RenderCanvas
+    public class Main : RenderCanvas
     {
-        public float RotYFromUi;
-        public float RotZFromUi;
-        public float RotXFromUi;
-
-        public event EventHandler<EventArgs> FusToWpfEvents;
-
-        public float4 RandomColor
-        {
-            get => _rndCol;
-            set
-            {
-                _rndCol = value;
-                _rocketScene.Children[0].Children[2].GetComponent<DefaultSurfaceEffect>().SurfaceInput.Albedo = _rndCol;
-            }
-        }
-        private float4 _rndCol;
-
         // angle variables
-        private static float _angleHorz, _angleVert, _angleVelHorz, _angleVelVert;
+        private static float _angleHorz = M.PiOver3, _angleVert = -M.PiOver6 * 0.5f, _angleVelHorz, _angleVelVert;
 
         private const float RotationSpeed = 7;
         private const float Damping = 0.8f;
@@ -56,6 +39,10 @@ namespace Fusee.Examples.Simple.Core
 
         private bool _keys;
 
+        public event EventHandler<FusEvent> FusToWpfEvents;
+
+        private Transform rocketTransform;
+
         // Init is called on startup.
         public override void Init()
         {
@@ -72,8 +59,11 @@ namespace Fusee.Examples.Simple.Core
 
             // Wrap a SceneRenderer around the model.
             _sceneRenderer = new SceneRendererForward(_rocketScene);
-
             _guiRenderer = new SceneRendererForward(_gui);
+
+            rocketTransform = _rocketScene.Children[0].GetTransform();
+
+            FusToWpfEvents?.Invoke(this, new StartupInfoEvent(VSync));
         }
 
         // RenderAFrame is called once a frame
@@ -81,9 +71,8 @@ namespace Fusee.Examples.Simple.Core
         {
             // Clear the backbuffer
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
-            RC.Viewport(0, 0, Width, Height);
 
-            _angleVelVert = -RotationSpeed * 0.0005f;
+            RC.Viewport(0, 0, Width, Height);
 
             // Mouse and keyboard movement
             if (Keyboard.LeftRightAxis != 0 || Keyboard.UpDownAxis != 0)
@@ -119,11 +108,11 @@ namespace Fusee.Examples.Simple.Core
                 }
             }
 
-            FusToWpfEvents?.Invoke(this, new RotationXChangedEventArgs(_angleVelVert));
-            FusToWpfEvents?.Invoke(this, new RotationXChangedEventArgs(_angleVelHorz));
+            _angleHorz += _angleVelHorz;
+            _angleVert += _angleVelVert;
 
             // Create the camera matrix and set it as the current ModelView transformation
-            var mtxRot = float4x4.CreateRotationZ(RotZFromUi) * float4x4.CreateRotationY(RotYFromUi) * float4x4.CreateRotationX(RotXFromUi);
+            var mtxRot = float4x4.CreateRotationX(_angleVert) * float4x4.CreateRotationY(_angleHorz);
             var mtxCam = float4x4.LookAt(0, +2, -10, 0, +2, 0, 0, 1, 0);
 
             var view = mtxCam * mtxRot;
@@ -145,10 +134,25 @@ namespace Fusee.Examples.Simple.Core
                 _sih.CheckForInteractiveObjects(RC, Touch.GetPosition(TouchPoints.Touchpoint_0), Width, Height);
             }
 
+            FusToWpfEvents?.Invoke(this, new FpsEvent(Time.FramesPerSecondAverage));
+
             _guiRenderer.Render(RC);
 
             // Swap buffers: Show the contents of the backbuffer (containing the currently rendered frame) on the front buffer.
             Present();
+        }
+
+        public void ChangeRocketX(float x)
+        {
+            rocketTransform.Translation.x = x;
+        }
+        public void ChangeRocketY(float y)
+        {
+            rocketTransform.Translation.y = y;
+        }
+        public void ChangeRocketZ(float z)
+        {
+            rocketTransform.Translation.z = z;
         }
 
         private SceneContainer CreateGui()
