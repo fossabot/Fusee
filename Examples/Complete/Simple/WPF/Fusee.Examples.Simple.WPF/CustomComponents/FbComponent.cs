@@ -54,7 +54,7 @@ namespace Fusee.Examples.Simple.Wpf.CustomComponents
         /// Occurs when the rendered scene is reloaded.
         /// </summary>
         [Description("Called whenever the rendered Scene should be reloaded."), Category("SharpGL")]
-        public event EventHandler Reload;        
+        public event EventHandler Reload;
 
         /// <summary>
         /// Initializes a new instance

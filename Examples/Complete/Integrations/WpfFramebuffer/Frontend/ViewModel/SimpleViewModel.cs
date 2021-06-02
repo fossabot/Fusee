@@ -38,7 +38,7 @@ namespace Fusee.Examples.Integrations.WpfFramebuffer.Frontend.ViewModel
 
         public void LoadApp(int width, int height)
         {
-            if(App != null)
+            if (App != null)
                 CloseApp();
             CreateApp();
             App.InitCanvas();
