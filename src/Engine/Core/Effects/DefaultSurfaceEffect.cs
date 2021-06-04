@@ -1,4 +1,4 @@
-﻿using Fusee.Engine.Core.ShaderShards;
+using Fusee.Engine.Core.ShaderShards;
 using Fusee.Math.Core;
 using System.Collections.Generic;
 
