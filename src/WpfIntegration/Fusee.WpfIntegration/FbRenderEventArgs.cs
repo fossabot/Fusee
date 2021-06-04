@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace Fusee.Examples.Integrations.WpfFramebuffer.Frontend.CustomComponents
+namespace Fusee.WpfIntegration
 {
     /// <summary>
-    /// event args for draw timing
+    /// Event args for draw timing
     /// </summary>
     public class FbRenderEventArgs : EventArgs
     {

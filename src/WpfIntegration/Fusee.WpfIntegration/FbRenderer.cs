@@ -13,7 +13,7 @@ using PixelType = OpenTK.Graphics.OpenGL.PixelType;
 using RenderbufferStorage = OpenTK.Graphics.OpenGL.RenderbufferStorage;
 using RenderbufferTarget = OpenTK.Graphics.OpenGL.RenderbufferTarget;
 
-namespace Fusee.Examples.Integrations.WpfFramebuffer.Frontend.CustomComponents
+namespace Fusee.WpfIntegration
 {
     public class FbRenderer
     {

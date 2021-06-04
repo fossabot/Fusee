@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Fusee.Examples.Integrations.WpfFramebuffer.Frontend.CustomComponents
+namespace Fusee.WpfIntegration
 {
     public class FbComponent : FrameworkElement
     {
@@ -100,7 +100,7 @@ namespace Fusee.Examples.Integrations.WpfFramebuffer.Frontend.CustomComponents
         /// Handles the Loaded event of the OpenGLControl control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> Instance containing the event data.</param>
+        /// <param name="routedEventArgs">The <see cref="RoutedEventArgs"/> Instance containing the event data.</param>
         private void OpenGLControl_Loaded(object sender, RoutedEventArgs routedEventArgs)
         {
             Resized?.Invoke(this, EventArgs.Empty);
@@ -113,7 +113,7 @@ namespace Fusee.Examples.Integrations.WpfFramebuffer.Frontend.CustomComponents
         /// Handles the Unloaded event of the OpenGLControl control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> Instance containing the event data.</param>
+        /// <param name="routedEventArgs">The <see cref="RoutedEventArgs"/> Instance containing the event data.</param>
         private void OpenGLControl_Unloaded(object sender, RoutedEventArgs routedEventArgs)
         {
             CompositionTarget.Rendering -= CompositionTarget_Rendering;

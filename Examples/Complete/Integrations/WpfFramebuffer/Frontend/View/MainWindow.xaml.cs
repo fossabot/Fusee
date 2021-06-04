@@ -1,7 +1,7 @@
 ﻿
-using Fusee.Examples.Integrations.WpfFramebuffer.Frontend.CustomComponents;
 using Fusee.Examples.Integrations.WpfFramebuffer.Frontend.ViewModel;
 using Fusee.Math.Core;
+using Fusee.WpfIntegration;
 using System;
 using System.Windows;
 using Window = System.Windows.Window;

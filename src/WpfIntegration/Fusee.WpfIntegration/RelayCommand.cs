@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace Fusee.Examples.Integrations.WpfFramebuffer.Frontend.ViewModel
+namespace Fusee.WpfIntegration
 {
     //src: https://www.c-sharpcorner.com/UploadFile/20c06b/icommand-and-relaycommand-in-wpf/
     public class RelayCommand : ICommand

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <DefineConstants>$(DefineConstants);PLATFORM_DESKTOP</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>Fusee Jometri</Description>
+    <OutputPath>$(BaseOutputPath)\Libraries</OutputPath>
+    <DocumentationFile>$(OutputPath)\$(RootNamespace).xml</DocumentationFile>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenTK" Version="4.6.3" />
+  </ItemGroup>
+
+</Project>
