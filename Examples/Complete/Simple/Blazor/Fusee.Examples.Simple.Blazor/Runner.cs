@@ -33,7 +33,7 @@ namespace Fusee.Examples.Simple.Blazor
 
             #region FAP
 
-            var fap = new Fusee.Base.Imp.WebAsm.AssetProvider(runtime);
+            var fap = new Fusee.Base.Imp.WebAsm.AssetProvider(Runtime);
             fap.RegisterTypeHandler(
                 new AssetHandler
                 {
@@ -133,10 +133,10 @@ namespace Fusee.Examples.Simple.Blazor
             _app = new Core.Simple();
 
             // Inject Fusee.Engine InjectMe dependencies (hard coded)
-            _canvasImp = new RenderCanvasImp(canvas, runtime, gl, canvasWidth, canvasHeight);
+            _canvasImp = new RenderCanvasImp(canvas, Runtime, gl, canvasWidth, canvasHeight);
             _app.CanvasImplementor = _canvasImp;
             _app.ContextImplementor = new RenderContextImp(_app.CanvasImplementor);
-            Input.AddDriverImp(new RenderCanvasInputDriverImp(_app.CanvasImplementor, runtime));
+            Input.AddDriverImp(new RenderCanvasInputDriverImp(_app.CanvasImplementor, Runtime));
 
             // Start the app
             _app.Run();

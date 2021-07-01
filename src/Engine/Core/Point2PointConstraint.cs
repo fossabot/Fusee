@@ -23,7 +23,7 @@ namespace Fusee.Engine.Core
                 var o = (Point2PointConstraint)_iP2PConstraintImp.UserObject;
                 o._iP2PConstraintImp.PivotInA = value;
             }
-            
+
         }
         /// <summary>
         /// Gets and sets the second pivot point.
@@ -60,7 +60,7 @@ namespace Fusee.Engine.Core
 
         public void SetParam(PointToPointFlags param, float value, int axis = -1)
         {
-            var o = (Point2PointConstraint) _iP2PConstraintImp.UserObject;
+            var o = (Point2PointConstraint)_iP2PConstraintImp.UserObject;
             o._iP2PConstraintImp.SetParam(param, value, axis);
         }
 
@@ -76,7 +76,7 @@ namespace Fusee.Engine.Core
             return retval;
         }
 
-        
+
         /// <summary>
         /// Returns the first rigid body.
         /// </summary>

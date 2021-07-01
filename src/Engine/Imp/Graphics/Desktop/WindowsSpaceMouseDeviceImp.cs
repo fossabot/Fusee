@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Fusee.Base.Core;
+using Fusee.Engine.Common;
+using Fusee.Engine.Imp.Graphics.Desktop._3DconnexionDriver;
+using OpenTK;
+using OpenTK.Windowing.Desktop;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Fusee.Engine.Common;
-using OpenTK;
-using Fusee.Base.Core;
-using Fusee.Engine.Imp.Graphics.Desktop._3DconnexionDriver;
 
 namespace Fusee.Engine.Imp.Graphics.Desktop
 {
@@ -145,7 +146,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         private HandleRef _handle;
         private readonly GameWindow _gameWindow;
         private readonly _3DconnexionDevice _current3DConnexionDevice;
-        
+
         #region Windows handling
         // This helper static method is required because the 32-bit version of user32.dll does not contain this API
         // (on any versions of Windows), so linking the method will fail at run-time. The bridge dispatches the request
@@ -229,15 +230,15 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
         private float GetWindowWidth()
         {
-            return _gameWindow.Width;
+            return _gameWindow.Size.X;
         }
 
         private float GetWindowHeight()
         {
-            return _gameWindow.Height;
+            return _gameWindow.Size.Y;
         }
         #endregion
-               
+
         /// <summary>
         /// Initializes a new instance of the <see cref="WindowsSpaceMouseInputDeviceImp" /> class.
         /// </summary>
@@ -247,7 +248,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         {
             _gameWindow = gameWindow;
 
-            _handle = new HandleRef(_gameWindow, _gameWindow.WindowInfo.Handle);
+            _handle = new HandleRef(_gameWindow, _gameWindow.Context.WindowPtr);
 
             try
             {
@@ -259,7 +260,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             }
             catch (Exception ex)
             {
-                Diagnostics.Warn("Trouble initializing the SpaceMouse. Probably due to missing driver.\n" + ex);
+                Diagnostics.Verbose("Trouble initializing the SpaceMouse. Probably due to missing driver.\n" + ex);
                 _current3DConnexionDevice = null;
             }
 

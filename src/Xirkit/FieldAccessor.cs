@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
+﻿using Fusee.Math.Core;
+using System.Diagnostics;
 using System.Reflection;
-using Fusee.Math.Core;
 
 namespace Fusee.Xirkit
 {
@@ -45,7 +45,7 @@ namespace Fusee.Xirkit
         public T Get(object o)
         {
             // NOTE: no checking done here.
-            return (T) _fieldInfo.GetValue(o);
+            return (T)_fieldInfo.GetValue(o);
         }
     }
 

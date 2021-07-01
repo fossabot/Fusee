@@ -9,7 +9,6 @@ using ProtoBuf;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using Path = Fusee.Base.Common.Path;
 
 namespace Fusee.Examples.AdvancedUI.Desktop
 {
@@ -20,16 +19,18 @@ namespace Fusee.Examples.AdvancedUI.Desktop
             // Inject Fusee.Engine.Base InjectMe dependencies
             IO.IOImp = new Fusee.Base.Imp.Desktop.IOImp();
 
-            #region FAP
-
-            var fap = new Fusee.Base.Imp.Desktop.FileAssetProvider("Assets");
+            FileAssetProvider fap = new Fusee.Base.Imp.Desktop.FileAssetProvider("Assets");
             fap.RegisterTypeHandler(
                 new AssetHandler
                 {
                     ReturnedType = typeof(Font),
                     Decoder = (string id, object storage) =>
                     {
-                        if (!Path.GetExtension(id).Contains("ttf", System.StringComparison.OrdinalIgnoreCase)) return null;
+                        if (!Path.GetExtension(id).Contains("ttf", System.StringComparison.OrdinalIgnoreCase))
+                        {
+                            return null;
+                        }
+
                         return new Font { _fontImp = new FontImp((Stream)storage) };
                     },
                     DecoderAsync = async (string id, object storage) =>
@@ -46,24 +47,15 @@ namespace Fusee.Examples.AdvancedUI.Desktop
                     Decoder = (string id, object storage) =>
                     {
                         if (!Path.GetExtension(id).Contains("fus", System.StringComparison.OrdinalIgnoreCase)) return null;
-                        return FusSceneConverter.ConvertFrom(ProtoBuf.Serializer.Deserialize<FusFile>((Stream)storage));
+                        return FusSceneConverter.ConvertFrom(ProtoBuf.Serializer.Deserialize<FusFile>((Stream)storage), id);
                     },
-                    DecoderAsync = async (string id, object storage) =>
-                    {
-                        if (Path.GetExtension(id).IndexOf("fus", System.StringComparison.OrdinalIgnoreCase) >= 0)
-                        {
-                            return await Task.Factory.StartNew(() => FusSceneConverter.ConvertFrom(Serializer.Deserialize<FusFile>((Stream)storage)));
-                        }
-                        return null;
-                    },
+
                     Checker = id => Path.GetExtension(id).Contains("fus", System.StringComparison.OrdinalIgnoreCase)
                 });
 
             AssetStorage.RegisterProvider(fap);
 
-            #endregion
-
-            var app = new Core.AdvancedUI();
+            Core.AdvancedUI app = new Core.AdvancedUI();
 
             // Inject Fusee.Engine InjectMe dependencies (hard coded)
             System.Drawing.Icon appIcon = System.Drawing.Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);

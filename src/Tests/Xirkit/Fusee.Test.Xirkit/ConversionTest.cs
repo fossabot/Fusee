@@ -1,8 +1,8 @@
-﻿using System;
-using Xunit;
-using System.Collections.Generic;
+﻿using Fusee.Math.Core;
 using Fusee.Xirkit;
-using Fusee.Math.Core;
+using System;
+using System.Collections.Generic;
+using Xunit;
 using static Fusee.Test.Xirkit.HelperClasses;
 
 namespace Fusee.Test.Xirkit
@@ -277,7 +277,7 @@ namespace Fusee.Test.Xirkit
             root.Attach("text", node, "d2");
             circuit.Execute();
 
-            Assert.True(expected.d2 == new double2(1,1), "Error when parsing to double2: Should be " + source.text + " but is " + expected.d2 + ".");
+            Assert.True(expected.d2 == new double2(1, 1), "Error when parsing to double2: Should be " + source.text + " but is " + expected.d2 + ".");
         }
 
         [Fact]

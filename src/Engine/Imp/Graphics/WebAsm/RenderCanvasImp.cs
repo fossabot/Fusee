@@ -66,6 +66,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <exception cref="NotImplementedException"></exception>
         public bool Fullscreen { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public IWindowHandle WindowHandle => throw new NotImplementedException();
+
         /// <summary>
         /// Occurs during initialization.
         /// </summary>

@@ -8,7 +8,6 @@ using ProtoBuf;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using Path = Fusee.Base.Common.Path;
 
 namespace Fusee.Examples.ThreeDFont.Desktop
 {
@@ -45,7 +44,7 @@ namespace Fusee.Examples.ThreeDFont.Desktop
                     Decoder = (string id, object storage) =>
                     {
                         if (!Path.GetExtension(id).Contains("fus", System.StringComparison.OrdinalIgnoreCase)) return null;
-                        return FusSceneConverter.ConvertFrom(ProtoBuf.Serializer.Deserialize<FusFile>((Stream)storage));
+                        return FusSceneConverter.ConvertFrom(ProtoBuf.Serializer.Deserialize<FusFile>((Stream)storage), id);
                     },
                     DecoderAsync = async (string id, object storage) =>
                     {

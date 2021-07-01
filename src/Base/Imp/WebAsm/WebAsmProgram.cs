@@ -33,7 +33,7 @@ namespace Fusee.Base.Imp.WebAsm
             // Let's first check if we can continue with WebGL2 instead of crashing.
             if (!IsBrowserSupportsWebGL2())
             {
-                HtmlHelper.AddParagraph(wasm.runtime, "We are sorry, but your browser does not seem to support WebGL2.");
+                HtmlHelper.AddParagraph(wasm.Runtime, "We are sorry, but your browser does not seem to support WebGL2.");
                 return;
             }
 
@@ -48,7 +48,7 @@ namespace Fusee.Base.Imp.WebAsm
                 var windowWidth = window.GetObjectProperty<int>("innerWidth");
                 var windowHeight = window.GetObjectProperty<int>("innerHeight");
 
-                using var canvas = (IJSInProcessObjectReference)HtmlHelper.AddCanvas(wasm.runtime, divCanvasName, canvasName, windowWidth, windowHeight);
+                using var canvas = (IJSInProcessObjectReference)HtmlHelper.AddCanvas(wasm.Runtime, divCanvasName, canvasName, windowWidth, windowHeight);
                 mainExecutable.Init(canvas, Runtime, CanvasColor);
                 mainExecutable.Run();
             }

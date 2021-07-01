@@ -165,7 +165,7 @@ namespace Fusee.Engine.Common
     /// <summary>
     /// Specifies if and how triangle culling should be performed. If no culling is specified, triangles are rendered, no matter how they are oriented.
     /// Clockwise and Counterclockwise culling refers to in which order a triangle's vertices appear on the screen. If either is specified, triangles
-    /// in the respective order are culled.
+    /// in the respective order are displayed.
     /// </summary>
     public enum Cull
     {
@@ -175,7 +175,7 @@ namespace Fusee.Engine.Common
         Counterclockwise = 3,
 #pragma warning restore 1591
     }
-    
+
     /// <summary>
     /// Used to define the source and destination blending factors. Together, these specify the blend operation to be used when writing a pixel color value onto the render canvas.
     /// </summary>
@@ -192,7 +192,7 @@ namespace Fusee.Engine.Common
         InverseDestinationAlpha = 8,
         DestinationColor = 9,
         InverseDestinationColor = 10,
- 
+
         BlendFactor = 14,
         InverseBlendFactor = 15,
         // Ignored by FUSEE
@@ -204,9 +204,9 @@ namespace Fusee.Engine.Common
 #pragma warning restore 1591
     }
 
-        /// <summary>
-        /// Specifies the fill mode to use by the rasterizer. Options are Point (renders vertices as single pixels), Wireframe (renders only triangles' edges as lines), or Solid (fills all pixels covered by triangles).
-        /// </summary>
+    /// <summary>
+    /// Specifies the fill mode to use by the rasterizer. Options are Point (renders vertices as single pixels), Wireframe (renders only triangles' edges as lines), or Solid (fills all pixels covered by triangles).
+    /// </summary>
     public enum FillMode
     {
 #pragma warning disable 1591
@@ -268,7 +268,7 @@ namespace Fusee.Engine.Common
         KanjiMode = 25,
         Escape = 27,
         IMEConvert = 28,
-        IMENonconvert = 29| LButton,
+        IMENonconvert = 29 | LButton,
         IMEAccept = 30,
         IMEModeChange = 31,
         Space = 32,
@@ -537,10 +537,10 @@ namespace Fusee.Engine.Common
         X = 1,
         Y = 2,
         B = 3,
-        Start = 4,
-        Back = 5,
-        LeftShoulder = 6,
-        RightShoulder = 7,
+        Start = 7,
+        Back = 6,
+        LeftShoulder = 4,
+        RightShoulder = 5,
         L3 = 8,
         R3 = 9,
         DPadUp = 10,
@@ -631,5 +631,18 @@ namespace Fusee.Engine.Common
         // (int) Touchpoint0 + i)
 #pragma warning restore 1591
         // Resharper restore InconsistentNaming
+    }
+
+    /// <summary>
+    /// Describes the platform of the current renderer. This can be used in shaders to do platform dependent things.
+    /// </summary>
+    public enum FuseePlatformId : int
+    {
+#pragma warning disable 1591
+        Undefined = 0,
+        Desktop = 1,
+        Android = 2,
+        Wasm = 3
+#pragma warning restore 1591
     }
 }

@@ -52,6 +52,33 @@ namespace Fusee.Test.Math.Core
             Assert.Equal(expected, actual);
         }
 
+        [Fact]
+        public void IntersectRay_Simple()
+        {
+            Rayf ray = new Rayf(new float3(0, 0, 0), new float3(1, 0, 0));
+            AABBf box = new AABBf(new float3(2, -1, -1), new float3(4, 1, 1));
+
+            Assert.True(box.IntersectRay(ray));
+        }
+
+        [Fact]
+        public void IntersectRay_AlongEdge()
+        {
+            Rayf ray = new Rayf(new float3(0, 0, 0), new float3(1, 0, 0));
+            AABBf box = new AABBf(new float3(2, 0, 0), new float3(4, 1, 1));
+
+            Assert.True(box.IntersectRay(ray));
+        }
+
+        [Fact]
+        public void IntersectRay_Outside()
+        {
+            Rayf ray = new Rayf(new float3(0, -1, -1), new float3(1, 0, 0));
+            AABBf box = new AABBf(new float3(2, 0, 0), new float3(4, 1, 1));
+
+            Assert.False(box.IntersectRay(ray));
+        }
+
         #region IEnumerables
 
         public static IEnumerable<object[]> GetUnion()
@@ -59,8 +86,8 @@ namespace Fusee.Test.Math.Core
             var a = new AABBf(new float3(0, 0, 0), new float3(1, 1, 1));
             var b = new AABBf(new float3(1, 1, 1), new float3(2, 2, 2));
 
-            yield return new object[] {a, b, new AABBf(new float3(0, 0, 0), new float3(2, 2, 2))};
-            yield return new object[] {b, a, new AABBf(new float3(0, 0, 0), new float3(2, 2, 2))};
+            yield return new object[] { a, b, new AABBf(new float3(0, 0, 0), new float3(2, 2, 2)) };
+            yield return new object[] { b, a, new AABBf(new float3(0, 0, 0), new float3(2, 2, 2)) };
         }
 
         public static IEnumerable<object[]> GetTransform()
@@ -71,9 +98,9 @@ namespace Fusee.Test.Math.Core
             var yRot = new float4x4(0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 1);
             var zRot = new float4x4(0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
-            yield return new object[] {xRot, a, new AABBf(new float3(0, -1, 0), new float3(1, 0, 1))};
-            yield return new object[] {yRot, a, new AABBf(new float3(0, 0, -1), new float3(1, 1, 0))};
-            yield return new object[] {zRot, a, new AABBf(new float3(-1, 0, 0), new float3(0, 1, 1))};
+            yield return new object[] { xRot, a, new AABBf(new float3(0, -1, 0), new float3(1, 0, 1)) };
+            yield return new object[] { yRot, a, new AABBf(new float3(0, 0, -1), new float3(1, 1, 0)) };
+            yield return new object[] { zRot, a, new AABBf(new float3(-1, 0, 0), new float3(0, 1, 1)) };
         }
 
         #endregion

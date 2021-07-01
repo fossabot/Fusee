@@ -1,4 +1,5 @@
 ﻿using Fusee.Engine.Common;
+using Microsoft.JSInterop;
 
 namespace Fusee.Engine.Imp.Graphics.WebAsm
 {
@@ -9,5 +10,10 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
     public class ShaderParam : IShaderParam
     {
         internal WebGLUniformLocation handle;
+    }
+
+    public class  ShaderHandleImp : IShaderHandle
+    {
+        internal WebGLProgram Handle;
     }
 }

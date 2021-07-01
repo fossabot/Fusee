@@ -39,7 +39,10 @@ namespace Fusee.Base.Imp.WebAsm
         /// </summary>
         public virtual bool EnableFullScreen => true;
 
-        public IJSRuntime runtime { get; private set; }
+        /// <summary>
+        /// The Javascript runtime instance
+        /// </summary>
+        public IJSRuntime Runtime { get; private set; }
 
         /// <summary>
         /// This method generates the WebGL2 context
@@ -51,7 +54,7 @@ namespace Fusee.Base.Imp.WebAsm
         {
             this.clearColor = clearColor;
             this.canvas = canvas;
-            this.runtime = runtime;
+            this.Runtime = runtime;
 
             canvasWidth = canvas.GetObjectProperty<int>("width");
             canvasHeight = canvas.GetObjectProperty<int>("height");

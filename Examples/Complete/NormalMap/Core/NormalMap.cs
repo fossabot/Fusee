@@ -1,8 +1,11 @@
-﻿using Fusee.Engine.Common;
+﻿using Fusee.Base.Core;
+using Fusee.Engine.Common;
 using Fusee.Engine.Core;
+using Fusee.Engine.Core.Primitives;
 using Fusee.Engine.Core.Scene;
 using Fusee.Math.Core;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Fusee.Examples.NormalMap.Core
@@ -10,11 +13,8 @@ namespace Fusee.Examples.NormalMap.Core
     [FuseeApplication(Name = "FUSEE Normal Mapping Example", Description = "Quick normal map example")]
     public class NormalMap : RenderCanvas
     {
-        public string ModelFile = "BrickBall.fus";
-
         // angle variables
-        private static float _angleHorz = M.PiOver3, _angleVert = -M.PiOver6 * 0.5f,
-                             _angleVelHorz, _angleVelVert, _angleRoll, _angleRollInit, _zoomVel, _zoom;
+        private static float _angleHorz, _angleVert, _angleVelHorz, _angleVelVert, _angleRoll, _angleRollInit, _zoomVel, _zoom;
 
         private static float2 _offset;
         private static float2 _offsetInit;
@@ -31,11 +31,14 @@ namespace Fusee.Examples.NormalMap.Core
         private bool _keys;
         private float _maxPinchSpeed;
 
+        private Mesh _mesh;
+        private Transform _meshTransform;
+
         // Init is called on startup.
-        public override async Task<bool> Init()
+        public override void Init()
         {
             // Initial "Zoom" value (it's rather the distance in view direction, not the camera's focal distance/opening angle)
-            _zoom = 400;
+            _zoom = 2;
 
             _angleRoll = 0;
             _angleRollInit = 0;
@@ -46,60 +49,39 @@ namespace Fusee.Examples.NormalMap.Core
             // Set the clear color for the backbuffer to white (100% intensity in all color channels R, G, B, A).
             RC.ClearColor = new float4(1, 1, 1, 1);
 
-            var plane = new Plane();
-            plane.Tangents = plane.CalculateTangents();
-            plane.BiTangents = plane.CalculateBiTangents();
+            _meshTransform = new Transform();
 
-            var sfx = await ShaderCodeBuilder.MakeShaderEffectFromShaderEffectPropsProto
-            (
-                new Engine.Core.ShaderShards.ShaderEffectProps
-                {
-                    MatProbs =
-                    {
-                        HasAlbedo = true,
-                        HasAlbedoTexture = true,
-                        HasNormalMap = true,
-                        HasSpecular = true
-                    },
-                    MatType = Engine.Core.ShaderShards.MaterialType.Standard,
-                    MatValues =
-                    {
-                        AlbedoColor = float4.One * 0.5f,
-                        AlbedoTexture = "Bricks_1K_Color.png",
-                        AlbedoMix = 1.0f,
-                        SpecularColor = float4.One,
-                        SpecularIntensity = .8f,
-                        SpecularShininess = 128f,
-                        NormalMap = "Bricks_1K_Normal.png",
-                        NormalMapIntensity = 1.0f
-                    }
-                }
-            );
-
-
-            _scene = new SceneContainer
+            _scene = new SceneContainer()
             {
-                Children = new System.Collections.Generic.List<SceneNode>
+                Children = new List<SceneNode>()
+                {
+                    new SceneNode()
                     {
-                        new SceneNode
+                        Components = new List<SceneComponent>()
                         {
-                            Components = new System.Collections.Generic.List<SceneComponent>
-                            {
-                                new Transform
-                                {
-                                    Rotation = new float3(0, -M.PiOver3, 0),
-                                    Scale = float3.One  * 500f
-                                },
-                                sfx,
-                                plane
-
-                            }
+                            _meshTransform,
+                            new Plane()
                         }
                     }
+                }
             };
 
-            var aabbc = new AABBCalculator(_scene);
-            var bbox = aabbc.GetBox();
+            var albedoTex = new Texture(AssetStorage.Get<ImageData>("Bricks_1K_Color.png"));
+            var normalTex = new Texture(AssetStorage.Get<ImageData>("Bricks_1K_Normal.png"));
+
+            var normalMappingEffect = MakeEffect.FromDiffuseSpecularTexture(float4.One, float4.Zero, albedoTex, normalTex, 1.0f, new float2(2, 2), 85, 0.2f, 0.3f);
+            normalMappingEffect.RendererStates.AlphaBlendEnable = true;
+            normalMappingEffect.RendererStates.SourceBlend = Blend.SourceAlpha;
+            normalMappingEffect.RendererStates.DestinationBlend = Blend.InverseSourceAlpha;
+            normalMappingEffect.RendererStates.BlendOperation = BlendOperation.Add;
+
+            _mesh = _scene.Children[0].GetComponent<Plane>();
+            _mesh.Tangents = _mesh.CalculateTangents();
+            _mesh.BiTangents = _mesh.CalculateBiTangents();
+            _scene.Children[0].Components.Insert(1, normalMappingEffect);
+
+            AABBCalculator aabbc = new AABBCalculator(_scene);
+            AABBf? bbox = aabbc.GetBox();
             if (bbox != null)
             {
                 // If the model origin is more than one third away from its bounding box,
@@ -111,10 +93,13 @@ namespace Fusee.Examples.NormalMap.Core
                 var center = float3.Zero;
                 if (System.Math.Abs(bbCenter.x) > bbSize.x * 0.3)
                     center.x = bbCenter.x;
+
                 if (System.Math.Abs(bbCenter.y) > bbSize.y * 0.3)
                     center.y = bbCenter.y;
+
                 if (System.Math.Abs(bbCenter.z) > bbSize.z * 0.3)
                     center.z = bbCenter.z;
+
                 _sceneCenter = float4x4.CreateTranslation(-center);
 
                 // Adjust the model size
@@ -123,12 +108,11 @@ namespace Fusee.Examples.NormalMap.Core
                     _sceneScale = float4x4.CreateScale(200.0f / maxScale);
                 else
                     _sceneScale = float4x4.Identity;
+
             }
 
             // Wrap a SceneRenderer around the model.
             _sceneRenderer = new SceneRendererForward(_scene);
-
-            return true;
         }
 
         // RenderAFrame is called once a frame
@@ -145,7 +129,7 @@ namespace Fusee.Examples.NormalMap.Core
                 _keys = true;
             }
 
-            var curDamp = (float)System.Math.Exp(-Damping * Time.DeltaTime);
+            float curDamp = (float)System.Math.Exp(-Damping * Time.DeltaTime);
 
             // Zoom & Roll
             if (Input.Touch.TwoPoint)
@@ -160,13 +144,16 @@ namespace Fusee.Examples.NormalMap.Core
                 _zoomVel = Input.Touch.TwoPointDistanceVel * -0.01f;
                 _angleRoll = Input.Touch.TwoPointAngle - _angleRollInit;
                 _offset = Input.Touch.TwoPointMidPoint - _offsetInit;
-                var pinchSpeed = Input.Touch.TwoPointDistanceVel;
-                if (pinchSpeed > _maxPinchSpeed) _maxPinchSpeed = pinchSpeed; // _maxPinchSpeed is used for debugging only.
+                float pinchSpeed = Input.Touch.TwoPointDistanceVel;
+                if (pinchSpeed > _maxPinchSpeed)
+                {
+                    _maxPinchSpeed = pinchSpeed; // _maxPinchSpeed is used for debugging only.
+                }
             }
             else
             {
                 _twoTouchRepeated = false;
-                _zoomVel = Input.Mouse.WheelVel * -0.5f;
+                _zoomVel = Input.Mouse.WheelVel * -0.01f;
                 _angleRoll *= curDamp * 0.8f;
                 _offset *= curDamp * 0.8f;
             }
@@ -202,10 +189,15 @@ namespace Fusee.Examples.NormalMap.Core
 
             _zoom += _zoomVel;
             // Limit zoom
-            if (_zoom < 80)
-                _zoom = 80;
-            if (_zoom > 2000)
-                _zoom = 2000;
+            if (_zoom < 1)
+            {
+                _zoom = 1;
+            }
+
+            if (_zoom > 100)
+            {
+                _zoom = 100;
+            }
 
             _angleHorz += _angleVelHorz;
             // Wrap-around to keep _angleHorz between -PI and + PI
@@ -219,10 +211,10 @@ namespace Fusee.Examples.NormalMap.Core
             _angleRoll = M.MinAngle(_angleRoll);
 
             // Create the camera matrix and set it as the current ModelView transformation
-            var mtxRot = float4x4.CreateRotationZ(_angleRoll) * float4x4.CreateRotationX(_angleVert) * float4x4.CreateRotationY(_angleHorz);
-            var mtxCam = float4x4.LookAt(0, 20, -_zoom, 0, 0, 0, 0, 1, 0);
+            float4x4 mtxRot = float4x4.CreateRotationZ(_angleRoll) * float4x4.CreateRotationX(_angleVert) * float4x4.CreateRotationY(_angleHorz);
+            float4x4 mtxCam = float4x4.LookAt(0, 0, -_zoom, 0, 0, 0, 0, 1, 0);
             RC.View = mtxCam * mtxRot * _sceneScale * _sceneCenter;
-            var mtxOffset = float4x4.CreateTranslation(2 * _offset.x / Width, -2 * _offset.y / Height, 0);
+            float4x4 mtxOffset = float4x4.CreateTranslation(2 * _offset.x / Width, -2 * _offset.y / Height, 0);
             RC.Projection = mtxOffset * RC.Projection;
 
             // Tick any animations and Render the scene loaded in Init()

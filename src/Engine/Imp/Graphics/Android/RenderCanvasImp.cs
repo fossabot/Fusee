@@ -159,6 +159,11 @@ namespace Fusee.Engine.Imp.Graphics.Android
         /// </value>
         public View View => _gameView;
 
+        /// <summary>
+        /// Window handle for the window the engine renders to.
+        /// </summary>
+        public IWindowHandle WindowHandle { get; }
+
         internal RenderCanvasGameView _gameView;
 
         #endregion Fields
@@ -171,6 +176,7 @@ namespace Fusee.Engine.Imp.Graphics.Android
         public RenderCanvasImp(Context context, IAttributeSet attrs, Action run)
         {
             _gameView = new RenderCanvasGameView(this, true, context, attrs, run);
+            WindowHandle = new WindowHandle() { WinId = _gameView.WindowId };
         }
 
         /// <summary>
@@ -373,30 +379,37 @@ namespace Fusee.Engine.Imp.Graphics.Android
 
         #region Overrides
 
+        private bool _wasLoaded = false;
+
         protected override void OnLoad(EventArgs e)
         {
-            // Check for necessary capabilities
-            string version = GL.GetString(All.Version);
-
-            int major = version[0];
-            // int minor = (int)version[2];
-
-            if (major < 2)
+            if (!_wasLoaded)
             {
-                throw new InvalidOperationException("You need at least OpenGL 2.0 to run this example. GLSL not supported.");
+                // Check for necessary capabilities
+                string version = GL.GetString(All.Version);
+
+                int major = version[0];
+                // int minor = (int)version[2];
+
+                if (major < 2)
+                {
+                    throw new InvalidOperationException("You need at least OpenGL 2.0 to run this example. GLSL not supported.");
+                }
+
+                GL.ClearColor(0, 0.3f, 0.1f, 1);
+
+                GL.Enable(All.DepthTest);
+                GL.Enable(All.CullFace);
+
+                // Use VSync!
+                // Context.SwapInterval = 1;
+                _run?.Invoke();
+
+                _renderCanvasImp.DoInit();
+                _stopwatch.Start();
+
+                _wasLoaded = true;
             }
-
-            GL.ClearColor(0, 0.3f, 0.1f, 1);
-
-            GL.Enable(All.DepthTest);
-            GL.Enable(All.CullFace);
-
-            // Use VSync!
-            // Context.SwapInterval = 1;
-            _run?.Invoke();
-
-            _renderCanvasImp.DoInit();
-            _stopwatch.Start();
         }
 
         protected override void OnUnload(EventArgs e)

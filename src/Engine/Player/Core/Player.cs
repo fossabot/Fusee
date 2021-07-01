@@ -1,17 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Fusee.Base.Common;
 using Fusee.Base.Core;
 using Fusee.Engine.Common;
 using Fusee.Engine.Core;
+using Fusee.Engine.Core.Effects;
+using Fusee.Engine.Core.Scene;
+using Fusee.Engine.Core.ShaderShards;
+using Fusee.Engine.GUI;
 using Fusee.Math.Core;
+using Fusee.Xene;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static Fusee.Engine.Core.Input;
 using static Fusee.Engine.Core.Time;
-using Fusee.Engine.GUI;
-using Fusee.Xene;
-using System.Threading.Tasks;
-using Fusee.Engine.Core.Scene;
 
 namespace Fusee.Engine.Player.Core
 {
@@ -51,46 +53,44 @@ namespace Fusee.Engine.Player.Core
 
         private float _maxPinchSpeed;
 
+        private bool _isLoaded;
+
         private GamePadDevice _gamePad;
 
-        // Init is called on startup. 
-        public override async Task<bool> Init()
+        public async void LoadAssets()
         {
-            _initCanvasWidth = Width / 100f;
-            _initCanvasHeight = Height / 100f;
-
-            _canvasHeight = _initCanvasHeight;
-            _canvasWidth = _initCanvasWidth;
-
-            // Initial "Zoom" value (it's rather the distance in view direction, not the camera's focal distance/opening angle)
-            _zoom = 400;
-
-            _angleRoll = 0;
-            _angleRollInit = 0;
-            _twoTouchRepeated = false;
-            _offset = float2.Zero;
-            _offsetInit = float2.Zero;
-
-            // Set the clear color for the back buffer to white (100% intensity in all color channels R, G, B, A).
-            RC.ClearColor = new float4(1, 1, 1, 1);
 
             // Load the standard model
-            _scene = await AssetStorage.GetAsync<SceneContainer>(ModelFile).ConfigureAwait(false);
-            
-            _gui = await CreateGui();
+            _scene = AssetStorage.Get<SceneContainer>(ModelFile);
+
+            // Initialize the information text line.
+            var textToDisplay = "FUSEE 3D Scene";
+            if (_scene.Header.CreatedBy != null || _scene.Header.CreationDate != null)
+            {
+                textToDisplay += " created";
+                if (_scene.Header.CreatedBy != null)
+                    textToDisplay += " by " + _scene.Header.CreatedBy;
+
+                if (_scene.Header.CreationDate != null)
+                    textToDisplay += " on " + _scene.Header.CreationDate;
+            }
+
+            _gui = CreateGui();
+
             // Create the interaction handler
             _sih = new SceneInteractionHandler(_gui);
 
             // Register the input devices that are not already given.
             _gamePad = GetDevice<GamePadDevice>(0);
 
+
             AABBCalculator aabbc = new AABBCalculator(_scene);
             var bbox = aabbc.GetBox();
             if (bbox != null)
             {
-                // If the model origin is more than one third away from its bounding box, 
+                // If the model origin is more than one third away from its bounding box,
                 // recenter it to the bounding box. Do this check individually per dimension.
-                // This way, small deviations will keep the model's original center, while big deviations 
+                // This way, small deviations will keep the model's original center, while big deviations
                 // will make the model rotate around its geometric center.
                 float3 bbCenter = bbox.Value.Center;
                 float3 bbSize = bbox.Value.Size;
@@ -115,15 +115,41 @@ namespace Fusee.Engine.Player.Core
             _sceneRenderer = new SceneRendererForward(_scene);
             _guiRenderer = new SceneRendererForward(_gui);
 
-            return true;
+            _isLoaded = true;
         }
 
-        
+        // Init is called on startup.
+        public override void Init()
+        {
+            _initCanvasWidth = Width / 100f;
+            _initCanvasHeight = Height / 100f;
+
+            _canvasHeight = _initCanvasHeight;
+            _canvasWidth = _initCanvasWidth;
+
+            // Initial "Zoom" value (it's rather the distance in view direction, not the camera's focal distance/opening angle)
+            _zoom = 400;
+
+            _angleRoll = 0;
+            _angleRollInit = 0;
+            _twoTouchRepeated = false;
+            _offset = float2.Zero;
+            _offsetInit = float2.Zero;
+
+            // Set the clear color for the back buffer to white (100% intensity in all color channels R, G, B, A).
+            RC.ClearColor = new float4(1, 1, 1, 1);
+
+            // Register the input devices that are not already given.
+            _gamePad = GetDevice<GamePadDevice>(0);
+
+            LoadAssets();
+        }
+
+
         // RenderAFrame is called once a frame
         public override void RenderAFrame()
         {
-            //if (_gamePad != null)
-            //    Diagnostics.Log(_gamePad.LSX);
+            if (!_isLoaded) return;
 
             // Clear the backbuffer
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
@@ -213,8 +239,8 @@ namespace Fusee.Engine.Player.Core
 
             // Create the camera matrix and set it as the current View transformation
             var mtxRot = /*float4x4.CreateRotationZ(_angleRoll) **/ float4x4.CreateRotationX(_angleVert) * float4x4.CreateRotationY(_angleHorz);
-            var mtxCam = float4x4.LookAt(0, 20, -_zoom, 0, 0, 0, 0, 1, 0);            
-            var mtxOffset = float4x4.CreateTranslation(2f * _offset.x / Width, -2f * _offset.y / Height, 0);            
+            var mtxCam = float4x4.LookAt(0, 20, -_zoom, 0, 0, 0, 0, 1, 0);
+            var mtxOffset = float4x4.CreateTranslation(2f * _offset.x / Width, -2f * _offset.y / Height, 0);
 
             var view = mtxCam * mtxRot * _sceneScale * _sceneCenter; ;
             var perspective = float4x4.CreatePerspectiveFieldOfView(_fovy, (float)Width / Height, ZNear, ZFar) * mtxOffset;
@@ -237,7 +263,7 @@ namespace Fusee.Engine.Player.Core
 
             RC.View = view;
             RC.Projection = orthographic;
-            _guiRenderer.Render(RC);            
+            _guiRenderer.Render(RC);
 
             // Swap buffers: Show the contents of the backbuffer (containing the currently rendered frame) on the front buffer.
             Present();
@@ -254,10 +280,11 @@ namespace Fusee.Engine.Player.Core
    
         }
 
-        private async Task<SceneContainer> CreateGui()
+        private SceneContainer CreateGui()
         {
-            var vsTex = await AssetStorage.GetAsync<string>("texture.vert");
-            var psTex = await AssetStorage.GetAsync<string>("texture.frag");
+            var vsTex = AssetStorage.Get<string>("texture.vert");
+            var psTex = AssetStorage.Get<string>("texture.frag");
+            var psText = AssetStorage.Get<string>("text.frag");
 
             var btnFuseeLogo = new GUIButton
             {
@@ -267,8 +294,8 @@ namespace Fusee.Engine.Player.Core
             btnFuseeLogo.OnMouseExit += BtnLogoExit;
             btnFuseeLogo.OnMouseDown += BtnLogoDown;
 
-            var guiFuseeLogo = new Texture(await AssetStorage.GetAsync<ImageData>("FuseeText.png"));
-            var fuseeLogo = new TextureNode (
+            var guiFuseeLogo = new Texture(AssetStorage.Get<ImageData>("FuseeText.png"));
+            var fuseeLogo = new TextureNode(
                 "fuseeLogo",
                 vsTex,
                 psTex,
@@ -277,9 +304,9 @@ namespace Fusee.Engine.Player.Core
                 //Define anchor points. They are given in percent, seen from the lower left corner, respectively to the width/height of the parent.
                 //In this setup the element will stretch horizontally but stay the same vertically if the parent element is scaled.
                 UIElementPosition.GetAnchors(AnchorPos.TopTopLeft),
-                //Define Offset and therefor the size of the element.                
-                UIElementPosition.CalcOffsets(AnchorPos.TopTopLeft, new float2(0, _initCanvasHeight - 0.5f), _initCanvasHeight, _initCanvasWidth, new float2(1.75f, 0.5f))
-                );
+                //Define Offset and therefor the size of the element.
+                UIElementPosition.CalcOffsets(AnchorPos.TopTopLeft, new float2(0, _initCanvasHeight - 0.5f), _initCanvasHeight, _initCanvasWidth, new float2(1.75f, 0.5f)),
+                float2.One);
             fuseeLogo.AddComponent(btnFuseeLogo);
 
             // Initialize the information text line.
@@ -294,18 +321,18 @@ namespace Fusee.Engine.Player.Core
                     textToDisplay += " on " + _scene.Header.CreationDate;
             }
 
-            var fontLato = await AssetStorage.GetAsync<Font>("Lato-Black.ttf");
+            var fontLato = AssetStorage.Get<Font>("Lato-Black.ttf");
             var guiLatoBlack = new FontMap(fontLato, 24);
 
             var text = new TextNode(
                 textToDisplay,
                 "SceneDescriptionText",
                 vsTex,
-                psTex,
+                psText,
                 UIElementPosition.GetAnchors(AnchorPos.StretchHorizontal),
                 UIElementPosition.CalcOffsets(AnchorPos.StretchHorizontal, new float2(_initCanvasWidth / 2 - 4, 0), _initCanvasHeight, _initCanvasWidth, new float2(8, 1)),
                 guiLatoBlack,
-                ColorUint.Tofloat4(ColorUint.Greenery),
+                (float4)ColorUint.Greenery,
                 HorizontalTextAlignment.Center,
                 VerticalTextAlignment.Center);
 
@@ -319,8 +346,8 @@ namespace Fusee.Engine.Player.Core
                     Max = new float2(_canvasWidth / 2, _canvasHeight / 2f)
                 });
             canvas.Children.Add(fuseeLogo);
-            canvas.Children.Add(text);           
-            
+            canvas.Children.Add(text);
+
             return new SceneContainer
             {
                 Children = new List<SceneNode>
@@ -333,14 +360,16 @@ namespace Fusee.Engine.Player.Core
 
         public void BtnLogoEnter(CodeComponent sender)
         {
-            SetCursor(CursorType.Hand);
-           _gui.Children.FindNodes(node => node.Name == "fuseeLogo").First().GetComponent<ShaderEffect>().SetEffectParam("DiffuseColor", new float4(0.8f, 0.8f, 0.8f, 1f));
+            var effect = _gui.Children.FindNodes(node => node.Name == "fuseeLogo").First().GetComponent<Effect>();
+            effect.SetFxParam(UniformNameDeclarations.Albedo, (float4)ColorUint.Black);
+            effect.SetFxParam(UniformNameDeclarations.AlbedoMix, 0.8f);
         }
 
         public void BtnLogoExit(CodeComponent sender)
         {
-            SetCursor(CursorType.Standard);
-            _gui.Children.FindNodes(node => node.Name == "fuseeLogo").First().GetComponent<ShaderEffect>().SetEffectParam("DiffuseColor", float4.One);
+            var effect = _gui.Children.FindNodes(node => node.Name == "fuseeLogo").First().GetComponent<Effect>();
+            effect.SetFxParam(UniformNameDeclarations.Albedo, float4.One);
+            effect.SetFxParam(UniformNameDeclarations.AlbedoMix, 1f);
         }
 
         public void BtnLogoDown(CodeComponent sender)

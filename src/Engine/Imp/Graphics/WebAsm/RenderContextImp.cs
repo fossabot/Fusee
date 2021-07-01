@@ -482,13 +482,13 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
             // enable GLSL (ES) shaders to use fuVertex, fuColor and fuNormal attributes
             gl2.BindAttribLocation(program, (uint)AttributeLocations.VertexAttribLocation, UniformNameDeclarations.Vertex);
-            gl2.BindAttribLocation(program, (uint)AttributeLocations.ColorAttribLocation, UniformNameDeclarations.Color);
+            gl2.BindAttribLocation(program, (uint)AttributeLocations.ColorAttribLocation, UniformNameDeclarations.VertexColor);
             gl2.BindAttribLocation(program, (uint)AttributeLocations.UvAttribLocation, UniformNameDeclarations.TextureCoordinates);
             gl2.BindAttribLocation(program, (uint)AttributeLocations.NormalAttribLocation, UniformNameDeclarations.Normal);
-            gl2.BindAttribLocation(program, (uint)AttributeLocations.TangentAttribLocation, UniformNameDeclarations.TangentAttribName);
+            gl2.BindAttribLocation(program, (uint)AttributeLocations.TangentAttribLocation, UniformNameDeclarations.Tangent);
             gl2.BindAttribLocation(program, (uint)AttributeLocations.BoneIndexAttribLocation, UniformNameDeclarations.BoneIndex);
             gl2.BindAttribLocation(program, (uint)AttributeLocations.BoneWeightAttribLocation, UniformNameDeclarations.BoneWeight);
-            gl2.BindAttribLocation(program, (uint)AttributeLocations.BitangentAttribLocation, UniformNameDeclarations.BitangentAttribName);
+            gl2.BindAttribLocation(program, (uint)AttributeLocations.BitangentAttribLocation, UniformNameDeclarations.Bitangent);
 
             gl2.LinkProgram(program);
 
@@ -915,6 +915,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             get => (float)gl2.GetParameter(DEPTH_CLEAR_VALUE);
             set => gl2.ClearDepth(value);
         }
+
+        public FuseePlatformId FuseePlatformId => throw new NotImplementedException();
 
         /// <summary>
         /// Clears the specified flags.
@@ -2348,6 +2350,31 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <param name="param"></param>
         /// <param name="texIds"></param>
         public void SetShaderParamTextureArray(IShaderParam param, ITextureHandle[] texIds)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetTextureFilterMode(ITextureHandle tex, TextureFilterMode filterMode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetTextureWrapMode(ITextureHandle tex, TextureWrapMode wrapMode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ITextureHandle CreateTexture(IWritableArrayTexture img)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetVertexArrayObject(IMeshImp mr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetRenderTarget(IWritableArrayTexture tex, int layer, ITextureHandle texHandle)
         {
             throw new NotImplementedException();
         }

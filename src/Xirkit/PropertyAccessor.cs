@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
+﻿using Fusee.Math.Core;
+using System.Diagnostics;
 using System.Reflection;
-using Fusee.Math.Core;
 
 namespace Fusee.Xirkit
 {
@@ -99,5 +99,5 @@ namespace Fusee.Xirkit
             return _o2p((TObj)_propertyInfo.GetValue(o, null));
         }
     }
-    
+
 }

@@ -1,7 +1,6 @@
 ﻿using Fusee.Base.Common;
 using Fusee.Base.Core;
 using Fusee.Base.Imp.Desktop;
-using Fusee.Engine.Common;
 using Fusee.Engine.Core;
 using Fusee.Engine.Core.Scene;
 using Fusee.Serialization;
@@ -9,7 +8,6 @@ using ProtoBuf;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using Path = Fusee.Base.Common.Path;
 
 namespace Fusee.Examples.NormalMap.Desktop
 {
@@ -46,7 +44,7 @@ namespace Fusee.Examples.NormalMap.Desktop
                     Decoder = (string id, object storage) =>
                     {
                         if (!Path.GetExtension(id).Contains("fus", System.StringComparison.OrdinalIgnoreCase)) return null;
-                        return FusSceneConverter.ConvertFrom(ProtoBuf.Serializer.Deserialize<FusFile>((Stream)storage));
+                        return FusSceneConverter.ConvertFrom(ProtoBuf.Serializer.Deserialize<FusFile>((Stream)storage), id);
                     },
                     DecoderAsync = async (string id, object storage) =>
                     {

@@ -1,18 +1,14 @@
-﻿using System.IO;
-using System.Runtime.InteropServices;
-using Fusee.Base.Common;
+﻿using Fusee.Base.Common;
 using Fusee.Base.Core;
 using Fusee.Base.Imp.Desktop;
 using Fusee.Engine.Core;
-using Fusee.Serialization;
-using FileMode = Fusee.Base.Common.FileMode;
-using Path = Fusee.Base.Common.Path;
-using System.Reflection;
-using System;
-using Fusee.Engine.Common;
 using Fusee.Engine.Core.Scene;
-using System.Threading.Tasks;
+using Fusee.Serialization;
 using ProtoBuf;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Fusee.Examples.Camera.Desktop
 {
@@ -48,8 +44,8 @@ namespace Fusee.Examples.Camera.Desktop
                     ReturnedType = typeof(SceneContainer),
                     Decoder = (string id, object storage) =>
                     {
-                        if (!Path.GetExtension(id).Contains("fus", System.StringComparison.OrdinalIgnoreCase)) return null;
-                        return FusSceneConverter.ConvertFrom(ProtoBuf.Serializer.Deserialize<FusFile>((Stream)storage));
+                        if (!Path.GetExtension(id).Contains("fus", StringComparison.OrdinalIgnoreCase)) return null;
+                        return FusSceneConverter.ConvertFrom(ProtoBuf.Serializer.Deserialize<FusFile>((Stream)storage), id);
                     },
                     DecoderAsync = async (string id, object storage) =>
                     {
@@ -67,10 +63,10 @@ namespace Fusee.Examples.Camera.Desktop
             #endregion
 
             var app = new Core.CameraExample();
-            
+
             // Inject Fusee.Engine InjectMe dependencies (hard coded)
             System.Drawing.Icon appIcon = System.Drawing.Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
-			app.CanvasImplementor = new Fusee.Engine.Imp.Graphics.Desktop.RenderCanvasImp(appIcon);            
+            app.CanvasImplementor = new Fusee.Engine.Imp.Graphics.Desktop.RenderCanvasImp(appIcon);
             app.ContextImplementor = new Fusee.Engine.Imp.Graphics.Desktop.RenderContextImp(app.CanvasImplementor);
             Input.AddDriverImp(new Fusee.Engine.Imp.Graphics.Desktop.RenderCanvasInputDriverImp(app.CanvasImplementor));
             Input.AddDriverImp(new Fusee.Engine.Imp.Graphics.Desktop.WindowsTouchInputDriverImp(app.CanvasImplementor));

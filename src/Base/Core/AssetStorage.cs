@@ -1,12 +1,55 @@
 using Fusee.Base.Common;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Fusee.Base.Core
 {
+
+    internal static class Ext
+    {
+        internal static Dictionary<DateTime, string> _timeAdded = new Dictionary<DateTime, string>();
+
+        /// <summary>
+        /// Checks if assets dictionary holds more than 20 element, if so, delete the latest 10 entries
+        /// </summary>
+        /// <param name="assetBuffer"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        internal static void AddTask(this Dictionary<string, Task> assetBuffer, string key, Task value)
+        {
+            // check if present
+            if (assetBuffer.ContainsKey(key)) return;
+
+            // any memory checks of available memory vs dictionary size, etc. fails here and isn't available
+            // for web. Therefore just this 20 element cap.
+            if (assetBuffer.Keys.Count > 20)
+            {
+                var timesSorted = _timeAdded.Keys.ToList();
+                timesSorted.Sort(); // this sort from oldest [0] to newest [length]
+
+                for (var i = 0; i < 10; i++)
+                {
+                    var oldestTime = timesSorted[i];
+                    var keyOfOldestTime = _timeAdded[oldestTime];
+
+                    // remove oldest element as well as oldest time from helper dict
+                    assetBuffer.Remove(keyOfOldestTime);
+                    _timeAdded.Remove(oldestTime);
+                }
+            }
+
+            _timeAdded.Add(DateTime.Now, key);
+            assetBuffer.Add(key, value);
+        }
+
+    }
+
     /// <summary>
     /// A class providing access to Assets. An asset is considered any content to be loaded, deserialized and converted during
     /// an application's lifetime. Often Assets should be loaded up-front and accessed during run-time with no perceivable delay.
@@ -23,12 +66,12 @@ namespace Fusee.Base.Core
     public sealed class AssetStorage
     {
         private readonly List<IAssetProvider> _providers;
-        private readonly Dictionary<string, Task> _assetBuffer;
+        private Dictionary<string, Task> _assetBuffer;
 
         private static AssetStorage _instance;
 
         /// <summary>
-        /// Returns true if all assets have finished loading, independent of failed or sucess state
+        /// Returns true if all assets have finished loading, independent of failed or success state
         /// </summary>
         public static bool AllAssetsFinishedLoading =>
             _instance._assetBuffer.Values.All(x => x.IsCompleted);
@@ -39,6 +82,7 @@ namespace Fusee.Base.Core
             _assetBuffer = new Dictionary<string, Task>();
         }
 
+
         /// <summary>
         /// Implements the Singleton pattern.
         /// </summary>
@@ -48,7 +92,7 @@ namespace Fusee.Base.Core
         public static AssetStorage Instance => _instance ??= new AssetStorage();
 
         /// <summary>
-        /// Returns true if an asset is currently loading or already loaded
+        /// Returns true if an asset is currently loading or already loaded, independent of failed or success state!
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -91,14 +135,14 @@ namespace Fusee.Base.Core
         /// <returns></returns>
         public static Task<T> GetAsync<T>(string id)
         {
-            if (IsAssetPresent(id))
+            if (Instance._assetBuffer.TryGetValue(id, out var value))
             {
-                return (Task<T>)_instance._assetBuffer[id];
+                return (Task<T>)value;
             }
             else
             {
                 var task = Instance.GetAssetAsync<T>(id);
-                _instance._assetBuffer.Add(id, task);
+                Instance._assetBuffer.AddTask(id, task);
                 return task;
             }
         }
@@ -114,7 +158,11 @@ namespace Fusee.Base.Core
         {
             var allTasks = new List<Task<T>>();
             foreach (var id in ids)
-                allTasks.Add(_instance.GetAssetAsync<T>(id));
+            {
+                var task = Instance.GetAssetAsync<T>(id);
+                allTasks.Add(task);
+                Instance._assetBuffer.AddTask(id, task);
+            }
 
             return Task.WhenAll(allTasks);
         }
@@ -143,7 +191,7 @@ namespace Fusee.Base.Core
 
 
         /// <summary>
-        /// Retrieves the asset identified by id.
+        /// Retrieves a <see cref="Task"/> which loads the asset identified by id, eventually.
         /// </summary>
         /// <typeparam name="T">The expected type of the asset to retrieve.</typeparam>
         /// <param name="id">The identifier.</param>
@@ -184,6 +232,14 @@ namespace Fusee.Base.Core
             if (_providers.Contains(assetProvider))
                 throw new InvalidOperationException("Asset Provider already registered " + assetProvider);
             _providers.Add(assetProvider);
+        }
+
+        /// <summary>
+        /// Unregisters all asset providers.
+        /// </summary>
+        public static void UnRegisterAllAssetProviders()
+        {
+            Instance._providers.Clear();
         }
 
         /// <summary>

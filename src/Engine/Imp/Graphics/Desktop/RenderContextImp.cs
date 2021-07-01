@@ -17,6 +17,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
     /// </summary>
     public class RenderContextImp : IRenderContextImp
     {
+        /// <summary>
+        /// Constant id that describes the renderer. This can be used in shaders to do platform dependent things.
+        /// </summary>
+        public FuseePlatformId FuseePlatformId { get; } = FuseePlatformId.Desktop;
+
         private int _textureCountPerShader;
         private readonly Dictionary<int, int> _shaderParam2TexUnit;
 
@@ -31,6 +36,10 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         private bool _isPtRenderingEnabled;
         private bool _isLineSmoothEnabled;
 
+#if DEBUG
+        private static DebugProc _openGlDebugDelegate;
+#endif
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderContextImp"/> class.
         /// </summary>
@@ -39,6 +48,16 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         {
             _textureCountPerShader = 0;
             _shaderParam2TexUnit = new Dictionary<int, int>();
+
+#if DEBUG
+            GL.Enable(EnableCap.DebugOutput);
+            GL.Enable(EnableCap.DebugOutputSynchronous);
+
+            _openGlDebugDelegate = new DebugProc(openGLDebugCallback);
+
+            GL.DebugMessageCallback(_openGlDebugDelegate, IntPtr.Zero);
+            GL.DebugMessageControl(DebugSourceControl.DontCare, DebugTypeControl.DontCare, DebugSeverityControl.DebugSeverityNotification, 0, new int[0], false);
+#endif
 
             // Due to the right-handed nature of OpenGL and the left-handed design of FUSEE
             // the meaning of what's Front and Back of a face simply flips.
@@ -55,7 +74,6 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             GL.GetInteger(GetPName.BlendEquationAlpha, out int blendEqA);
             GL.GetInteger(GetPName.BlendEquationRgb, out int blendEqRgb);
 
-
             _blendDstRgb = (BlendingFactorDest)blendDstRgb;
             _blendSrcRgb = (BlendingFactorSrc)blendSrcRgb;
             _blendSrcAlpha = (BlendingFactorSrc)blendSrcAlpha;
@@ -63,8 +81,26 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             _blendEquationAlpha = (BlendEquationMode)blendEqA;
             _blendEquationRgb = (BlendEquationMode)blendEqRgb;
 
-            Diagnostics.Debug(GetHardwareDescription());
+            Diagnostics.Debug(GL.GetString(StringName.Vendor) + " - " + GL.GetString(StringName.Renderer) + " - " + GL.GetString(StringName.Version));
+#if DEBUG
+            var numExtensions = GL.GetInteger(GetPName.NumExtensions);
+            var extensions = new string[numExtensions];
+
+            for (int i = 0; i < numExtensions; i++)
+            {
+                extensions[i] = GL.GetString(StringNameIndexed.Extensions, i);
+            }
+
+            Diagnostics.Verbose(string.Join(';', extensions));
+#endif
         }
+
+#if DEBUG
+        private static void openGLDebugCallback(DebugSource source, DebugType type, int id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
+        {
+            Diagnostics.Debug($"{System.Runtime.InteropServices.Marshal.PtrToStringAnsi(message, length)}\n\tid:{id} severity:{severity} type:{type} source:{source}\n");
+        }
+#endif
 
         #region Image data related Members
 
@@ -191,8 +227,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                     break;
                 // TODO: Handle Alpha-only / Intensity-only and AlphaIntensity correctly.
                 case ColorFormat.Intensity:
-                    internalFormat = PixelInternalFormat.Alpha;
-                    format = PixelFormat.Alpha;
+                    internalFormat = PixelInternalFormat.R8;
+                    format = PixelFormat.Red;
                     pxType = PixelType.UnsignedByte;
 
                     break;
@@ -225,6 +261,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                     format = PixelFormat.Rgb;
                     pxType = PixelType.Float;
                     break;
+                case ColorFormat.fRGBA16:
+                    internalFormat = PixelInternalFormat.Rgba16f;
+                    format = PixelFormat.Rgba;
+                    pxType = PixelType.Float;
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException("CreateTexture: Image pixel format not supported");
             }
@@ -234,14 +275,46 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 Format = format,
                 InternalFormat = internalFormat,
                 PxType = pxType
-
             };
+        }
+
+        /// <summary>
+        /// Creates a new Texture and binds it to the shader.
+        /// </summary>
+        /// <param name="img">A given ImageData object, containing all necessary information for the upload to the graphics card.</param>
+        /// <returns>An ITextureHandle that can be used for texturing in the shader. In this implementation, the handle is an integer-value which is necessary for OpenTK.</returns>
+        public ITextureHandle CreateTexture(IWritableArrayTexture img)
+        {
+            int id = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2DArray, id);
+
+            var glMinMagFilter = GetMinMagFilter(img.FilterMode);
+            var minFilter = glMinMagFilter.Item1;
+            var magFilter = glMinMagFilter.Item2;
+            var glWrapMode = GetWrapMode(img.WrapMode);
+            var pxInfo = GetTexturePixelInfo(img);
+
+            GL.TexImage3D(TextureTarget.Texture2DArray, 0, pxInfo.InternalFormat, img.Width, img.Height, img.Layers, 0, pxInfo.Format, pxInfo.PxType, IntPtr.Zero);
+
+            if (img.DoGenerateMipMaps)
+                GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureCompareMode, (int)GetTexComapreMode(img.CompareMode));
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureCompareFunc, (int)GetDepthCompareFunc(img.CompareFunc));
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)minFilter);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)magFilter);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)glWrapMode);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)glWrapMode);
+
+            ITextureHandle texID = new TextureHandle { TexHandle = id };
+
+            return texID;
         }
 
         /// <summary>
         /// Creates a new CubeMap and binds it to the shader.
         /// </summary>
-        /// <param name="img">A given ImageData object, containing all necessary information for the upload to the graphics card.</param>
+        /// <param name="img">A given IWritableCubeMap object, containing all necessary information for the upload to the graphics card.</param>
         /// <returns>An ITextureHandle that can be used for texturing in the shader. In this implementation, the handle is an integer-value which is necessary for OpenTK.</returns>
         public ITextureHandle CreateTexture(IWritableCubeMap img)
         {
@@ -269,11 +342,10 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             return texID;
         }
 
-
         /// <summary>
         /// Creates a new Texture and binds it to the shader.
         /// </summary>
-        /// <param name="img">A given ImageData object, containing all necessary information for the upload to the graphics card.</param>
+        /// <param name="img">A given ITexture object, containing all necessary information for the upload to the graphics card.</param>
         /// <returns>An ITextureHandle that can be used for texturing in the shader. In this implementation, the handle is an integer-value which is necessary for OpenTK.</returns>
         public ITextureHandle CreateTexture(ITexture img)
         {
@@ -288,10 +360,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
             var pxInfo = GetTexturePixelInfo(img);
 
+            GL.TexImage2D(TextureTarget.Texture2D, 0, pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, img.PixelData);
+
             if (img.DoGenerateMipMaps)
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
-            GL.TexImage2D(TextureTarget.Texture2D, 0, pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, img.PixelData);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)minFilter);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)magFilter);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)glWrapMode);
@@ -306,7 +379,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <summary>
         /// Creates a new Texture and binds it to the shader.
         /// </summary>
-        /// <param name="img">A given ImageData object, containing all necessary information for the upload to the graphics card.</param>
+        /// <param name="img">A given IWritableTexture object, containing all necessary information for the upload to the graphics card.</param>
         /// <returns>An ITextureHandle that can be used for texturing in the shader. In this implementation, the handle is an integer-value which is necessary for OpenTK.</returns>
         public ITextureHandle CreateTexture(IWritableTexture img)
         {
@@ -319,13 +392,13 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             var glWrapMode = GetWrapMode(img.WrapMode);
             var pxInfo = GetTexturePixelInfo(img);
 
+            GL.TexImage2D(TextureTarget.Texture2D, 0, pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, IntPtr.Zero);
+
             if (img.DoGenerateMipMaps)
                 GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
-            GL.TexImage2D(TextureTarget.Texture2D, 0, pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, IntPtr.Zero);
-
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareMode, (int)GetTexComapreMode(img.CompareMode));
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareFunc, (int)GetDepthCompareFunc(img.CompareFunc));            
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareFunc, (int)GetDepthCompareFunc(img.CompareFunc));
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)minFilter);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)magFilter);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)glWrapMode);
@@ -373,6 +446,33 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+        }
+
+        /// <summary>
+        /// Sets the textures filter mode (<see cref="TextureFilterMode"/> at runtime.
+        /// </summary>
+        /// <param name="tex">The handle of the texture.</param>
+        /// <param name="filterMode">The new filter mode.</param>
+        public void SetTextureFilterMode(ITextureHandle tex, TextureFilterMode filterMode)
+        {
+            GL.BindTexture(TextureTarget.Texture2D, ((TextureHandle)tex).TexHandle);
+            var glMinMagFilter = GetMinMagFilter(filterMode);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)glMinMagFilter.Item1);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)glMinMagFilter.Item2);
+        }
+
+        /// <summary>
+        /// Sets the textures filter mode (<see cref="Common.TextureWrapMode"/> at runtime.
+        /// </summary>
+        /// <param name="tex">The handle of the texture.</param>
+        ///<param name="wrapMode">The new wrap mode.</param>
+        public void SetTextureWrapMode(ITextureHandle tex, Common.TextureWrapMode wrapMode)
+        {
+            GL.BindTexture(TextureTarget.Texture2D, ((TextureHandle)tex).TexHandle);
+            var glWrapMode = GetWrapMode(wrapMode);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)glWrapMode);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)glWrapMode);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapR, (int)glWrapMode);
         }
 
         /// <summary>
@@ -447,7 +547,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
 
             // Compile geometry shader
             int geometryObject = -1;
-            if (gs != null)
+            if (!string.IsNullOrEmpty(gs))
             {
                 geometryObject = GL.CreateShader(ShaderType.GeometryShader);
 
@@ -472,23 +572,24 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             int program = GL.CreateProgram();
             GL.AttachShader(program, fragmentObject);
 
-            if (gs != null)
+            if (!string.IsNullOrEmpty(gs))
                 GL.AttachShader(program, geometryObject);
 
             GL.AttachShader(program, vertexObject);
 
             // enable GLSL (ES) shaders to use fuVertex, fuColor and fuNormal attributes
             GL.BindAttribLocation(program, AttributeLocations.VertexAttribLocation, UniformNameDeclarations.Vertex);
-            GL.BindAttribLocation(program, AttributeLocations.ColorAttribLocation, UniformNameDeclarations.Color);
+            GL.BindAttribLocation(program, AttributeLocations.ColorAttribLocation, UniformNameDeclarations.VertexColor);
             GL.BindAttribLocation(program, AttributeLocations.UvAttribLocation, UniformNameDeclarations.TextureCoordinates);
             GL.BindAttribLocation(program, AttributeLocations.NormalAttribLocation, UniformNameDeclarations.Normal);
-            GL.BindAttribLocation(program, AttributeLocations.TangentAttribLocation, UniformNameDeclarations.TangentAttribName);
+            GL.BindAttribLocation(program, AttributeLocations.TangentAttribLocation, UniformNameDeclarations.Tangent);
             GL.BindAttribLocation(program, AttributeLocations.BoneIndexAttribLocation, UniformNameDeclarations.BoneIndex);
             GL.BindAttribLocation(program, AttributeLocations.BoneWeightAttribLocation, UniformNameDeclarations.BoneWeight);
-            GL.BindAttribLocation(program, AttributeLocations.BitangentAttribLocation, UniformNameDeclarations.BitangentAttribName);
+            GL.BindAttribLocation(program, AttributeLocations.BitangentAttribLocation, UniformNameDeclarations.Bitangent);
+            GL.BindAttribLocation(program, AttributeLocations.FuseePlatformIdLocation, UniformNameDeclarations.FuseePlatformId);
 
             GL.LinkProgram(program); //Must be called AFTER BindAttribLocation
-            
+
             GL.DetachShader(program, fragmentObject);
             GL.DetachShader(program, vertexObject);
             GL.DeleteShader(fragmentObject);
@@ -509,7 +610,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             // wait for all threads to be finished
             GL.Finish();
             GL.Flush();
-           
+
             GL.DeleteProgram(program);
         }
 
@@ -608,6 +709,9 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                     case ActiveUniformType.SamplerCube:
                     case ActiveUniformType.SamplerCubeShadow:
                         paramInfo.Type = typeof(IWritableCubeMap);
+                        break;
+                    case ActiveUniformType.Sampler2DArray:
+                        paramInfo.Type = typeof(IWritableArrayTexture);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException($"ActiveUniformType {uType} unknown.");
@@ -765,8 +869,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 case TextureType.TextureCubeMap:
                     GL.BindTexture(TextureTarget.TextureCubeMap, ((TextureHandle)texId).TexHandle);
                     break;
-                default:
+                case TextureType.ArrayTexture:
+                    GL.BindTexture(TextureTarget.Texture2DArray, ((TextureHandle)texId).TexHandle);
                     break;
+                default:
+                    throw new ArgumentException($"Unknown texture target: {texTarget}.");
             }
         }
 
@@ -850,7 +957,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         public void SetActiveAndBindTextureArray(IShaderParam param, ITextureHandle[] texIds, TextureType texTarget, out int[] texUnitArray)
         {
             int iParam = ((ShaderParam)param).handle;
-           texUnitArray = new int[texIds.Length];
+            texUnitArray = new int[texIds.Length];
 
             if (!_shaderParam2TexUnit.TryGetValue(iParam, out int firstTexUnit))
             {
@@ -877,7 +984,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <param name="texTarget">The texture type, describing to which texture target the texture gets bound to.</param>
         public void SetShaderParamTexture(IShaderParam param, ITextureHandle texId, TextureType texTarget)
         {
-            SetActiveAndBindTexture(param, texId, texTarget, out int texUnit);            
+            SetActiveAndBindTexture(param, texId, texTarget, out int texUnit);
             GL.Uniform1(((ShaderParam)param).handle, texUnit);
         }
 
@@ -894,7 +1001,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             fixed (int* pFlt = &texUnitArray[0])
                 GL.Uniform1(((ShaderParam)param).handle, texUnitArray.Length, pFlt);
         }
-        
+
         #endregion
 
         #region Clear
@@ -918,7 +1025,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         {
             get
             {
-                GL.GetFloat(GetPName.ColorClearValue, out Vector4 ret);
+                GL.GetFloat(GetPName.ColorClearValue, out OpenTK.Mathematics.Vector4 ret);
                 return new float4(ret.X, ret.Y, ret.Z, ret.W);
             }
             set { GL.ClearColor(value.x, value.y, value.z, value.w); }
@@ -1005,6 +1112,18 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                     ((AttributeImp)attribHandle).AttributeBufferObject = 0;
                 }
             }
+        }
+
+        /// <summary>
+        /// Binds the VertexArrayObject onto the GL Render context and assigns its index to the passed <see cref="IMeshImp" /> instance.
+        /// </summary>
+        /// <param name="mr">The <see cref="IMeshImp" /> instance.</param>
+        public void SetVertexArrayObject(IMeshImp mr)
+        {
+            if (((MeshImp)mr).VertexArrayObject == 0)
+                ((MeshImp)mr).VertexArrayObject = GL.GenVertexArray();
+
+            GL.BindVertexArray(((MeshImp)mr).VertexArrayObject);
         }
 
         /// <summary>
@@ -1329,6 +1448,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <param name="mr">The <see cref="IMeshImp" /> instance.</param>
         public void Render(IMeshImp mr)
         {
+            GL.BindVertexArray(((MeshImp)mr).VertexArrayObject);
+
             if (((MeshImp)mr).VertexBufferObject != 0)
             {
                 GL.EnableVertexAttribArray(AttributeLocations.VertexAttribLocation);
@@ -1341,7 +1462,6 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 GL.BindBuffer(BufferTarget.ArrayBuffer, ((MeshImp)mr).ColorBufferObject);
                 GL.VertexAttribPointer(AttributeLocations.ColorAttribLocation, 4, VertexAttribPointerType.UnsignedByte, true, 0, IntPtr.Zero);
             }
-
             if (((MeshImp)mr).UVBufferObject != 0)
             {
                 GL.EnableVertexAttribArray(AttributeLocations.UvAttribLocation);
@@ -1450,6 +1570,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
                 GL.DisableVertexAttribArray(AttributeLocations.TangentAttribLocation);
             if (((MeshImp)mr).BitangentBufferObject != 0)
                 GL.DisableVertexAttribArray(AttributeLocations.TangentAttribLocation);
+
+            GL.BindVertexArray(0);
         }
 
         /// <summary>
@@ -1943,6 +2065,48 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         }
 
         /// <summary>
+        /// Renders into the given layer of the array texture.
+        /// </summary>
+        /// <param name="tex">The array texture.</param>
+        /// <param name="layer">The layer to render to.</param>
+        /// <param name="texHandle">The texture handle, associated with the given texture. Should be created by the TextureManager in the RenderContext.</param>
+        public void SetRenderTarget(IWritableArrayTexture tex, int layer, ITextureHandle texHandle)
+        {
+            if (((TextureHandle)texHandle).FrameBufferHandle == -1)
+            {
+                var fBuffer = GL.GenFramebuffer();
+                ((TextureHandle)texHandle).FrameBufferHandle = fBuffer;
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, fBuffer);
+
+                GL.BindTexture(TextureTarget.Texture2DArray, ((TextureHandle)texHandle).TexHandle);
+
+                if (tex.TextureType != RenderTargetTextureTypes.Depth)
+                {
+                    CreateDepthRenderBuffer(tex.Width, tex.Height);
+                    GL.FramebufferTextureLayer(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, ((TextureHandle)texHandle).TexHandle, 0, layer);
+                    GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
+                }
+                else
+                {
+                    GL.FramebufferTextureLayer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, ((TextureHandle)texHandle).TexHandle, 0, layer);
+                    GL.DrawBuffer(DrawBufferMode.None);
+                    GL.ReadBuffer(ReadBufferMode.None);
+                }
+            }
+            else
+            {
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, ((TextureHandle)texHandle).FrameBufferHandle);
+                GL.BindTexture(TextureTarget.Texture2DArray, ((TextureHandle)texHandle).TexHandle);
+                GL.FramebufferTextureLayer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, ((TextureHandle)texHandle).TexHandle, 0, layer);
+            }
+
+            if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete)
+                throw new Exception($"Error creating RenderTarget: {GL.GetError()}, {GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer)}");
+
+            GL.Clear(ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit);
+        }
+
+        /// <summary>
         /// Renders into the given textures of the RenderTarget.
         /// </summary>
         /// <param name="renderTarget">The render target.</param>
@@ -2177,8 +2341,11 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <param name="color">The color of the DebugLine.</param>
         public void DebugLine(float3 start, float3 end, float4 color)
         {
+
             GL.Begin(PrimitiveType.Lines);
+            GL.Color4(color.x, color.y, color.z, color.w);
             GL.Vertex3(start.x, start.y, start.z);
+            GL.Color4(color.x, color.y, color.z, color.w);
             GL.Vertex3(end.x, end.y, end.z);
             GL.End();
         }

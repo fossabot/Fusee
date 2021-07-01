@@ -8,6 +8,11 @@ namespace Fusee.Engine.Common
     public interface IRenderCanvasImp
     {
         /// <summary>
+        /// Cross-platform window handle for the window the engine renders to.
+        /// </summary>
+        IWindowHandle WindowHandle { get; }
+
+        /// <summary>
         /// Implementation Tasks: Gets and sets the width(pixel units) of the Canvas.
         /// </summary>
         /// <value>
@@ -123,6 +128,6 @@ namespace Fusee.Engine.Common
         /// <summary>
         /// Occurs when [Resize] is called.
         /// </summary>
-        event EventHandler<ResizeEventArgs> Resize;    
+        event EventHandler<ResizeEventArgs> Resize;
     }
 }

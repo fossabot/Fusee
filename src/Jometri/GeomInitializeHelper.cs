@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Fusee.Math.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Fusee.Math.Core;
 
 namespace Fusee.Jometri
 {
@@ -374,4 +374,3 @@ namespace Fusee.Jometri
         #endregion
     }
 }
-

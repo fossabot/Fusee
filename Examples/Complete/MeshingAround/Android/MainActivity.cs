@@ -15,7 +15,6 @@ using ProtoBuf;
 using System.IO;
 using System.Threading.Tasks;
 using Font = Fusee.Base.Core.Font;
-using Path = Fusee.Base.Common.Path;
 
 namespace Fusee.Examples.MeshingAround.Android
 {
@@ -23,7 +22,7 @@ namespace Fusee.Examples.MeshingAround.Android
 #if __ANDROID_11__
         HardwareAccelerated = false,
 #endif
-        ConfigurationChanges = ConfigChanges.KeyboardHidden, LaunchMode = LaunchMode.SingleTask)]
+        ConfigurationChanges = ConfigChanges.KeyboardHidden | ConfigChanges.ScreenSize | ConfigChanges.Orientation, LaunchMode = LaunchMode.SingleTask)]
     public class MainActivity : Activity
     {
         protected override void OnCreate(Bundle savedInstanceState)

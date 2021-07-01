@@ -27,6 +27,7 @@ namespace Fusee.Engine.Imp.Graphics.Android
     {
         #region Internal Fields
 
+        internal int VertexArrayObject;
         internal int VertexBufferObject;
         internal int NormalBufferObject;
         internal int ColorBufferObject;
@@ -41,6 +42,22 @@ namespace Fusee.Engine.Imp.Graphics.Android
         #endregion Internal Fields
 
         #region Public Fields & Members pairs
+
+        /// <summary>
+        /// Invalidates the VertexArrayObject.
+        /// </summary>
+        public void InvalidateVertexArrayObject()
+        {
+            VertexArrayObject = 0;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether [VertexArrayObject set].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [VertexArrayObject set]; otherwise, <c>false</c>.
+        /// </value>
+        public bool VertexArrayObjectSet { get { return VertexArrayObject != 0; } }
 
         /// <summary>
         /// Invalidates the vertices.

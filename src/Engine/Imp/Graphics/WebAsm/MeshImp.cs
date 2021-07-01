@@ -156,6 +156,12 @@ namespace Fusee.Engine.Imp.WebAsm
             ElementBufferObject = null;
             NElements = 0;
         }
+
+        public void InvalidateVertexArrayObject()
+        {
+            throw new System.NotImplementedException();
+        }
+
         /// <summary>
         /// Gets a value indicating whether [triangles set].
         /// </summary>
@@ -168,6 +174,8 @@ namespace Fusee.Engine.Imp.WebAsm
         /// Type of data of this mesh (e.g. Triangles, Points, Lines, etc.)
         /// </summary>
         public OpenGLPrimitiveType MeshType { get; set; }
+
+        public bool VertexArrayObjectSet => throw new System.NotImplementedException();
 
         #endregion
     }

@@ -26,7 +26,12 @@ namespace Fusee.Engine.Common
         /// <summary>
         /// Exactly 6 distinct sets of 2D images, all of the same size. They act as 6 faces of a cube.
         /// </summary>
-        TextureCubeMap
+        TextureCubeMap,
+
+        /// <summary>
+        /// A texture with a number of layers. Each layer can be written to and read from separately.
+        /// </summary>
+        ArrayTexture
     }
 
     /// <summary>
@@ -67,8 +72,8 @@ namespace Fusee.Engine.Common
         /// <summary>
         /// Enables the compare mode.
         /// </summary>
-        CompareRefToTexture 
-    }    
+        CompareRefToTexture
+    }
 
     /// <summary>
     /// Defines how to map texels to uv coordinates.

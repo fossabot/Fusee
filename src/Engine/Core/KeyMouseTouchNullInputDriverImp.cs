@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Fusee.Engine.Common;
+using System;
 using System.Collections.Generic;
-using Fusee.Engine.Common;
 
 namespace Fusee.Engine.Core
 {
@@ -53,7 +53,7 @@ namespace Fusee.Engine.Core
         {
             get
             {
-                foreach (var keyId in (KeyCodes[]) Enum.GetValues(typeof(KeyCodes)))
+                foreach (var keyId in (KeyCodes[])Enum.GetValues(typeof(KeyCodes)))
                 {
                     yield return new ButtonImpDescription
                     {
@@ -320,8 +320,8 @@ namespace Fusee.Engine.Core
     {
         private Dictionary<int, AxisImpDescription> _tpAxisDescs;
         private Dictionary<int, ButtonImpDescription> _tpButtonDescs;
-        private readonly int _nTouchPointsSupported = 5;
-    
+        private int _nTouchPointsSupported = 5;
+
 
         /// <summary>
         /// Constructor. Initializes internal structures.
