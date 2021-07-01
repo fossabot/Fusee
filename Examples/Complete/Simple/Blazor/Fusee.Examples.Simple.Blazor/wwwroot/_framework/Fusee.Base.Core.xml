@@ -1,0 +1,638 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Fusee.Base.Core</name>
+    </assembly>
+    <members>
+        <member name="T:Fusee.Base.Core.AssetStorage">
+            <summary>
+            A class providing access to Assets. An asset is considered any content to be loaded, deserialized and converted during
+            an application's lifetime. Often Assets should be loaded up-front and accessed during run-time with no perceivable delay.
+            AssetStorage is a staticton (a singleton with an additional static interface).
+            </summary>
+            <remarks>
+            The existence of this class is a tribute to the Web-world where a lot of asset types (e.g. images) are JavaScript built-in
+            functionality with no possibility to separate the many aspects of asset-access (like loading, deserialization, codec,
+            asynchronicity). Decent programming environments allow to separate these aspects using streams. A decoder is implemented
+            against a stream. Anything capable of providing streams, synchronously or asynchronously thus can act as an asset store.
+            If FUSEE had been designed without JavaScript X-compilation in mind, this class would probably not
+            exist.
+            </remarks>
+        </member>
+        <member name="P:Fusee.Base.Core.AssetStorage.AllAssetsFinishedLoading">
+            <summary>
+            Returns true if all assets have finished loading, independent of failed or sucess state
+            </summary>
+        </member>
+        <member name="P:Fusee.Base.Core.AssetStorage.Instance">
+            <summary>
+            Implements the Singleton pattern.
+            </summary>
+            <value>
+            The (one-and-only) instance of AssetStorage.
+            </value>
+        </member>
+        <member name="M:Fusee.Base.Core.AssetStorage.IsAssetPresent(System.String)">
+            <summary>
+            Returns true if an asset is currently loading or already loaded
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Base.Core.AssetStorage.IsAssetLoaded(System.String)">
+            <summary>
+            Returns true if an asset has finished loading successfully,
+            returns false if not present, see <see cref="M:Fusee.Base.Core.AssetStorage.IsAssetPresent(System.String)"/>
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Base.Core.AssetStorage.Get``1(System.String)">
+            <summary>
+            Staticton implementation of <see cref="M:Fusee.Base.Core.AssetStorage.GetAsset``1(System.String)"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="id">The identifier.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Base.Core.AssetStorage.GetAsync``1(System.String)">
+            <summary>
+            Staticton implementation of <see cref="M:Fusee.Base.Core.AssetStorage.GetAsset``1(System.String)"/>.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="id">The identifier.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Base.Core.AssetStorage.GetAssetsAsync``1(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Retrieves the assets identified by ids in an completely async parallel matter.
+            </summary>
+            <typeparam name="T">The expected types of the asset to retrieve.</typeparam>
+            <param name="ids">The identifiers.</param>
+            <returns>The assets, if found. Otherwise null.</returns>
+        </member>
+        <member name="M:Fusee.Base.Core.AssetStorage.GetAsset``1(System.String)">
+            <summary>
+            Retrieves the asset identified by id.
+            </summary>
+            <typeparam name="T">The expected type of the asset to retrieve.</typeparam>
+            <param name="id">The identifier.</param>
+            <returns>The asset, if found. Otherwise null.</returns>
+            <remarks>Internally, this method queries all of the registered asset providers (<see cref="M:Fusee.Base.Core.AssetStorage.RegisterAssetProvider(Fusee.Base.Common.IAssetProvider)"/>.
+            The first asset provider capable of retrieving the asset "wins". It's up to any application to guarantee
+            uniqueness of asset identifiers among all assets and asset providers.
+            </remarks>
+        </member>
+        <member name="M:Fusee.Base.Core.AssetStorage.GetAssetAsync``1(System.String)">
+            <summary>
+            Retrieves the asset identified by id.
+            </summary>
+            <typeparam name="T">The expected type of the asset to retrieve.</typeparam>
+            <param name="id">The identifier.</param>
+            <returns>The asset, if found. Otherwise null.</returns>
+            <remarks>Internally, this method queries all of the registered asset providers (<see cref="M:Fusee.Base.Core.AssetStorage.RegisterAssetProvider(Fusee.Base.Common.IAssetProvider)"/>.
+            The first asset provider capable of retrieving the asset "wins". It's up to any application to guarantee
+            uniqueness of asset identifiers among all assets and asset providers.
+            </remarks>
+        </member>
+        <member name="M:Fusee.Base.Core.AssetStorage.RegisterProvider(Fusee.Base.Common.IAssetProvider)">
+            <summary>
+            Staticton implementation of <see cref="M:Fusee.Base.Core.AssetStorage.RegisterAssetProvider(Fusee.Base.Common.IAssetProvider)"/>.
+            </summary>
+            <param name="assetProvider">The asset provider.</param>
+        </member>
+        <member name="M:Fusee.Base.Core.AssetStorage.RegisterAssetProvider(Fusee.Base.Common.IAssetProvider)">
+            <summary>
+            Registers the given asset provider. Use this method to register asset providers
+            for the platform (desktop, mobile, web) your main application should run on.
+            </summary>
+            <param name="assetProvider">The asset provider to register.</param>
+        </member>
+        <member name="M:Fusee.Base.Core.AssetStorage.DeepCopy``1(``0)">
+            <summary>
+            Creates a deep copy of the source object. Only works for source objects with the
+            <see cref="T:ProtoBuf.ProtoContractAttribute"/> defined on their class.
+            </summary>
+            <typeparam name="T">
+              Type of the source and object and the returned clone. Implicitly defined by the source parameter.
+            </typeparam>
+            <param name="source">The source object to clone.</param>
+            <returns>A deep copy of the source object. All objects referenced directly and indirectly from the source
+             object are copied, too.</returns>
+        </member>
+        <member name="T:Fusee.Base.Core.AsyncHttpAsset">
+            <summary>
+            Class to load data over HTTP asynchronously and process it according to AsyncAssetHandlers.
+            </summary>
+        </member>
+        <member name="P:Fusee.Base.Core.AsyncHttpAsset.AssetHandlers">
+            <summary>
+            The async asset handlers.
+            </summary>
+        </member>
+        <member name="M:Fusee.Base.Core.AsyncHttpAsset.RegisterTypeHandler(Fusee.Base.Core.AsyncAssetHandler)">
+            <summary>
+            Register an AsyncAssetHandler.
+            </summary>
+            <param name="assetHandler"></param>
+        </member>
+        <member name="M:Fusee.Base.Core.AsyncHttpAsset.RegisterTypeHandler(System.Type,Fusee.Base.Core.AsyncAssetDecoder)">
+            <summary>
+            Register an AsyncAssetDecoder for a certain Type.
+            </summary>
+            <param name="type"></param>
+            <param name="asyncAssetDecoder"></param>
+        </member>
+        <member name="P:Fusee.Base.Core.AsyncHttpAsset.Id">
+            <summary>
+            Id/URL of the asset.
+            </summary>
+        </member>
+        <member name="P:Fusee.Base.Core.AsyncHttpAsset.Type">
+            <summary>
+            Type of the asset.
+            </summary>
+        </member>
+        <member name="P:Fusee.Base.Core.AsyncHttpAsset.Content">
+            <summary>
+            Content of the asset.
+            </summary>
+        </member>
+        <member name="P:Fusee.Base.Core.AsyncHttpAsset.State">
+            <summary>
+            State of the asset.
+            </summary>
+        </member>
+        <member name="E:Fusee.Base.Core.AsyncHttpAsset.onDone">
+            <summary>
+            EventHandler for when downloading and processing is done.
+            </summary>
+        </member>
+        <member name="E:Fusee.Base.Core.AsyncHttpAsset.onFail">
+            <summary>
+            EventHandler for when either downloading or processing fails.
+            </summary>
+        </member>
+        <member name="M:Fusee.Base.Core.AsyncHttpAsset.#ctor(System.String,System.Type,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="id"></param>
+            <param name="type"></param>
+            <param name="startLoad">If true, starts loading immediately, otherwise call StartGet() to start loading the asset.</param>
+        </member>
+        <member name="M:Fusee.Base.Core.AsyncHttpAsset.#ctor(System.String,System.Type,System.EventHandler,System.EventHandler,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="id"></param>
+            <param name="type"></param>
+            <param name="onDone"></param>
+            <param name="onFail"></param>
+            <param name="startLoad">If true, starts loading immediately, otherwise call StartGet() to start loading the asset.</param>
+        </member>
+        <member name="M:Fusee.Base.Core.AsyncHttpAsset.StartLoad">
+            <summary>
+            Starts to load the assets.
+            </summary>
+        </member>
+        <member name="T:Fusee.Base.Core.AsyncAssetState">
+            <summary>
+            The states an asset can inhibit.
+            </summary>
+        </member>
+        <member name="F:Fusee.Base.Core.AsyncAssetState.None">
+            <summary>
+            No available state.
+            </summary>
+        </member>
+        <member name="F:Fusee.Base.Core.AsyncAssetState.Downloading">
+            <summary>
+            Asset is being downloaded.
+            </summary>
+        </member>
+        <member name="F:Fusee.Base.Core.AsyncAssetState.Processing">
+            <summary>
+            Asset is being processed.
+            </summary>
+        </member>
+        <member name="F:Fusee.Base.Core.AsyncAssetState.Done">
+            <summary>
+            State: done.
+            </summary>
+        </member>
+        <member name="F:Fusee.Base.Core.AsyncAssetState.Failed">
+            <summary>
+            State: failed.
+            </summary>
+        </member>
+        <member name="F:Fusee.Base.Core.AsyncAssetState.UserState1">
+            <summary>
+            State: defined by User.
+            </summary>
+        </member>
+        <member name="F:Fusee.Base.Core.AsyncAssetState.UserState2">
+            <summary>
+            State: defined by User.
+            </summary>
+        </member>
+        <member name="F:Fusee.Base.Core.AsyncAssetState.UserState3">
+            <summary>
+            State: defined by User.
+            </summary>
+        </member>
+        <member name="T:Fusee.Base.Core.AsyncAssetHandler">
+            <summary>
+            The asset handler.
+            </summary>
+        </member>
+        <member name="F:Fusee.Base.Core.AsyncAssetHandler.ReturnedType">
+            <summary>
+            The asset load type.
+            </summary>
+        </member>
+        <member name="F:Fusee.Base.Core.AsyncAssetHandler.Decoder">
+            <summary>
+            The asset decoder.
+            </summary>
+        </member>
+        <member name="T:Fusee.Base.Core.AsyncAssetDecoder">
+            <summary>
+            The asset decoder
+            </summary>
+            <param name="id">The asset id.</param>
+            <param name="data">The asset data.</param>
+            <param name="callback">The decoded asset data.</param>
+        </member>
+        <member name="T:Fusee.Base.Core.Diagnostics">
+            <summary>
+            Contains mostly static functions for diagnostic purposes.
+            </summary>
+        </member>
+        <member name="T:Fusee.Base.Core.Diagnostics.Formater">
+            <summary>
+                The methods used for formating messages
+            </summary>
+            <param name="callingMethod">The calling method</param>
+            <param name="lineNumber">The line number of the calling file</param>
+            <param name="sourceFilePath">The calling file</param>
+            <param name="lvl">The severity level</param>
+            <param name="msg">The message</param>
+            <param name="ex">A possible exception</param>
+            <param name="args">Possible arguments</param>
+        </member>
+        <member name="P:Fusee.Base.Core.Diagnostics.Timer">
+            <summary>
+            High precision timer values.
+            </summary>
+            <value>
+            A double value containing consecutive real time values in milliseconds.
+            </value>
+            <remarks>
+            To measure the elapsed time between two places in code get this value twice and calculate the difference.
+            </remarks>
+        </member>
+        <member name="T:Fusee.Base.Core.Diagnostics.SeverityLevel">
+            <summary>
+                The severity level at which logging is enabled
+            </summary>
+        </member>
+        <member name="M:Fusee.Base.Core.Diagnostics.LogToTextFile(System.Boolean,System.String)">
+            <summary>
+                Enable / disable text file logging, default is disabled
+            </summary>
+            <param name="logToTxtFile"></param>
+            <param name="logFileName"></param>
+        </member>
+        <member name="M:Fusee.Base.Core.Diagnostics.SetMinTextFileLoggingSeverityLevel(Fusee.Base.Core.Diagnostics.SeverityLevel)">
+            <summary>
+                Change the min logging severity level before logging is placed within the log text file
+            </summary>
+            <param name="lvl"></param>
+        </member>
+        <member name="M:Fusee.Base.Core.Diagnostics.SetMinConsoleLoggingSeverityLevel(Fusee.Base.Core.Diagnostics.SeverityLevel)">
+            <summary>
+                Change the min logging severity level before logging is written to the console
+            </summary>
+            <param name="lvl"></param>
+        </member>
+        <member name="M:Fusee.Base.Core.Diagnostics.SetMinDebugOutputLoggingSeverityLevel(Fusee.Base.Core.Diagnostics.SeverityLevel)">
+            <summary>
+                Change the min logging severity level before logging is written to the debug output
+            </summary>
+            <param name="lvl"></param>
+        </member>
+        <member name="M:Fusee.Base.Core.Diagnostics.SetFormat(Fusee.Base.Core.Diagnostics.Formater)">
+            <summary>
+                Update the format of the logging messages
+            </summary>
+            <param name="formater"></param>
+        </member>
+        <member name="M:Fusee.Base.Core.Diagnostics.Log(System.Object,Fusee.Base.Core.Diagnostics.SeverityLevel,System.String,System.Int32,System.String)">
+            <summary>
+                Log a debug output message to the respective output console.
+            </summary>
+            <param name="o">The object to log. Will be converted to a string.</param>
+            <param name="logLevel">The level to log, see <see cref="T:Fusee.Base.Core.Diagnostics.SeverityLevel"></see> for a list</param>
+            <param name="callerName">The calling method</param>
+            <param name="sourceLineNumber">The line number, optional.</param>
+            <param name="sourceFilePath">The file path, optional.</param>
+        </member>
+        <member name="M:Fusee.Base.Core.Diagnostics.Debug(System.Object,System.Exception,System.Object[],System.String,System.Int32,System.String)">
+            <summary>
+                Log a debug event.
+                Per default visible within the Visual Studio debug console and the console window in debug builds.
+            </summary>
+            <param name="o">The object to write</param>
+            <param name="ex">A possible exception, optional</param>
+            <param name="args">Possible arguments, optional</param>
+            <param name="callerName">The calling method</param>
+            <param name="sourceLineNumber">The line number, optional.</param>
+            <param name="sourceFilePath">The file path, optional.</param>
+        </member>
+        <member name="M:Fusee.Base.Core.Diagnostics.Info(System.Object,System.Exception,System.Object[],System.String,System.Int32,System.String)">
+            <summary>
+                Log a info event.
+                Per default visible within the Visual Studio debug console and the console window in debug builds, as well as in release builds.
+            </summary>
+            <param name="o">The object to write</param>
+            <param name="ex">A possible exception, optional</param>
+            <param name="args">Possible arguments, optional</param>
+            <param name="callerName">The calling method</param>
+            <param name="sourceLineNumber">The line number, optional.</param>
+            <param name="sourceFilePath">The file path, optional.</param>
+        </member>
+        <member name="M:Fusee.Base.Core.Diagnostics.Warn(System.Object,System.Exception,System.Object[],System.String,System.Int32,System.String)">
+            <summary>
+                Log a warning event.
+                Per default visible within the Visual Studio debug console and the console window in debug builds.
+            </summary>
+            <param name="o">The object to write</param>
+            <param name="ex">A possible exception, optional</param>
+            <param name="args">Possible arguments, optional</param>
+            <param name="callerName">The calling method</param>
+            <param name="sourceLineNumber">The line number, optional.</param>
+            <param name="sourceFilePath">The file path, optional.</param>
+        </member>
+        <member name="M:Fusee.Base.Core.Diagnostics.Error(System.Object,System.Exception,System.Object[],System.String,System.Int32,System.String)">
+            <summary>
+                Log an error event.
+                Per default visible within the Visual Studio debug console and the console window in debug and release builds.
+            </summary>
+            <param name="o">The object to write</param>
+            <param name="ex">A possible exception, optional</param>
+            <param name="args">Possible arguments, optional</param>
+            <param name="callerName">The calling method</param>
+            <param name="sourceLineNumber">The line number, optional.</param>
+            <param name="sourceFilePath">The file path, optional.</param>
+        </member>
+        <member name="T:Fusee.Base.Core.Font">
+            <summary>
+            A Font instance contains methods to access font and glyph data stored in a font
+            description (TrueType or OpenType fonts).
+            </summary>
+        </member>
+        <member name="F:Fusee.Base.Core.Font._fontImp">
+            <summary>
+            For implementation purposes only. Do not use this.
+            </summary>
+        </member>
+        <member name="P:Fusee.Base.Core.Font.UseKerning">
+            <summary>
+                Gets and sets a value indicating whether the kerning definition of a font should be used.
+            </summary>
+            <value>
+                <c>true</c> if the kerning definition of a font should be used; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Fusee.Base.Core.Font.PixelHeight">
+            <summary>
+            Gets and sets the size in pixels.
+            </summary>
+            <value>
+            The vertical size of the font in pixels.
+            </value>
+        </member>
+        <member name="M:Fusee.Base.Core.Font.GetGlyphInfo(System.UInt32)">
+            <summary>
+            Gets the character information.
+            </summary>
+            <param name="c">The character to retrieve information.</param>
+            <returns>An information record about the character.</returns>
+        </member>
+        <member name="M:Fusee.Base.Core.Font.GetGlyphCurve(System.UInt32)">
+            <summary>
+            Gets the character's points, contours and tags and translates them into a curve.
+            </summary>
+            <param name="c">The character from which the information is to be read.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Base.Core.Font.GetUnscaledAdvance(System.UInt32)">
+            <summary>
+            Get the unscaled advance from a character.
+            </summary>
+            <param name="c">The character from which the information is to be read.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Base.Core.Font.RenderGlyph(System.UInt32,System.Int32@,System.Int32@)">
+            <summary>
+                Renders the given glyph.
+            </summary>
+            <param name="c">The character code (Unicode) of the character to render.</param>
+            <param name="bitmapLeft">
+                The x-Bearing of the glyph on the bitmap (in pixels). The number of pixels from the left border of the image 
+                to the leftmost pixel of the glyph within the rendered image.
+            </param>
+            <param name="bitmapTop">
+                The y-Bearing of the glyph on the bitmap (in pixels). The number of pixels from the character's origin 
+                (base line) of the image to the topmost pixel of the glyph within the rendered image.
+            </param>
+            <returns>
+                An image data structure containing an image of the given character.
+            </returns>
+        </member>
+        <member name="M:Fusee.Base.Core.Font.GetKerning(System.UInt32,System.UInt32)">
+            <summary>
+            Gets the kerning offset between a pair of two consecutive characters in a text string.
+            </summary>
+            <param name="leftC">The left character.</param>
+            <param name="rightC">The right character.</param>
+            <returns>An offset to add to the normal advance. Typically negative since kerning rather compacts text lines.</returns>
+        </member>
+        <member name="M:Fusee.Base.Core.Font.GetUnscaledKerning(System.UInt32,System.UInt32)">
+            <summary>
+            Gets the unscaled kerning offset between a pair of two consecutive characters in a text string.
+            </summary>
+            <param name="leftC">The left character.</param>
+            <param name="rightC">The right character.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Fusee.Base.Core.ImageData">
+            <summary>
+            ImageData solves the problem of handling bitmaps in fusee by offering functions of bitmap manipulation.
+            </summary>
+        </member>
+        <member name="P:Fusee.Base.Core.ImageData.PixelData">
+            <summary>
+            The byte array that makes up this ImageData instance.
+            </summary>
+        </member>
+        <member name="M:Fusee.Base.Core.ImageData.#ctor(System.Byte[],System.Int32,System.Int32,Fusee.Base.Common.ImagePixelFormat)">
+            <summary>
+            Constructor takes the pixelData byte array, width and height dimensions in pixels and the <see cref="T:Fusee.Base.Common.ImagePixelFormat"/>.
+            </summary>
+            <param name="pixelData">The pixelData byte array contains all bitmap pixels.</param>
+            <param name="width">Width in pixels.</param>
+            <param name="height">Height in pixels.</param>
+            <param name="colorFormat"><see cref="T:Fusee.Base.Common.ImagePixelFormat"/> provides additional information about pixel Encoding.</param>
+        </member>
+        <member name="M:Fusee.Base.Core.ImageData.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Creates a new instance of type ImageData.
+            </summary>
+            <param name="width">Width in px.</param>
+            <param name="height">Height in px.</param>
+        </member>
+        <member name="M:Fusee.Base.Core.ImageData.#ctor(Fusee.Base.Common.ColorFormat,System.Int32,System.Int32)">
+            <summary>
+            Creates a new instance of type ImageData.
+            </summary>
+            <param name="format">The <see cref="T:Fusee.Base.Common.ColorFormat"/>.</param>
+            <param name="width">Width in px.</param>
+            <param name="height">Height in px.</param>
+        </member>
+        <member name="P:Fusee.Base.Core.ImageData.Width">
+            <summary>
+            Width in pixels.
+            </summary>
+        </member>
+        <member name="P:Fusee.Base.Core.ImageData.Height">
+            <summary>
+            Height in pixels.
+            </summary>
+        </member>
+        <member name="P:Fusee.Base.Core.ImageData.PixelFormat">
+            <summary>
+            PixelFormat provides additional information about pixel encoding.
+            </summary>
+        </member>
+        <member name="M:Fusee.Base.Core.ImageData.Blt(System.Int32,System.Int32,Fusee.Base.Common.IImageData,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Copies a rectangular block of pixel data from a source image to a this image (Blt = BlockTransfer).
+            </summary>
+            <param name="xDst">The x destination coordinate (where to place the block within dst).</param>
+            <param name="yDst">The y destination coordinate (where to place the block within dst).</param>
+            <param name="src">The source image.</param>
+            <param name="xSrc">The x source coordinate (where to start copying from within src).</param>
+            <param name="ySrc">The y source coordinate (where to start copying from within src).</param>
+            <param name="width">The width of the block to copy. (default is src.Width).</param>
+            <param name="height">The height of the block to copy (default is src.Height).</param>
+            <remarks>
+                All specified parameters are clipped to avoid out-of-bounds indices. No warnings or exceptions are issued
+                in case clipping results in a smaller or an empty block.
+            </remarks>
+        </member>
+        <member name="M:Fusee.Base.Core.ImageData.ScanLines(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Retrieve a rectangular block from this image that is represented by horizontal ScanLines from top to bottom along width and height, beginning at offsets xSrc and ySrc.
+            </summary>
+            <param name="xSrc">x offset in pixels.</param>
+            <param name="ySrc">y offset in pixels.</param>
+            <param name="width">width of ScanLines in pixels.</param>
+            <param name="height">Height describes how many ScanLines will be returned.</param>
+            <returns>Returns a rectangular block of horizontal ScanLine instances.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:Fusee.Base.Core.ImageData.ClipBlt(System.Int32@,System.Int32,System.Int32@,System.Int32,System.Int32@)">
+            <summary>
+            Performs clipping along one dimension of a blt operation.
+            </summary>
+            <param name="iDst">The destination coordinate.</param>
+            <param name="sizeDst">The size of the destination buffer.</param>
+            <param name="iSrc">The source coordinate.</param>
+            <param name="sizeSrc">The size of the source coordinate.</param>
+            <param name="sizeBlk">The size of the block to copy.</param>
+            <remarks>
+               All parameters decorated with "ref" might be altered to avoid out-of-bounds indices.
+               If the resulting number of items to copy is 0, only sizeBlk will be set to 0. No other
+               ref-parameter will be altered then.
+            </remarks>
+        </member>
+        <member name="P:Fusee.Base.Core.ImageData.IsEmpty">
+            <summary>
+            Checks if an image contains no data by checking if <see cref="P:Fusee.Base.Core.ImageData.Width"/> or <see cref="P:Fusee.Base.Core.ImageData.Height"/> is 0.
+            </summary>
+            <value>
+            <c>true</c> if this instance is empty; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="M:Fusee.Base.Core.ImageData.CreateImage(System.Int32,System.Int32,Fusee.Base.Common.ColorUint)">
+            <summary>
+            Creates an image and fills it with the given color.
+            </summary>
+            <param name="width">The width (in pixels) of the image to create.</param>
+            <param name="height">The height (in pixels) of the image to create.</param>
+            <param name="color">The color to fill the image with.</param>
+            <returns>The newly created image.</returns>
+        </member>
+        <member name="T:Fusee.Base.Core.IO">
+            <summary>
+            Contains static methods not supported by portable libraries
+            dealing with input/output.
+            </summary>
+        </member>
+        <member name="P:Fusee.Base.Core.IO.IOImp">
+            <summary>
+            The platform dependent implementation of all IO functionality.
+            </summary>
+            <value>
+            The io implementation.
+            </value>
+        </member>
+        <member name="M:Fusee.Base.Core.IO.StreamFromFile(System.String,Fusee.Base.Common.FileMode)">
+            <summary>
+            Opens a file and returns its contents as a <see cref="T:System.IO.Stream" />.
+            </summary>
+            <param name="path">The path to the file to open.</param>
+            <param name="mode">The mode.</param>
+            <returns>
+            A stream
+            </returns>
+            <exception>
+            Exceptions thrown by this method depend on the underlying 
+            platform dependent implementation.
+            </exception>
+        </member>
+        <member name="T:Fusee.Base.Core.NamespaceDoc">
+            <summary>
+            <para>
+            Types in this module implement FUSEE's basic functionality 
+            such as operating system functionality abstraction with varying implementations
+            on different platforms and general functionality not related to 3D rendering
+            </para>
+            <para>
+            Among the most important classes are
+            <list type="bullet">
+              <item>
+                <term><see cref="T:Fusee.Base.Core.AssetStorage"/></term>
+                <description>Can be used in applications to load assets of various types.</description>
+              </item>
+              <item>
+                <term><see cref="T:Fusee.Base.Core.Diagnostics"/></term>
+                <description>Contains diagnostic aids to be used during debugging and logging.</description>
+              </item>
+              <item>
+                <term><see cref="T:Fusee.Base.Core.Font"/></term>
+                <description>Platform independent access to font data.</description>
+              </item>
+            </list>
+            </para>
+            <para>
+            Some of the functionality relies on platform specific implementations found in underlying platform-dependent modules.
+            Common classes used by both, this module and underlying platform-dependent implementation modules can be found int the
+            <see cref="N:Fusee.Base.Common"/> namespace.
+            </para>
+            </summary>
+        </member>
+    </members>
+</doc>

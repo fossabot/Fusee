@@ -1,0 +1,22 @@
+﻿@page "/"
+@using System.Runtime.CompilerServices
+@using System.Diagnostics.CodeAnalysis
+@using Fusee.Base.Imp.WebAsm
+@inject IJSRuntime JS
+
+<canvas id="c" width="200" height="200" style="width: 200px; height: 200px"></canvas>
+
+
+@code
+{
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            WebAsmProgram.Start(new Runner(), JS);
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+}

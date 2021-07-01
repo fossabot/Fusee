@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using WebAssembly.Core;
 using static Fusee.Engine.Imp.Graphics.WebAsm.WebGL2RenderingContextBase;
 using static Fusee.Engine.Imp.Graphics.WebAsm.WebGLRenderingContextBase;
 
@@ -209,32 +208,32 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             };
         }
 
-        private ITypedArray GetEmptyArray(ITextureBase tex)
+        private Array GetEmptyArray(ITextureBase tex)
         {
-
+        
             Diagnostics.Warn("GetEmptyArray", null, new object[] { tex });
 
             switch (tex.PixelFormat.ColorFormat)
             {
                 case ColorFormat.RGBA:
-                    return new Uint8Array(tex.Width * tex.Height * 4);
+                    return new byte[tex.Width * tex.Height * 4];
                 case ColorFormat.RGB:
-                    return new Uint8Array(tex.Width * tex.Height * 3);
+                    return new byte[tex.Width * tex.Height * 3];
                 // TODO: Handle Alpha-only / Intensity-only and AlphaIntensity correctly.
                 case ColorFormat.Intensity:
-                    return new Uint8Array(tex.Width * tex.Height);
+                    return new byte[tex.Width * tex.Height];
                 case ColorFormat.Depth24:
                 case ColorFormat.Depth16:
-                    return new Float32Array(tex.Width * tex.Height);
+                    return new float[tex.Width * tex.Height];
                 case ColorFormat.uiRgb8:
-                    return new Uint8Array(tex.Width * tex.Height * 4);
+                    return new byte[tex.Width * tex.Height * 4];
                 case ColorFormat.fRGB32:
                 case ColorFormat.fRGB16:
-                    return new Float32Array(tex.Width * tex.Height * 3);
+                    return new float[tex.Width * tex.Height * 3];
                 default:
                     throw new ArgumentOutOfRangeException("CreateTexture: Image pixel format not supported");
             }
-
+        
         }
 
         /// <summary>
@@ -288,8 +287,9 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             var glWrapMode = GetWrapMode(img.WrapMode);
             var pxInfo = GetTexturePixelInfo(img);
 
-            var imageData = gl2.CastNativeArray(img.PixelData);
-            gl2.TexImage2D(TEXTURE_2D, 0, pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, imageData);
+            //var imageData = gl2.CastNativeArray(img.PixelData);
+            // TODO(MR): Add native C# to javascript interop
+            gl2.TexImage2D(TEXTURE_2D, 0, pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, img.PixelData);
 
             if (img.DoGenerateMipMaps)
                 gl2.GenerateMipmap(TEXTURE_2D);
@@ -324,7 +324,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
             var imgData = GetEmptyArray(img);
 
-            gl2.TexImage2D(TEXTURE_2D, 0, pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, imgData);
+            gl2.TexImage2D(TEXTURE_2D, 0, (int)pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, imgData);
 
             if (img.DoGenerateMipMaps)
                 gl2.GenerateMipmap(TEXTURE_2D);
@@ -374,8 +374,9 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             } while (scanlines.MoveNext());
 
             gl2.BindTexture(TEXTURE_2D, ((TextureHandle)tex).TexHandle);
-            var imageData = gl2.CastNativeArray(bytes);
-            gl2.TexSubImage2D(TEXTURE_2D, 0, startX, startY, width, height, pixelFormat, UNSIGNED_BYTE, imageData);
+            //var imageData = gl2.CastNativeArray(bytes);
+            // TODO(MR): Add native C# to javascript interop
+            gl2.TexSubImage2D(TEXTURE_2D, 0, startX, startY, width, height, pixelFormat, UNSIGNED_BYTE, new ReadOnlySpan<byte>(bytes));
 
             gl2.GenerateMipmap(TEXTURE_2D);
 
@@ -664,8 +665,9 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <param name="val">The value.</param>
         public unsafe void SetShaderParam(IShaderParam param, float3[] val)
         {
-            fixed (float3* pFlt = &val[0])
-                gl2.Uniform3fv(((ShaderParam)param).handle, new Span<float>((float*)pFlt, val.Length * 3));
+            // TODO(MR): Make unmanaged call
+            //fixed (float3* pFlt = &val[0])
+                gl2.Uniform3fv(((ShaderParam)param).handle, val, 0, (uint)val.Length);
         }
 
         /// <summary>
@@ -698,7 +700,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         public unsafe void SetShaderParam(IShaderParam param, float4[] val)
         {
             fixed (float4* pFlt = &val[0])
-                gl2.Uniform4fv(((ShaderParam)param).handle, new Span<float>((float*)pFlt, val.Length * 4));
+                gl2.Uniform4fv(((ShaderParam)param).handle, val, 0, (uint)val.Length);
         }
 
         /// <summary>
@@ -718,8 +720,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                 tmpArray[i * 4 + 3] = val[i].Column3;
             }
 
-            fixed (float4* pMtx = &tmpArray[0])
-                gl2.UniformMatrix4fv(((ShaderParam)param).handle, true, new Span<float>((float*)pMtx, val.Length * 16));
+            //fixed (float4* pMtx = &tmpArray[0])
+                gl2.UniformMatrix4fv(((ShaderParam)param).handle, true, val, 0, (uint)val.Length);
         }
 
         /// <summary>
@@ -890,7 +892,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         {
             get
             {
-                var ret = (Float32Array)gl2.GetParameter(COLOR_CLEAR_VALUE);
+                var ret = (float[])gl2.GetParameter(COLOR_CLEAR_VALUE);
                 //var ret = new float[4];
                 //ret[0] = (c & 0xff000000) >> 32;
                 //ret[1] = (c & 0x00ff0000) >> 16;
@@ -2286,8 +2288,9 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         public IImageData GetPixelColor(int x, int y, int w = 1, int h = 1)
         {
             var image = Fusee.Base.Core.ImageData.CreateImage(w, h, ColorUint.Black);
-            var pixelDataTA = Uint8Array.From(image.PixelData);
-            gl2.ReadPixels(x, y, w, h, RGB /* yuk, yuk ??? */, UNSIGNED_BYTE, pixelDataTA);
+            var pixelDataTA = image.PixelData; // Uint8Array.From(image.PixelData);
+            // TODO(MR): Check!
+            gl2.ReadPixels(x, y, w, h, RGB /* yuk, yuk ??? */, UNSIGNED_BYTE, 0);
             return image;
         }
 
@@ -2300,8 +2303,10 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         public float GetPixelDepth(int x, int y)
         {
             var depth = new float[1];
-            var depthTA = Float32Array.From(depth);
-            gl2.ReadPixels(x, y, 1, 1, DEPTH_COMPONENT, UNSIGNED_BYTE, depthTA);
+            //var depthTA = Float32Array.From(depth);
+            // TODO(MR): Check!
+
+            gl2.ReadPixels(x, y, 1, 1, DEPTH_COMPONENT, UNSIGNED_BYTE, 0);
 
             return depth[0];
         }

@@ -1,15 +1,16 @@
 ﻿using Fusee.Base.Core;
+using Fusee.Base.Imp.WebAsm;
+using Microsoft.JSInterop;
 using System;
 using System.Text;
-using WebAssembly;
-using WebAssembly.Core;
+
 
 namespace Fusee.Engine.Imp.Graphics.WebAsm
 {
 #pragma warning disable 1591
     public abstract class JSHandler : IDisposable
     {
-        internal JSObject Handle { get; set; }
+        internal IJSObjectReference Handle { get; set; }
 
         public bool IsDisposed { get; private set; }
 
@@ -24,7 +25,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected virtual async void Dispose(bool disposing)
         {
             if (IsDisposed)
             {
@@ -33,7 +34,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
             IsDisposed = true;
 
-            Handle.Dispose();
+            await Handle.DisposeAsync();
         }
     }
 
@@ -43,9 +44,14 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
     public partial class WebGLContextAttributes : JSHandler
     {
+        // TODO(MR): Check for runtime error, fix it with initialization of a Handle object
+        //public WebGLContextAttributes()
+        //{
+        //Handle = new IJSObjectReference();
+        //}
+
         public WebGLContextAttributes()
         {
-            Handle = new JSObject();
         }
     }
 
@@ -55,13 +61,13 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
     public partial class WebGLRenderingContext : WebGLRenderingContextBase
     {
-        public WebGLRenderingContext(JSObject canvas)
-            : base(canvas, "webgl")
+        public WebGLRenderingContext(IJSObjectReference canvas, IJSRuntime runtime)
+            : base(canvas, runtime, "webgl")
         {
         }
 
-        public WebGLRenderingContext(JSObject canvas, WebGLContextAttributes contextAttributes)
-            : base(canvas, "webgl", contextAttributes)
+        public WebGLRenderingContext(IJSObjectReference canvas, IJSRuntime runtime, WebGLContextAttributes contextAttributes)
+            : base(canvas, runtime, "webgl", contextAttributes)
         {
         }
     }
@@ -70,18 +76,21 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
     {
         private const string WindowPropertyName = "WebGLRenderingContext";
 
-        protected readonly JSObject gl;
+        protected readonly IJSObjectReference gl;
+        protected readonly IJSRuntime runtime;
 
         protected WebGLRenderingContextBase(
-            JSObject canvas,
+            IJSObjectReference canvas,
+            IJSRuntime runtime,
             string contextType,
             string windowPropertyName = WindowPropertyName)
-            : this(canvas, contextType, null, windowPropertyName)
+            : this(canvas, runtime, contextType, null, windowPropertyName)
         {
         }
 
         protected WebGLRenderingContextBase(
-            JSObject canvas,
+            IJSObjectReference canvas,
+            IJSRuntime runtime,
             string contextType,
             WebGLContextAttributes contextAttributes,
             string windowPropertyName = WindowPropertyName)
@@ -91,46 +100,46 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                 throw new PlatformNotSupportedException(
                     $"The context '{contextType}' is not supported in this browser");
             }
-
-            gl = (JSObject)canvas.Invoke("getContext", contextType, contextAttributes?.Handle);
+            this.runtime = runtime;
+            gl = ((IJSInProcessObjectReference)canvas).Invoke<IJSObjectReference>("getContext", contextType, contextAttributes?.Handle);
         }
 
-        public static bool IsSupported => CheckWindowPropertyExists(WindowPropertyName);
+        public bool IsSupported => CheckWindowPropertyExists(WindowPropertyName);
 
         public static bool IsVerbosityEnabled { get; set; } = false;
 
-        public static ITypedArray CastNativeArray(object managedArray)
+        //public ITypedArray CastNativeArray(object managedArray)
+        //{
+        //    var arrayType = managedArray.GetType();
+
+        //    // Here are listed some JavaScript array types:
+        //    // https://github.com/mono/mono/blob/a7f5952c69ae76015ccaefd4dfa8be2274498a21/sdks/wasm/bindings-test.cs
+        //    if (arrayType == typeof(byte[]))
+        //    {
+        //        return Uint8Array.From((byte[])managedArray);
+        //    }
+        //    else if (arrayType == typeof(float[]))
+        //    {
+        //        return Float32Array.From((float[])managedArray);
+        //    }
+        //    else if (arrayType == typeof(ushort[]))
+        //    {
+        //        return Uint16Array.From((ushort[])managedArray);
+        //    }
+        //    else if (arrayType == typeof(uint[]))
+        //    {
+        //        return Uint32Array.From((uint[])managedArray);
+        //    }
+        //
+        //    var ex = new ArgumentException("Type {managedArray} not convertible!");
+        //    Diagnostics.Error("Error converting managed array to javascript array!", ex);
+        //    throw ex;
+        //}
+
+        protected bool CheckWindowPropertyExists(string property)
         {
-            var arrayType = managedArray.GetType();
-
-            // Here are listed some JavaScript array types:
-            // https://github.com/mono/mono/blob/a7f5952c69ae76015ccaefd4dfa8be2274498a21/sdks/wasm/bindings-test.cs
-            if (arrayType == typeof(byte[]))
-            {
-                return Uint8Array.From((byte[])managedArray);
-            }
-            else if (arrayType == typeof(float[]))
-            {
-                return Float32Array.From((float[])managedArray);
-            }
-            else if (arrayType == typeof(ushort[]))
-            {
-                return Uint16Array.From((ushort[])managedArray);
-            }
-            else if (arrayType == typeof(uint[]))
-            {
-                return Uint32Array.From((uint[])managedArray);
-            }
-
-            var ex = new ArgumentException("Type {managedArray} not convertible!");
-            Diagnostics.Error("Error converting managed array to javascript array!", ex);
-            throw ex;
-        }
-
-        protected static bool CheckWindowPropertyExists(string property)
-        {
-            var window = (JSObject)Runtime.GetGlobalObject();
-            var exists = window.GetObjectProperty(property) != null;
+            var window = runtime.GetGlobalObject<IJSObjectReference>("window");
+            var exists = window.GetObjectProperty<bool>(property);
 
             return exists;
         }
@@ -141,44 +150,44 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             {
                 var arg = args[i];
 
-                if (arg is ITypedArray typedArray && typedArray != null)
-                {
-                    var disposable = (IDisposable)typedArray;
-                    disposable.Dispose();
-                }
-                if (arg is WebAssembly.Core.Array jsArray && jsArray != null)
-                {
-                    var disposable = (IDisposable)jsArray;
-                    disposable.Dispose();
+                //if (arg is ITypedArray typedArray && typedArray != null)
+                //{
+                    //var disposable = (IDisposable)typedArray;
+                    //disposable.Dispose();
+                //}
+                //if (arg is WebAssembly.Core.Array jsArray && jsArray != null)
+                //{
+                    //var disposable = (IDisposable)jsArray;
+                    //disposable.Dispose();
 
-                }
+                //}
             }
         }
 
         protected object Invoke(string method, params object[] args)
         {
             var actualArgs = Translate(args);
-            var result = gl.Invoke(method, actualArgs);
-            DisposeArrayTypes(actualArgs);
+            var result = ((IJSInProcessObjectReference)gl).Invoke<IJSObjectReference>(method, actualArgs);
+            //DisposeArrayTypes(actualArgs); TODO(MR): Later
 
-            if (IsVerbosityEnabled)
-            {
-                var dump = new StringBuilder();
-                dump.Append(method).Append('(');
+            //if (IsVerbosityEnabled)
+            //{
+                //var dump = new StringBuilder();
+                //dump.Append(method).Append('(');
 
-                for (var i = 0; i < args.Length; i++)
-                {
-                    var item = args[i];
-                    dump.Append(Dump(item));
+                //for (var i = 0; i < args.Length; i++)
+                //{
+                    //var item = args[i];
+                    //dump.Append(Dump(item));
 
-                    if (i < (args.Length - 1))
-                    {
-                        dump.Append(", ");
-                    }
-                }
+                    //if (i < (args.Length - 1))
+                    //{
+                        //dump.Append(", ");
+                    //}
+                //}
 
-                dump.Append(") = ").Append(Dump(result));
-            }
+                //dump.Append(") = ").Append(Dump(result));
+            //}
 
             return result;
         }
@@ -190,7 +199,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
             return new T
             {
-                Handle = (JSObject)rawResult
+                Handle = (IJSObjectReference)rawResult
             };
         }
 
@@ -225,7 +234,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             where T : JSHandler, new()
         {
             using var rawResult = (WebAssembly.Core.Array)Invoke(method, args);
-            return rawResult.ToArray(item => new T { Handle = (JSObject)item });
+            return rawResult.ToArray(item => new T { Handle = (IJSObjectReference)item });
         }
 
         protected T InvokeForBasicType<T>(string method, params object[] args)
@@ -263,7 +272,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                 {
                     if (((System.Array)arg).GetType().GetElementType().IsPrimitive)
                     {
-                        arg = CastNativeArray(array);
+                        arg = array;
                     }
                     else
                     {
@@ -293,13 +302,13 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
     public partial class WebGL2RenderingContext : WebGL2RenderingContextBase
     {
-        public WebGL2RenderingContext(JSObject canvas)
-            : base(canvas, "webgl2")
+        public WebGL2RenderingContext(IJSObjectReference canvas, IJSRuntime runtime)
+            : base(canvas, runtime, "webgl2")
         {
         }
 
-        public WebGL2RenderingContext(JSObject canvas, WebGLContextAttributes contextAttributes)
-            : base(canvas, "webgl2", contextAttributes)
+        public WebGL2RenderingContext(IJSObjectReference canvas, IJSRuntime runtime, WebGLContextAttributes contextAttributes)
+            : base(canvas, runtime, "webgl2", contextAttributes)
         {
         }
     }
@@ -309,23 +318,25 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         private const string WindowPropertyName = "WebGL2RenderingContext";
 
         protected WebGL2RenderingContextBase(
-            JSObject canvas,
+            IJSObjectReference canvas,
+            IJSRuntime runtime,
             string contextType,
             string windowPropertyName = WindowPropertyName)
-            : this(canvas, contextType, null, windowPropertyName)
+            : this(canvas, runtime, contextType, null, windowPropertyName)
         {
         }
 
         protected WebGL2RenderingContextBase(
-            JSObject canvas,
+            IJSObjectReference canvas,
+            IJSRuntime runtime,
             string contextType,
             WebGLContextAttributes contextAttributes,
             string windowPropertyName = WindowPropertyName)
-            : base(canvas, contextType, contextAttributes, windowPropertyName)
+            : base(canvas, runtime, contextType, contextAttributes, windowPropertyName)
         {
         }
 
-        public static new bool IsSupported => CheckWindowPropertyExists(WindowPropertyName);
+        public new bool IsSupported => CheckWindowPropertyExists(WindowPropertyName);
 
         public void TexImage2D(
             uint target,
@@ -338,8 +349,9 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             uint type,
             ReadOnlySpan<byte> source)
         {
-            using var nativeArray = Uint8Array.From(source);
-            TexImage2D(target, level, internalformat, width, height, border, format, type, nativeArray);
+            // TODO(MR): managed to native via javscript (implement & test)
+            //using var nativeArray = Uint8Array.From(source);
+            TexImage2D(target, level, internalformat, width, height, border, format, type, source);
         }
 
         public void TexImage3D(
@@ -354,8 +366,9 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             uint type,
             ReadOnlySpan<byte> source)
         {
-            using var nativeArray = Uint8Array.From(source);
-            TexImage3D(target, level, internalformat, width, height, depth, border, format, type, nativeArray);
+            // TODO(MR): managed to native via javscript (implement & test)
+            //using var nativeArray = Uint8Array.From(source);
+            TexImage3D(target, level, internalformat, width, height, depth, border, format, type, source);
         }
 
         public void TexSubImage3D(
@@ -371,7 +384,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             uint type,
             ReadOnlySpan<byte> source)
         {
-            using var nativeArray = Uint8Array.From(source);
+            // TODO(MR): managed to native via javscript (implement & test)
+            //using var nativeArray = Uint8Array.From(source);
             TexSubImage3D(
                 target,
                 level,
@@ -383,7 +397,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                 depth,
                 format,
                 type,
-                nativeArray);
+                source);
         }
 
         public void TexSubImage2D(
@@ -397,7 +411,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             uint type,
             ReadOnlySpan<byte> source)
         {
-            using var nativeArray = Uint8Array.From(source);
+            // TODO(MR): managed to native via javscript (implement & test)
+            //using var nativeArray = Uint8Array.From(source);
             TexSubImage2D(
                 target,
                 level,
@@ -407,7 +422,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                 height,
                 format,
                 type,
-                nativeArray);
+                source);
         }
     }
 

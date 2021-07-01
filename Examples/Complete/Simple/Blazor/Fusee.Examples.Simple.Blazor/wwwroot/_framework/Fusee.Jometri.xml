@@ -1,0 +1,874 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Fusee.Jometri</name>
+    </assembly>
+    <members>
+        <member name="T:Fusee.Jometri.Node`2">
+            <summary>
+            Represents a node in a (binary) tree.
+            </summary>
+            <typeparam name="TK">The key of the node as generic type.</typeparam>
+            <typeparam name="TV">The payload of the node as generic type.</typeparam>
+        </member>
+        <member name="P:Fusee.Jometri.Node`2.Key">
+            <summary>
+            The key of the node - determines how a node is sorted into the tree.
+            </summary>
+        </member>
+        <member name="P:Fusee.Jometri.Node`2.Value">
+            <summary>
+            The payload of the node.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.Node`2.LeftNode">
+            <summary>
+            An item with lower value than the value of this node will become a LeftNode.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.Node`2.RightNode">
+            <summary>
+            An item with higher value than the value of this node will become a RightNode.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.Node`2.#ctor(`0,`1)">
+            <summary>
+            Constructor, creates a new node.
+            </summary>
+            <param name="key">The key of the new node.</param>
+            <param name="value">Payload of the new node.</param>
+        </member>
+        <member name="T:Fusee.Jometri.BinarySearchTree`2">
+            <summary>
+            Data structure that stores items and allows fast lookup, insertion and deletion.
+            </summary>
+            <typeparam name="TK">The type of the tree's key.</typeparam>
+            <typeparam name="TV">The type of the tree's value.</typeparam>
+        </member>
+        <member name="F:Fusee.Jometri.BinarySearchTree`2._globalRoot">
+            <summary>
+            The root node of the tree.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.BinarySearchTree`2.InsertNode(`0,`1)">
+            <summary>
+            Inserts a new node in a existing tree.
+            </summary>
+            <param name="key">The key of the node. </param>
+            <param name="value">Value of the node to be inserted into the tree.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.BinarySearchTree`2.PreorderTraverseTreeKeys">
+            <summary>
+            Preorder traversal of the tree. Visits the root, then visits the left sub-tree, after that visits the right sub-tree.
+            Returns the keys.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.BinarySearchTree`2.PreorderTraverseTreeValues">
+            <summary>
+            Preorder traversal of the tree. Visits the root, then visits the left sub-tree, after that visits the right sub-tree.
+            Returns the values.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.BinarySearchTree`2.InOrderTraverseTree">
+            <summary>
+            Inorder traversal of the tree.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.BinarySearchTree`2.DeleteNode(`0)">
+            <summary>
+            Deletes a node from the tree.
+            </summary>
+            <param name="key">Key of the node which is to be deleted.</param>
+        </member>
+        <member name="M:Fusee.Jometri.BinarySearchTree`2.FindNode(`0)">
+            <summary>
+            Traverses the tree to find and return a node with a certain value.
+            </summary>
+            <param name="key">The key to be searched for.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.BinarySearchTree`2.FindMin">
+            <summary>
+            Returns the minimum value in the tree.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.BinarySearchTree`2.FindMin(Fusee.Jometri.Node{`0,`1})">
+            <summary>
+            Returns the minimum value in the tree, starting at the given node.
+            </summary>
+            <param name="root">The node at which to start the search.</param>
+            <returns>The node containing the minimum value.</returns>
+        </member>
+        <member name="M:Fusee.Jometri.BinarySearchTree`2.BalanceTree">
+            <summary>
+            Balances a given tree.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.BinarySearchTree`2.FindLargestSmallerThanInBalanced(`0)">
+            <summary>
+             Finds the value of a node whose key is the largest, smaller than the given.
+             Only works with a balanced tree. It may be necessary to call BalanceTree before this method.
+             </summary>
+             <param name="key">The key that is used as search parameter.</param>
+             <returns></returns>
+        </member>
+        <member name="T:Fusee.Jometri.CreatePrimitiveGeometry">
+            <summary>
+            This class provides public methods to create primitive geometry from scratch. The Geometry is stored in DCEL
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.CreatePrimitiveGeometry.CreateCuboidGeometry(System.Single,System.Single,System.Single)">
+            <summary>
+            Creates and returns a Cuboid as DCEL with the given dimensions, centered in the world coordinate system.
+            </summary>
+            <param name="dimensionX">Width in X-dimension.</param>
+            <param name="dimensionY">Height in Y-dimension.</param>
+            <param name="dimensionZ">Depth in Z-dimension.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.CreatePrimitiveGeometry.CreateSpehreGeometry(System.Single,System.Int32,System.Int32)">
+            <summary>
+            Creates and returns a UV-Sphere as a DCEL with the specified dimensions centered in the worlds coordinate system.
+            </summary>
+            <param name="radius">Radius of the sphere.</param>
+            <param name="horizontalResolution">Lines of latitude, smallest value is 3.</param> 
+            <param name="verticalResolution">Lines of longitude, smallest value is 3.</param>
+            <returns>A UV-Sphere centered in the world coordinate system as a DCEL.</returns>
+        </member>
+        <member name="M:Fusee.Jometri.CreatePrimitiveGeometry.CreateConeGeometry(System.Single,System.Single,System.Int32)">
+            <summary>
+            Creates and returns a cone with the given dimensions.
+            </summary>
+            <param name="baseRadius">The radius of the base circle.</param>
+            <param name="dimensionY">The height of the cone.</param>
+            <param name="sliceCount">The horizontal resolution of the base circle. Min value is 3. For a basic cone 15.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.CreatePrimitiveGeometry.CreatePyramidGeometry(System.Single,System.Single,System.Single)">
+            <summary>
+            Creates and returns a Pyramid as a DCEL with the specified dimensions centered in the worlds coordinate system.
+            </summary>
+            <param name="dimensionX">Width of the Pyramid in X-dimension</param>
+            <param name="dimensionY">Height of the Pyramid in Y-dimension.</param>
+            <param name="dimensionZ">Depth of the Pyramid in Z-dimension.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Fusee.Jometri.Extrude">
+            <summary>
+            Provides extrusion functionality for geometries.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.Extrude.Extrude2DPolygon(Fusee.Jometri.Geometry,System.Single,System.Boolean)">
+            <summary>
+            Extrudes a complete planar geometry.
+            </summary>
+            <param name="geometry">The geometry to be extruded.</param>
+            <param name="offset">zOffset will be used to create the new vertices.</param>
+            <param name="extrudeAlongNormal">Pass 'true' if you want do extrude the polygon along its normal and 'false' if you want to extrude along the worlds z axis.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Extrude.ExtrudeFace(Fusee.Jometri.Geometry,System.Int32,System.Single)">
+            <summary>
+            Extrudes a given Face by a given offset along its normal vector.
+            </summary>
+            <param name="geometry">The geometry.</param>
+            <param name="faceHandle">The handle of the face to extrude.</param>
+            <param name="offset">How far the face should get extruded.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Extrude.ExtrudeFace(Fusee.Jometri.Geometry,System.Int32,System.Single,Fusee.Math.Core.float3)">
+            <summary>
+            Extrudes a given Face along a specified Vector.
+            </summary>
+            <param name="geometry"></param>
+            <param name="faceHandle"></param>
+            <param name="offset"></param>
+            <param name="extrusionVector"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Fusee.Jometri.VertexData">
+            <summary>
+            Contains additional information that can be added to Vertices.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.VertexData.Pos">
+            <summary>
+            The position of the Vertex.
+            </summary>
+        </member>
+        <member name="T:Fusee.Jometri.HalfEdgeData">
+            <summary>
+            Contains additional information that can be added to HalfEdges.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.HalfEdgeData.Normal">
+            <summary>
+            The normal belonging to this HalfEdge.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.HalfEdgeData.TextureCoord">
+            <summary>
+            Texture coordinates.
+            </summary>
+        </member>
+        <member name="T:Fusee.Jometri.FaceData">
+            <summary>
+            Contains additional information that can be added to Faces.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.FaceData.FaceNormal">
+            <summary>
+            The normal of the Face.
+            </summary>
+        </member>
+        <member name="T:Fusee.Jometri.Vertex">
+            <summary>
+            Each vertex contains:
+            a handle to assign a abstract reference to it.
+            attribute information, e.g. the position of the vertex.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.Vertex.Handle">
+            <summary>
+            The reference of the Vertex.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.Vertex.IncidentHalfEdge">
+            <summary>
+            The handle to the HalfEdge with this Vertex as origin.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.Vertex.VertData">
+            <summary>
+            Attribute information.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.Vertex.#ctor(System.Int32,Fusee.Math.Core.float3)">
+            <summary>
+            Constructor for creating a new Vertex.
+            </summary>
+            <param name="handle">The reference of the Vertex.</param>
+            <param name="pos">The coordinate of the Vertex.</param>
+        </member>
+        <member name="M:Fusee.Jometri.Vertex.#ctor(Fusee.Jometri.Vertex,Fusee.Math.Core.float3)">
+            <summary>
+            Constructor for creating a new Vertex from an old one, changing its coordinate.
+            </summary>
+            <param name="vert">The old vertex.</param>
+            <param name="newPos">The new coordinate of the vertex.</param>
+        </member>
+        <member name="M:Fusee.Jometri.Vertex.op_LessThan(Fusee.Jometri.Vertex,Fusee.Jometri.Vertex)">
+            <summary>
+            Overload for "smaller than" operator. Comparison based on the Vertex's handle.
+            </summary>
+            <param name="first">First comparison parameter.</param>
+            <param name="second">Second comparison parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Vertex.op_GreaterThan(Fusee.Jometri.Vertex,Fusee.Jometri.Vertex)">
+            <summary>
+            Overload for "smaller than" operator. Comparison based on the Vertex's handle.
+            </summary>
+            <param name="first">First comparison parameter.</param>
+            <param name="second">Second comparison parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Vertex.op_Inequality(Fusee.Jometri.Vertex,Fusee.Jometri.Vertex)">
+            <summary>
+            Overload for != operator.
+            </summary>
+            <param name="first">First comparison parameter.</param>
+            <param name="second">Second comparison parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Vertex.op_Equality(Fusee.Jometri.Vertex,Fusee.Jometri.Vertex)">
+            <summary>
+            Overload for == operator.
+            </summary>
+            <param name="first">First comparison parameter.</param>
+            <param name="second">Second comparison parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Vertex.Equals(System.Object)">
+            <summary>Overwrites "Equals".</summary>
+            <returns>true, if <paramref name="obj" /> and this instance of the object are of the same type and represent the same value.</returns>
+            <param name="obj">Object to compare with.</param>
+        </member>
+        <member name="M:Fusee.Jometri.Vertex.GetHashCode">
+            <summary>Overwrites GetHashCode.</summary>
+            <returns>Handle as code.</returns>
+        </member>
+        <member name="T:Fusee.Jometri.HalfEdge">
+            <summary>
+            Represents a half edge.
+            Each half edge contains:
+            a handle to assign a abstract reference to it.
+            a handle to the half edge's origin vertex.
+            a handle to the next half edge.
+            a handle to the previous half edge.
+            a handle to the face it belongs to.
+            attribute information, e.g. the normal and the texture coordinates.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.HalfEdge.Handle">
+            <summary>
+            The HalfEdges's handle
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.HalfEdge.HalfEdgeData">
+            <summary>
+            Attribute information.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.HalfEdge.#ctor(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Constructor for creating a new HalfEdge.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.HalfEdge.#ctor(System.Int32)">
+            <summary>
+            Constructor for creating a new HalfEdge.
+            </summary>
+            <param name="handle">The reference of the HalfEdge.</param>
+        </member>
+        <member name="M:Fusee.Jometri.HalfEdge.#ctor(System.Int32,Fusee.Jometri.HalfEdge)">
+            <summary>
+            Constructor for creating a new HalfEdge from another one.
+            </summary>
+            <param name="handle">The reference of the half edge.</param>
+            <param name="halfEdge">The original HalfEdge.</param>
+        </member>
+        <member name="M:Fusee.Jometri.HalfEdge.op_LessThan(Fusee.Jometri.HalfEdge,Fusee.Jometri.HalfEdge)">
+            <summary>
+            Overload for "smaller than" operator. Comparison based on the HalfEdge's handle.
+            </summary>
+            <param name="first">First comparison parameter.</param>
+            <param name="second">Second comparison parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.HalfEdge.op_GreaterThan(Fusee.Jometri.HalfEdge,Fusee.Jometri.HalfEdge)">
+            <summary>
+            Overload for "smaller than" operator. Comparison based on the HalfEdge's handle.
+            </summary>
+            <param name="first">First comparison parameter.</param>
+            <param name="second">Second comparison parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.HalfEdge.op_Inequality(Fusee.Jometri.HalfEdge,Fusee.Jometri.HalfEdge)">
+            <summary>
+            Overload for != operator.
+            </summary>
+            <param name="first">First comparison parameter.</param>
+            <param name="second">Second comparison parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.HalfEdge.op_Equality(Fusee.Jometri.HalfEdge,Fusee.Jometri.HalfEdge)">
+            <summary>
+            Overload for == operator.
+            </summary>
+            <param name="first">First comparison parameter.</param>
+            <param name="second">Second comparison parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.HalfEdge.Equals(System.Object)">
+            <summary>Overwrites "Equals".</summary>
+            <returns>true, if <paramref name="obj" /> and this instance are of the same type and represent the same value.</returns>
+            <param name="obj">Comparison object.</param>
+        </member>
+        <member name="M:Fusee.Jometri.HalfEdge.GetHashCode">
+            <summary>Overwrites GetHashCode</summary>
+            <returns>Handle as hash code.</returns>
+        </member>
+        <member name="T:Fusee.Jometri.Face">
+            <summary>
+            Each face belonging to a 2D geometry contains:
+            a handle to assign a abstract reference to it.
+            a reference to one of the half edges that belongs to the faces outer boundary.
+            a List that contains handles to one half edge for each hole in a face.
+            attribute information, e.g. the face normal.
+            Note that unbounded faces can't have a OuterHalfEdge but must have at least one InnerHalfEdge - bounded faces must have a OuterComponent.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.Face.Handle">
+            <summary>
+            The reference of the Face.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.Face.OuterHalfEdge">
+            <summary>
+            A reference to one of the half edges that belongs to the Face's outer boundary.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.Face.FaceData">
+            <summary>
+            Attribute information, e.g. the face normals.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.Face.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Constructor for creating a new Face.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.Face.#ctor(System.Int32)">
+            <summary>
+            Constructor for creating a new Face.
+            </summary>
+            <param name="handle">The reference of the Face.</param>
+        </member>
+        <member name="M:Fusee.Jometri.Face.#ctor(System.Int32,Fusee.Jometri.Face)">
+            <summary>
+            Constructor for creating a new Face from an other one.
+            </summary>
+            <param name="handle">The reference of the Face.</param>
+            <param name="face">The original Face.</param>
+        </member>
+        <member name="M:Fusee.Jometri.Face.op_LessThan(Fusee.Jometri.Face,Fusee.Jometri.Face)">
+            <summary>
+            Overload for "smaller than" operator. Comparison based on the Face's handle.
+            </summary>
+            <param name="first">First comparison parameter.</param>
+            <param name="second">Second comparison parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Face.op_GreaterThan(Fusee.Jometri.Face,Fusee.Jometri.Face)">
+            <summary>
+            Overload for "smaller than" operator. Comparison based on the Face's handle.
+            </summary>
+            <param name="first">First comparison parameter.</param>
+            <param name="second">Second comparison parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Face.op_Inequality(Fusee.Jometri.Face,Fusee.Jometri.Face)">
+            <summary>
+            Overload for != operator.
+            </summary>
+            <param name="first">First comparison parameter.</param>
+            <param name="second">Second comparison parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Face.op_Equality(Fusee.Jometri.Face,Fusee.Jometri.Face)">
+            <summary>
+            Overload for == operator.
+            </summary>
+            <param name="first">First comparison parameter.</param>
+            <param name="second">Second comparison parameter.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Face.Equals(System.Object)">
+            <summary>Overwrites "Equals"</summary>
+            <returns>true, if <paramref name="obj" /> and this instance are of the same type and represent the same value.</returns>
+            <param name="obj">Comparison object.</param>
+        </member>
+        <member name="M:Fusee.Jometri.Face.GetHashCode">
+            <summary>Overwrites GetHashCode</summary>
+            <returns>Handle as hash code.</returns>
+        </member>
+        <member name="T:Fusee.Jometri.GeomEditing">
+            <summary>
+            Provides methods to edit the components of a geometry.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.GeomEditing.InsertVertex(Fusee.Jometri.Geometry,System.Int32,System.Int32,Fusee.Math.Core.float3)">
+            <summary>
+            Inserts a new Vertex between two given existing Vertices.
+            </summary>
+            <param name="geometry">The Geometry to insert a Vertex.</param>
+            <param name="p">Handle of Vertex one.</param>
+            <param name="q">Handle of Vertex two.</param>
+            <param name="pos">Position of the new Vertex</param>
+            <returns>New Vertex Handle.</returns>
+        </member>
+        <member name="M:Fusee.Jometri.GeomEditing.InsertDiagonal(Fusee.Jometri.Geometry,System.Int32,System.Int32)">
+            <summary>
+            Inserts a pair of HalfEdges between two (non adjacent) vertices of a Face.
+            </summary>
+            <param name="geometry">The Geometry to insert a diagonal.</param>
+            <param name="p">First Vertex handle.</param>
+            <param name="q">Second Vertex handle.</param>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Fusee.Jometri.GeomEditing.InsetFace(Fusee.Jometri.Geometry,System.Int32,System.Single)">
+            <summary>
+            Insets a Face with a given offset. The new, center Face has the same Handle as the original Face.
+            </summary>
+            <param name="geometry">The geometry on which to perform a face inset.</param>
+            <param name="faceHandle">The Handle of the face, the new one will be inserted to.</param>
+            <param name="insetOffset">The offset of the inset in percent. Use values between 0 and 1. A value of 0.5f means 50% of the original face remains.</param>
+            <returns>Returns the geometry with edited faces.</returns>
+        </member>
+        <member name="T:Fusee.Jometri.GeometricOperations">
+            <summary>
+            Provides methods to perform geometric operations.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.GeometricOperations.Reduce2D(Fusee.Math.Core.float3,Fusee.Math.Core.float3)">
+            <summary>
+            Calculates the vertex position so that it is parallel to the x-y plane.
+            </summary>
+            <param name="vertPos">Original vertex position.</param>
+            <param name="normal">The normal of the polygon the vertex belongs to. Used as new Z axis.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.GeometricOperations.CalculateFaceNormal(System.Collections.Generic.IList{Fusee.Jometri.Vertex})">
+            <summary>
+            Calculates a face normal from three vertices. The vertices have to be coplanar and part of the face.
+            </summary>
+            <param name="faceOuterVertices">All vertices of the outer boundary of the face.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.GeometricOperations.IsPointInPolygon(Fusee.Jometri.Geometry,Fusee.Jometri.Face,Fusee.Jometri.Vertex)">
+            <summary>
+            Tests if a point/vertex lies inside or outside a face - only works for polygons parallel to a plane!
+            </summary>
+            <param name="geometry">The geometry the polygon (here: face) belongs to.</param>
+            <param name="face">The faces to be tested.</param>
+            <param name="v">The vertex to be tested.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.GeometricOperations.IsPointInPolygon(Fusee.Jometri.Geometry,Fusee.Jometri.Face,Fusee.Math.Core.float3)">
+            <summary>
+            Tests if a point/vertex lies inside or outside a face - Only use this if you know the face AND vertex lie in the same plane and this plane is parallel to xy or xz or yz!
+            </summary>
+            <param name="geometry">The geometry the polygon (here: face) belongs to.</param>
+            <param name="face">The faces to be tested. It will not be Reduced2D!</param>
+            <param name="v">The vertex to be tested.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.GeometricOperations.IsAngleGreaterPi(Fusee.Jometri.Geometry,Fusee.Jometri.Face,Fusee.Jometri.Vertex,Fusee.Jometri.Vertex,Fusee.Jometri.Vertex)">
+            <summary>
+            Determines whether the angle between two vectors formed by three vertices is greater than 180 °.
+            The first vector will be created from v1 and v2, the second from v2 and v3.
+            </summary>
+            <param name="geom">The geometry the vertices belong to.</param>
+            <param name="face">The face the vertices belong to.</param>
+            <param name="v1">Vertex one</param>
+            <param name="v2">Vertex two</param>
+            <param name="v3">Vertex three</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.GeometricOperations.IsAngleGreaterOrEqualPi(Fusee.Jometri.Geometry,Fusee.Jometri.Face,Fusee.Jometri.Vertex,Fusee.Jometri.Vertex,Fusee.Jometri.Vertex)">
+            <summary>
+            Determines if the angle between two vectors, formed by three vertices, is greater or equal 180°.
+            The first vector will be created from v1 and v2, the second from v2 and v3.
+            </summary>
+            <param name="geom">The geometry the vertices belong to.</param>
+            <param name="face">The face the vertices belong to.</param>
+            <param name="v1">Vertex one</param>
+            <param name="v2">Vertex two</param>
+            <param name="v3">Vertex three</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.GeometricOperations.IsVertexAdjacentToVertex(Fusee.Jometri.Geometry,System.Int32,System.Int32,Fusee.Jometri.HalfEdge,Fusee.Jometri.HalfEdge)">
+            <summary>
+            Tests if a vertex is a direct neighbor of an other vertex. Only use this method if you know the incident half edges of the vertex.
+            </summary>
+            <param name="geometry">The geometry the vertex belongs to.</param>
+            <param name="p">First vertex</param>
+            <param name="q">Second vertex</param>
+            <param name="vertPStartHe">p incident half edge. </param>
+            <param name="vertQStartHe">q incident half edge.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.GeometricOperations.GetHalfEdgesWChangedWinding(Fusee.Jometri.Geometry,System.Collections.Generic.IEnumerable{Fusee.Jometri.HalfEdge})">
+            <summary>
+            Returns the half edges from a source collection of half edges - with opposite direction.
+            </summary>
+            <param name="geometry"></param>
+            <param name="originHEdges"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.GeometricOperations.IsCounterClockwise(System.Collections.Generic.IList{Fusee.Math.Core.float3})">
+            <summary>
+            Checks whether a polygon, parallel to the xy plane, has a ccw winding.
+            This method does NOT support polygons parallel to the yz or xz plane!
+            To guarantee a correct output make sure the polygon doesn't degenerate when the z coordinates are ignored.
+            </summary>
+            <param name="source">The polygon, represented as list of float3s.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.GeometricOperations.IsLineIntersectingLine(Fusee.Math.Core.float3,Fusee.Math.Core.float3,Fusee.Math.Core.float3,Fusee.Math.Core.float3,Fusee.Math.Core.float3@)">
+            <summary>
+            Checks if two lines intersect.
+            </summary>
+            <param name="p1">First control point of the first line.</param>
+            <param name="p2">Second control point of the first line.</param>
+            <param name="p3">First point of the second line.</param>
+            <param name="p4">Second point of the second line.</param>
+            <param name="intersectionPoint">The intersection point, if the lines do not intersect this will be float3 Infinity.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.GeometricOperations.GetVerticesMeanPos(System.Collections.Generic.List{Fusee.Jometri.Vertex})">
+            <summary>
+            Calculates the mean Vertex position of given Vertices.
+            </summary>
+            <param name="vertices">List of all Vertices which are part of the new mean position.</param>
+            <returns>Returns the position of the mean of all Vertices as a float3.</returns>
+        </member>
+        <member name="T:Fusee.Jometri.Geometry">
+            <summary>
+            Stores geometry in a DCEL (doubly connected (half) edge list).
+            </summary>
+        </member>
+        <member name="P:Fusee.Jometri.Geometry.DictVertices">
+            <summary>
+            Contains all vertices of the Geometry.
+            </summary>
+        </member>
+        <member name="P:Fusee.Jometri.Geometry.DictHalfEdges">
+            <summary>
+            Contains all HalfEdges of the Geometry.
+            </summary>
+        </member>
+        <member name="P:Fusee.Jometri.Geometry.DictFaces">
+            <summary>
+            Contains all Faces of the Geometry.
+            </summary>
+        </member>
+        <member name="P:Fusee.Jometri.Geometry.HighestHalfEdgeHandle">
+            <summary>
+            The highest handle of all HalfEdge handles - used to create a new handle.
+            </summary>
+        </member>
+        <member name="P:Fusee.Jometri.Geometry.HighestVertHandle">
+            <summary>
+            The highest handle of all Vertex handles - used to create a new handle.
+            </summary>
+        </member>
+        <member name="P:Fusee.Jometri.Geometry.HighestFaceHandle">
+            <summary>
+            The highest handle of all face handles - used to create a new handle.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.#ctor">
+            <summary>
+            Creates an empty geometry.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.#ctor(System.Collections.Generic.IEnumerable{Fusee.Jometri.PolyBoundary})">
+            <summary>
+            2D Geometry, stored in a DCEL (half edge data structure).
+            </summary>
+            <param name="outlines">A collection of the geometry's outlines, each containing the geometric information as a list of float3 in ccw order.</param>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.CloneGeometry">
+            <summary>
+            Creates an exact copy of the given Geometry.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.SetFaceNormal(System.Collections.Generic.IList{Fusee.Jometri.Vertex},Fusee.Jometri.Face)">
+            <summary>
+            Calculates and saves the normal of the Face into its FaceData.
+            </summary>
+            <param name="faceOuterVertices">All vertices of the outer boundary of the Face.</param>
+            <param name="face">The Face the normal belongs to.</param>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetVertexByHandle(System.Int32)">
+            <summary>
+            Gets a Vertex by its handle.
+            </summary>
+            <param name="vHandle">The reference of the Vertex.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetAllVertices">
+            <summary>
+            Returns all Vertices of the Geometry.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetAllHalfEdges">
+            <summary>
+            Returns all HalfEdges of the Geometry.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetAllFaces">
+            <summary>
+            Returns all Faces of the Geometry.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetVertexAdjacentVertices(System.Int32)">
+            <summary>
+            This collection contains all vertices neighboring a given Vertex.
+            </summary>
+            <param name="vHandle">The reference of the Vertex.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetVertexAdajacentFaces(System.Int32)">
+            <summary>
+            This collection contains all handles to Faces adjacent to a given Vertex.
+            </summary>
+            <param name="vHandle">The reference of the Vertex.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetVertexIncidentHalfEdges(System.Int32)">
+            <summary>
+            This collection contains all handles to HalfEdges starting at or targeting a given Vertex.
+            </summary>
+            <param name="vHandle">The reference of the Vertex.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetVertexStartingHalfEdges(System.Int32)">
+            <summary>
+            This collection contains all handles to HalfEdges starting at a given Vertex.
+            </summary>
+            <param name="vHandle">The reference of the Vertex.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetVertexTargetingHalfEdges(System.Int32)">
+            <summary>
+            This collection contains all handles to HalfEdges ending at a given Vertex.
+            </summary>
+            <param name="vHandle">The reference of the Vertex.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetHalfEdgeLoop(System.Int32)">
+            <summary>
+            This collection contains all handles to HalfEdges belonging to a closed loop.
+            Collection is made by tracking the initial HalfEdge's successors.
+            </summary>
+            <param name="heHandle">The reference to the HalfEdge with which the loop starts.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetHalfEdgeLoopReverse(System.Int32)">
+            <summary>
+            This collection contains all handles to HalfEdges belonging to a closed loop.
+            Calculation is made by tracking the initial HalfEdge's predecessors.
+            </summary>
+            <param name="heHandle">The reference to the HalfEdge with which the loop starts.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetFacesAdajacentToFace(System.Int32)">
+            <summary>
+            This collection contains all Faces neighboring a given Face.
+            </summary>
+            <param name="fHandle">The reference of the Face.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetFaceVertices(System.Int32)">
+            <summary>
+            This collection contains all Vertices of a given Face.
+            </summary>
+            <param name="fHandle">The reference of the Face.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetFaceOuterVertices(System.Int32)">
+            <summary>
+            This collection contains all Vertices of the outer boundary of a given Face.
+            </summary>
+            <param name="fHandle">The reference of the Face.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Jometri.Geometry.GetFaceHalfEdges(System.Int32)">
+            <summary>
+            This collection contains all handles to HalfEdges of a given Face.
+            </summary>
+            <param name="fHandle">The reference of the Face.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Fusee.Jometri.PolyBoundary">
+            <summary>
+            Represents an outer or inner boundary of a polygon.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.PolyBoundary.Points">
+            <summary>
+            The geometric information of the vertices which belong to a boundary.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.PolyBoundary.IsOuter">
+            <summary>
+            Determines whether a boundary is a outer boundary or a inner boundary (which forms a hole in the face).
+            </summary>
+        </member>
+        <member name="T:Fusee.Jometri.GeomInitializeHelper">
+            <summary>
+            Helper class for initializing Geometry objects.
+            </summary>
+        </member>
+        <member name="T:Fusee.Jometri.GeomInitializeHelper.BoundaryEdge">
+            <summary>
+            Used in the initialization process of a new Geometry.
+            A BoundaryEdge contains one edge of the boundary and the information whether the source vertex of the half edge (not the twin half edge) is already part of the Geometry.
+            </summary>
+        </member>
+        <member name="T:Fusee.Jometri.NamespaceDoc">
+            <summary>
+            <para>
+            The types in this module implement geometry manipulation functionality.
+            </para>
+            <para>
+            Geometry manipulation algorithms need to quickly access information about 
+            a geometry's topology including queries such as "Which edges are connected to a vertex",
+            "Retrieve all vertices for a given polygon", "Retrieve all adjacent polygons".
+            </para>
+            <para>
+            The main type provided in this module is <see cref="T:Fusee.Jometri.Geometry"/> internally keeping
+            geometry data in a data structure called DECL (doubly connected (half) edge list)
+            allows for such queries. Additionally, a number of geometric algorithms are implemented here.
+            </para>
+            </summary>
+        </member>
+        <member name="T:Fusee.Jometri.SubdivisionSurface">
+            <summary>
+             Provides functionality to perform a Catmull-Clark Subdivision-Surface algorithm on a Geometry.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.SubdivisionSurface.CatmullClarkSubdivision(Fusee.Jometri.Geometry)">
+            <summary>
+            Performs a Catmull-Clark Subdivision-Surface algorithm on a given geometry which is stored as DCEL.
+            </summary>
+            <param name="geometry">The geometry to perform the SD on.</param>
+            <returns>A smoother geometry with </returns>
+        </member>
+        <member name="T:Fusee.Jometri.Triangulation">
+            <summary>
+            Contains the triangulation of a geometry, stored in half edge data structure.
+            </summary>
+        </member>
+        <member name="M:Fusee.Jometri.Triangulation.Triangulate(Fusee.Jometri.Geometry)">
+            <summary>
+            After triangulation all faces of a geometry consist of three vertices and three half edges.
+            </summary>
+            <param name="geometry"></param>
+        </member>
+        <member name="T:Fusee.Jometri.VertexType">
+            <summary>
+            To divide a polygon into y monotone pieces, the corners of this polygon must be divided into different categories.
+            Those are start, end, split, merge, and regular vertices.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.VertexType.StartVertex">
+            <summary>
+            A vertex is a start vertex in case his two neighbors are below him and the interior angle between the two adjacent edges is smaller than pi.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.VertexType.EndVertex">
+            <summary>
+            A vertex is a end vertex in case his two neighbors are above him and the interior angle between the two adjacent edges is smaller than pi.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.VertexType.SplitVertex">
+            <summary>
+            A vertex is a split vertex in case his two neighbors are below him and the interior angle between the two adjacent edges is greater than pi.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.VertexType.MergeVertex">
+            <summary>
+            A vertex is a merge vertex in case his two neighbors are above him and the interior angle between the two adjacent edges is greater than pi.
+            </summary>
+        </member>
+        <member name="F:Fusee.Jometri.VertexType.RegularVertex">
+            <summary>
+            A vertex is a regular vertex in case his two neighbors and the adjacent edges do not meet one of the conditions defining the other types.
+            </summary>
+        </member>
+    </members>
+</doc>

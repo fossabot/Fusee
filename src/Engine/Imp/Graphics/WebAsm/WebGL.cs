@@ -1,4 +1,8 @@
-using WebAssembly.Core;
+
+
+using Fusee.Base.Imp.WebAsm;
+using Microsoft.JSInterop;
+using System;
 
 namespace Fusee.Engine.Imp.Graphics.WebAsm
 {
@@ -8,61 +12,61 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
     {
         public bool Alpha
         {
-            get => (bool)Handle.GetObjectProperty("alpha");
+            get => Handle.GetObjectProperty<bool>("alpha");
             set => Handle.SetObjectProperty("alpha", value);
         }
 
         public bool Depth
         {
-            get => (bool)Handle.GetObjectProperty("depth");
+            get => Handle.GetObjectProperty<bool>("depth");
             set => Handle.SetObjectProperty("depth", value);
         }
 
         public bool Stencil
         {
-            get => (bool)Handle.GetObjectProperty("stencil");
+            get => Handle.GetObjectProperty<bool>("stencil");
             set => Handle.SetObjectProperty("stencil", value);
         }
 
         public bool Antialias
         {
-            get => (bool)Handle.GetObjectProperty("antialias");
+            get => Handle.GetObjectProperty<bool>("antialias");
             set => Handle.SetObjectProperty("antialias", value);
         }
 
         public bool PremultipliedAlpha
         {
-            get => (bool)Handle.GetObjectProperty("premultipliedAlpha");
+            get => Handle.GetObjectProperty<bool>("premultipliedAlpha");
             set => Handle.SetObjectProperty("premultipliedAlpha", value);
         }
 
         public bool PreserveDrawingBuffer
         {
-            get => (bool)Handle.GetObjectProperty("preserveDrawingBuffer");
+            get => Handle.GetObjectProperty<bool>("preserveDrawingBuffer");
             set => Handle.SetObjectProperty("preserveDrawingBuffer", value);
         }
 
         public bool PreferLowPowerToHighPerformance
         {
-            get => (bool)Handle.GetObjectProperty("preferLowPowerToHighPerformance");
+            get => Handle.GetObjectProperty<bool>("preferLowPowerToHighPerformance");
             set => Handle.SetObjectProperty("preferLowPowerToHighPerformance", value);
         }
 
         public bool FailIfMajorPerformanceCaveat
         {
-            get => (bool)Handle.GetObjectProperty("failIfMajorPerformanceCaveat");
+            get => Handle.GetObjectProperty<bool>("failIfMajorPerformanceCaveat");
             set => Handle.SetObjectProperty("failIfMajorPerformanceCaveat", value);
         }
 
         public bool Desynchronized
         {
-            get => (bool)Handle.GetObjectProperty("desynchronized");
+            get => Handle.GetObjectProperty<bool>("desynchronized");
             set => Handle.SetObjectProperty("desynchronized", value);
         }
 
         public string PowerPreference
         {
-            get => (string)Handle.GetObjectProperty("powerPreference");
+            get => Handle.GetObjectProperty<string>("powerPreference");
             set => Handle.SetObjectProperty("powerPreference", value);
         }
 
@@ -103,21 +107,21 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
     public partial class WebGLActiveInfo
     {
-        public int Size => (int)Handle.GetObjectProperty("size");
+        public int Size => Handle.GetObjectProperty<int>("size");
 
-        public uint Type => (uint)(int)Handle.GetObjectProperty("type");
+        public uint Type => Handle.GetObjectProperty<uint>("type");
 
-        public string Name => (string)Handle.GetObjectProperty("name");
+        public string Name => Handle.GetObjectProperty<string>("name");
 
     }
 
     public partial class WebGLShaderPrecisionFormat
     {
-        public int RangeMin => (int)Handle.GetObjectProperty("rangeMin");
+        public int RangeMin => Handle.GetObjectProperty<int>("rangeMin");
 
-        public int RangeMax => (int)Handle.GetObjectProperty("rangeMax");
+        public int RangeMax => Handle.GetObjectProperty<int>("rangeMax");
 
-        public int Precision => (int)Handle.GetObjectProperty("precision");
+        public int Precision => Handle.GetObjectProperty<int>("precision");
 
     }
 
@@ -717,11 +721,11 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
         public const uint BROWSER_DEFAULT_WEBGL = 0x9244;
 
-        public object Canvas => Handle.GetObjectProperty("canvas");
+        public object Canvas => Handle.GetObjectProperty<IJSObjectReference>("canvas");
 
-        public int DrawingBufferWidth => (int)Handle.GetObjectProperty("drawingBufferWidth");
+        public int DrawingBufferWidth => Handle.GetObjectProperty<int>("drawingBufferWidth");
 
-        public int DrawingBufferHeight => (int)Handle.GetObjectProperty("drawingBufferHeight");
+        public int DrawingBufferHeight => Handle.GetObjectProperty<int>("drawingBufferHeight");
 
         public WebGLContextAttributes GetContextAttributes()
         {
@@ -853,12 +857,12 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("compileShader", shader);
         }
 
-        public void CompressedTexImage2D(uint target, int level, uint internalformat, int width, int height, int border, ITypedArray data)
+        public void CompressedTexImage2D(uint target, int level, uint internalformat, int width, int height, int border, Array data)
         {
             Invoke("compressedTexImage2D", target, level, internalformat, width, height, border, data);
         }
 
-        public void CompressedTexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, ITypedArray data)
+        public void CompressedTexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, Array data)
         {
             Invoke("compressedTexSubImage2D", target, level, xoffset, yoffset, width, height, format, data);
         }
@@ -1178,7 +1182,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("polygonOffset", factor, units);
         }
 
-        public void ReadPixels(int x, int y, int width, int height, uint format, uint type, ITypedArray pixels)
+        public void ReadPixels(int x, int y, int width, int height, uint format, uint type, Array pixels)
         {
             Invoke("readPixels", x, y, width, height, format, type, pixels);
         }
@@ -1233,7 +1237,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("stencilOpSeparate", face, fail, zfail, zpass);
         }
 
-        public void TexImage2D(uint target, int level, uint internalformat, int width, int height, int border, uint format, uint type, ITypedArray pixels)
+        public void TexImage2D(uint target, int level, uint internalformat, int width, int height, int border, uint format, uint type, Array pixels)
         {
             Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, pixels);
         }
@@ -1253,7 +1257,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("texParameteri", target, pname, param);
         }
 
-        public void TexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, ITypedArray pixels)
+        public void TexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, Array pixels)
         {
             Invoke("texSubImage2D", target, level, xoffset, yoffset, width, height, format, type, pixels);
         }
@@ -1268,7 +1272,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("uniform1f", location, x);
         }
 
-        public void Uniform1fv(WebGLUniformLocation location, Float32Array v)
+        public void Uniform1fv(WebGLUniformLocation location, Array v)
         {
             Invoke("uniform1fv", location, v);
         }
@@ -1283,7 +1287,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("uniform1i", location, x);
         }
 
-        public void Uniform1iv(WebGLUniformLocation location, Int32Array v)
+        public void Uniform1iv(WebGLUniformLocation location, Array v)
         {
             Invoke("uniform1iv", location, v);
         }
@@ -1298,7 +1302,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("uniform2f", location, x, y);
         }
 
-        public void Uniform2fv(WebGLUniformLocation location, Float32Array v)
+        public void Uniform2fv(WebGLUniformLocation location, Array v)
         {
             Invoke("uniform2fv", location, v);
         }
@@ -1313,7 +1317,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("uniform2i", location, x, y);
         }
 
-        public void Uniform2iv(WebGLUniformLocation location, Int32Array v)
+        public void Uniform2iv(WebGLUniformLocation location, Array v)
         {
             Invoke("uniform2iv", location, v);
         }
@@ -1328,7 +1332,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("uniform3f", location, x, y, z);
         }
 
-        public void Uniform3fv(WebGLUniformLocation location, Float32Array v)
+        public void Uniform3fv(WebGLUniformLocation location, Array v)
         {
             Invoke("uniform3fv", location, v);
         }
@@ -1343,7 +1347,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("uniform3i", location, x, y, z);
         }
 
-        public void Uniform3iv(WebGLUniformLocation location, Int32Array v)
+        public void Uniform3iv(WebGLUniformLocation location, Array v)
         {
             Invoke("uniform3iv", location, v);
         }
@@ -1358,7 +1362,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("uniform4f", location, x, y, z, w);
         }
 
-        public void Uniform4fv(WebGLUniformLocation location, Float32Array v)
+        public void Uniform4fv(WebGLUniformLocation location, Array v)
         {
             Invoke("uniform4fv", location, v);
         }
@@ -1373,7 +1377,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("uniform4i", location, x, y, z, w);
         }
 
-        public void Uniform4iv(WebGLUniformLocation location, Int32Array v)
+        public void Uniform4iv(WebGLUniformLocation location, Array v)
         {
             Invoke("uniform4iv", location, v);
         }
@@ -1383,7 +1387,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("uniform4iv", location, v);
         }
 
-        public void UniformMatrix2fv(WebGLUniformLocation location, bool transpose, Float32Array value)
+        public void UniformMatrix2fv(WebGLUniformLocation location, bool transpose, Array value)
         {
             Invoke("uniformMatrix2fv", location, transpose, value);
         }
@@ -1393,7 +1397,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("uniformMatrix2fv", location, transpose, value);
         }
 
-        public void UniformMatrix3fv(WebGLUniformLocation location, bool transpose, Float32Array value)
+        public void UniformMatrix3fv(WebGLUniformLocation location, bool transpose, Array value)
         {
             Invoke("uniformMatrix3fv", location, transpose, value);
         }
@@ -1403,7 +1407,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("uniformMatrix3fv", location, transpose, value);
         }
 
-        public void UniformMatrix4fv(WebGLUniformLocation location, bool transpose, Float32Array value)
+        public void UniformMatrix4fv(WebGLUniformLocation location, bool transpose, Array value)
         {
             Invoke("uniformMatrix4fv", location, transpose, value);
         }
@@ -1428,7 +1432,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("vertexAttrib1f", indx, x);
         }
 
-        public void VertexAttrib1fv(uint indx, Float32Array values)
+        public void VertexAttrib1fv(uint indx, Array values)
         {
             Invoke("vertexAttrib1fv", indx, values);
         }
@@ -1443,7 +1447,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("vertexAttrib2f", indx, x, y);
         }
 
-        public void VertexAttrib2fv(uint indx, Float32Array values)
+        public void VertexAttrib2fv(uint indx, Array values)
         {
             Invoke("vertexAttrib2fv", indx, values);
         }
@@ -1458,7 +1462,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("vertexAttrib3f", indx, x, y, z);
         }
 
-        public void VertexAttrib3fv(uint indx, Float32Array values)
+        public void VertexAttrib3fv(uint indx, Array values)
         {
             Invoke("vertexAttrib3fv", indx, values);
         }
@@ -1473,7 +1477,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("vertexAttrib4f", indx, x, y, z, w);
         }
 
-        public void VertexAttrib4fv(uint indx, Float32Array values)
+        public void VertexAttrib4fv(uint indx, Array values)
         {
             Invoke("vertexAttrib4fv", indx, values);
         }
@@ -2055,22 +2059,22 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("bufferData", target, size, usage);
         }
 
-        public void BufferData(uint target, ITypedArray srcData, uint usage)
+        public void BufferData(uint target, Array srcData, uint usage)
         {
             Invoke("bufferData", target, srcData, usage);
         }
 
-        public void BufferSubData(uint target, uint dstByteOffset, ITypedArray srcData)
+        public void BufferSubData(uint target, uint dstByteOffset, Array srcData)
         {
             Invoke("bufferSubData", target, dstByteOffset, srcData);
         }
 
-        public void BufferData(uint target, ITypedArray srcData, uint usage, uint srcOffset, uint length)
+        public void BufferData(uint target, Array srcData, uint usage, uint srcOffset, uint length)
         {
             Invoke("bufferData", target, srcData, usage, srcOffset, length);
         }
 
-        public void BufferSubData(uint target, uint dstByteOffset, ITypedArray srcData, uint srcOffset, uint length)
+        public void BufferSubData(uint target, uint dstByteOffset, Array srcData, uint srcOffset, uint length)
         {
             Invoke("bufferSubData", target, dstByteOffset, srcData, srcOffset, length);
         }
@@ -2080,7 +2084,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("copyBufferSubData", readTarget, writeTarget, readOffset, writeOffset, size);
         }
 
-        public void GetBufferSubData(uint target, uint srcByteOffset, ITypedArray dstBuffer, uint dstOffset, uint length)
+        public void GetBufferSubData(uint target, uint srcByteOffset, Array dstBuffer, uint dstOffset, uint length)
         {
             Invoke("getBufferSubData", target, srcByteOffset, dstBuffer, dstOffset, length);
         }
@@ -2140,7 +2144,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, source);
         }
 
-        public void TexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, ITypedArray srcData, uint srcOffset)
+        public void TexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, Array srcData, uint srcOffset)
         {
             Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, srcData, srcOffset);
         }
@@ -2155,12 +2159,12 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("texImage3D", target, level, internalformat, width, height, depth, border, format, type, source);
         }
 
-        public void TexImage3D(uint target, int level, int internalformat, int width, int height, int depth, int border, uint format, uint type, ITypedArray srcData)
+        public void TexImage3D(uint target, int level, int internalformat, int width, int height, int depth, int border, uint format, uint type, Array srcData)
         {
             Invoke("texImage3D", target, level, internalformat, width, height, depth, border, format, type, srcData);
         }
 
-        public void TexImage3D(uint target, int level, int internalformat, int width, int height, int depth, int border, uint format, uint type, ITypedArray srcData, uint srcOffset)
+        public void TexImage3D(uint target, int level, int internalformat, int width, int height, int depth, int border, uint format, uint type, Array srcData, uint srcOffset)
         {
             Invoke("texImage3D", target, level, internalformat, width, height, depth, border, format, type, srcData, srcOffset);
         }
@@ -2175,7 +2179,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("texSubImage2D", target, level, xoffset, yoffset, width, height, format, type, source);
         }
 
-        public void TexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, ITypedArray srcData, uint srcOffset)
+        public void TexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, Array srcData, uint srcOffset)
         {
             Invoke("texSubImage2D", target, level, xoffset, yoffset, width, height, format, type, srcData, srcOffset);
         }
@@ -2190,7 +2194,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("texSubImage3D", target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, source);
         }
 
-        public void TexSubImage3D(uint target, int level, int xoffset, int yoffset, int zoffset, int width, int height, int depth, uint format, uint type, ITypedArray srcData, uint srcOffset)
+        public void TexSubImage3D(uint target, int level, int xoffset, int yoffset, int zoffset, int width, int height, int depth, uint format, uint type, Array srcData, uint srcOffset)
         {
             Invoke("texSubImage3D", target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, srcData, srcOffset);
         }
@@ -2205,7 +2209,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("compressedTexImage2D", target, level, internalformat, width, height, border, imageSize, offset);
         }
 
-        public void CompressedTexImage2D(uint target, int level, uint internalformat, int width, int height, int border, ITypedArray srcData, uint srcOffset, uint srcLengthOverride)
+        public void CompressedTexImage2D(uint target, int level, uint internalformat, int width, int height, int border, Array srcData, uint srcOffset, uint srcLengthOverride)
         {
             Invoke("compressedTexImage2D", target, level, internalformat, width, height, border, srcData, srcOffset, srcLengthOverride);
         }
@@ -2215,7 +2219,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("compressedTexImage3D", target, level, internalformat, width, height, depth, border, imageSize, offset);
         }
 
-        public void CompressedTexImage3D(uint target, int level, uint internalformat, int width, int height, int depth, int border, ITypedArray srcData, uint srcOffset, uint srcLengthOverride)
+        public void CompressedTexImage3D(uint target, int level, uint internalformat, int width, int height, int depth, int border, Array srcData, uint srcOffset, uint srcLengthOverride)
         {
             Invoke("compressedTexImage3D", target, level, internalformat, width, height, depth, border, srcData, srcOffset, srcLengthOverride);
         }
@@ -2225,7 +2229,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("compressedTexSubImage2D", target, level, xoffset, yoffset, width, height, format, imageSize, offset);
         }
 
-        public void CompressedTexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, ITypedArray srcData, uint srcOffset, uint srcLengthOverride)
+        public void CompressedTexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, Array srcData, uint srcOffset, uint srcLengthOverride)
         {
             Invoke("compressedTexSubImage2D", target, level, xoffset, yoffset, width, height, format, srcData, srcOffset, srcLengthOverride);
         }
@@ -2235,7 +2239,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("compressedTexSubImage3D", target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, offset);
         }
 
-        public void CompressedTexSubImage3D(uint target, int level, int xoffset, int yoffset, int zoffset, int width, int height, int depth, uint format, ITypedArray srcData, uint srcOffset, uint srcLengthOverride)
+        public void CompressedTexSubImage3D(uint target, int level, int xoffset, int yoffset, int zoffset, int width, int height, int depth, uint format, Array srcData, uint srcOffset, uint srcLengthOverride)
         {
             Invoke("compressedTexSubImage3D", target, level, xoffset, yoffset, zoffset, width, height, depth, format, srcData, srcOffset, srcLengthOverride);
         }
@@ -2420,7 +2424,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("readPixels", x, y, width, height, format, type, offset);
         }
 
-        public void ReadPixels(int x, int y, int width, int height, uint format, uint type, ITypedArray dstData, uint dstOffset)
+        public void ReadPixels(int x, int y, int width, int height, uint format, uint type, Array dstData, uint dstOffset)
         {
             Invoke("readPixels", x, y, width, height, format, type, dstData, dstOffset);
         }

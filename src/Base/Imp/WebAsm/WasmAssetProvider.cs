@@ -1,11 +1,11 @@
 ﻿using Fusee.Base.Common;
 using Fusee.Base.Core;
+using Microsoft.JSInterop;
 using System;
 using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using WebAssembly;
 
 namespace Fusee.Base.Imp.WebAsm
 {
@@ -18,12 +18,12 @@ namespace Fusee.Base.Imp.WebAsm
         /// returns the local HTTP address
         /// </summary>
         /// <returns></returns>
-        public static string GetLocalAddress()
+        public static string GetLocalAddress(IJSRuntime runtime)
         {
-            using var window = (JSObject)Runtime.GetGlobalObject("window");
-            using var location = (JSObject)window.GetObjectProperty("location");
+            using var window = runtime.GetGlobalObject<IJSInProcessObjectReference>("window");
+            using var location = window.GetObjectProperty<IJSInProcessObjectReference>("location");
 
-            var address = (string)location.GetObjectProperty("href");
+            var address = location.GetObjectProperty<string>("href");
 
             if (address.Contains("/"))
             {
@@ -41,15 +41,18 @@ namespace Fusee.Base.Imp.WebAsm
     public class AssetProvider : StreamAssetProvider
     {
         private readonly string _baseDir;
+        private readonly IJSRuntime _runtime;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssetProvider"/> class.
         /// </summary>
         /// <param name="baseDir">The base directory where assets should be looked for.</param>
+        /// <param name="runtime">The JSRuntime</param>
         /// <exception cref="System.ArgumentNullException"></exception>
-        public AssetProvider(string baseDir = null)
+        public AssetProvider(IJSRuntime runtime, string baseDir = null)
         {
             _baseDir = (string.IsNullOrEmpty(baseDir)) ? "Assets" : baseDir;
+            _runtime = runtime;
 
             if (_baseDir[_baseDir.Length - 1] != '/')
                 _baseDir += '/';
@@ -80,7 +83,7 @@ namespace Fusee.Base.Imp.WebAsm
         /// <exception cref="System.ArgumentNullException"></exception>
         protected override Stream GetStream(string id)
         {
-            var baseAddress = WasmResourceLoader.GetLocalAddress() + "Assets/";
+            var baseAddress = WasmResourceLoader.GetLocalAddress(_runtime) + "Assets/";
             using var httpClient = new HttpClient { BaseAddress = new Uri(baseAddress) };
             var response = httpClient.GetAsync(id);
             return response.Result.Content.ReadAsStreamAsync().Result;
@@ -96,7 +99,7 @@ namespace Fusee.Base.Imp.WebAsm
         /// <exception cref="System.ArgumentNullException"></exception>
         protected override async Task<Stream> GetStreamAsync(string id)
         {
-            var baseAddress = WasmResourceLoader.GetLocalAddress() + "Assets/";
+            var baseAddress = WasmResourceLoader.GetLocalAddress(_runtime) + "Assets/";
             using var httpClient = new HttpClient { BaseAddress = new Uri(baseAddress) };
 
             Diagnostics.Debug($"Requesting '{id}' at '{baseAddress}' ...");
@@ -131,7 +134,7 @@ namespace Fusee.Base.Imp.WebAsm
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
 
-            var baseAddress = WasmResourceLoader.GetLocalAddress() + "Assets/";
+            var baseAddress = WasmResourceLoader.GetLocalAddress(_runtime) + "Assets/";
             using var httpClient = new HttpClient { BaseAddress = new Uri(baseAddress) };
             var response = httpClient.GetAsync(id);
             return response.Result.StatusCode == System.Net.HttpStatusCode.OK;
@@ -149,7 +152,7 @@ namespace Fusee.Base.Imp.WebAsm
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
 
-            var baseAddress = WasmResourceLoader.GetLocalAddress() + "Assets/";
+            var baseAddress = WasmResourceLoader.GetLocalAddress(_runtime) + "Assets/";
             using var httpClient = new HttpClient { BaseAddress = new Uri(baseAddress) };
             var response = await httpClient.GetAsync(id).ConfigureAwait(false);
             return response.StatusCode == System.Net.HttpStatusCode.OK;

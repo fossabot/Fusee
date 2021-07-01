@@ -64,7 +64,7 @@ namespace Fusee.Examples.Simple.Core
         }
 
         // Init is called on startup.
-        public override void Init()
+        public override Task<bool> Init()
         {
             LoadAssets();
 
@@ -73,6 +73,7 @@ namespace Fusee.Examples.Simple.Core
 
             System.Console.WriteLine("End of init");
 
+            return Task.FromResult(true);
         }
 
         // RenderAFrame is called once a frame

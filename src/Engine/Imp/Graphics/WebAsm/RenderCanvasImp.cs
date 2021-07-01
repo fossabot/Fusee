@@ -1,6 +1,7 @@
 ﻿using Fusee.Engine.Common;
+using Fusee.Base.Imp.WebAsm;
+using Microsoft.JSInterop;
 using System;
-using WebAssembly;
 
 
 namespace Fusee.Engine.Imp.Graphics.WebAsm
@@ -11,14 +12,17 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
     public class RenderCanvasImp : IRenderCanvasImp
     {
         internal WebGL2RenderingContextBase _gl;
-        internal JSObject _canvas;
+        internal IJSObjectReference _canvas;
+        internal IJSRuntime _runtime;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderCanvasImp"/> class.
         /// </summary>
-        public RenderCanvasImp(JSObject canvas, WebGL2RenderingContextBase gl, int width, int height)
+        public RenderCanvasImp(IJSObjectReference canvas, IJSRuntime runtime, WebGL2RenderingContextBase gl, int width, int height)
         {
             _canvas = canvas;
+            _runtime = runtime;
+
 
             _gl = gl;
             Width = width;
@@ -98,8 +102,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <remarks>Not needed in WebGL.</remarks>
         public void OpenLink(string link)
         {
-            using var window = (JSObject)Runtime.GetGlobalObject("window");
-            window.Invoke("open", link);
+            using var window = _runtime.GetGlobalObject<IJSInProcessObjectReference>("window");
+            window.InvokeVoid("open", link);
         }
 
         /// <summary>
@@ -126,7 +130,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <remarks>Not needed in WebGL.</remarks>
         public void SetCursor(CursorType cursorType)
         {
-            if (_canvas.JSHandle.Equals(-1)) return;
+            if (_canvas.Equals(-1)) return;
 
             switch (cursorType)
             {

@@ -1,0 +1,1266 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Fusee.Engine.Imp.Graphics.WebAsm</name>
+    </assembly>
+    <members>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.ArrayExtensions">
+            <summary>
+            A static helper class to provide functions for arrays.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.ArrayExtensions.ToArray``1(WebAssembly.Core.Array,System.Func{System.Object,``0})">
+            <summary>
+            Casts an array to an array of the given type T.
+            </summary>
+            <typeparam name="T">The given type to cast to.</typeparam>
+            <param name="array">The array to parse.</param>
+            <param name="cast">The cast to make.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.RenderBufferHandle">
+            <summary>
+            RenderBuffer implementation for WebAsm.
+            </summary>
+        </member>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.FrameBufferHandle">
+            <summary>
+            RenderBuffer implementation for WebAsm.
+            </summary>
+        </member>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasInputDriverImp">
+            <summary>
+            Input driver implementation for keyboard and mouse, as well as touch input in the browser.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasInputDriverImp.#ctor(Fusee.Engine.Common.IRenderCanvasImp)">
+            <summary>
+            Constructor. Use this in platform specific application projects.
+            </summary>
+            <param name="renderCanvas">The render canvas to provide mouse and keyboard input for.</param>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasInputDriverImp.Devices">
+            <summary>
+            Devices supported by this driver: One mouse and one keyboard.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasInputDriverImp.DriverDesc">
+            <summary>
+            Returns a human readable description of this driver.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasInputDriverImp.DriverId">
+            <summary>
+            Returns a (hopefully) unique ID for this driver. Uniqueness is granted by using the
+            full class name (including namespace).
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasInputDriverImp.DeviceDisconnected">
+            <summary>
+            Not supported on this driver. Mouse and keyboard are considered to be connected all the time.
+            You can register handlers but they will never get called.
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasInputDriverImp.NewDeviceConnected">
+            <summary>
+            Not supported on this driver. Mouse and keyboard are considered to be connected all the time.
+            You can register handlers but they will never get called.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasInputDriverImp.Dispose(System.Boolean)">
+            <summary>
+            Part of the Dispose pattern.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasInputDriverImp.Dispose">
+            <summary>
+            Part of the dispose pattern.
+            </summary>
+        </member>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.GamePadDeviceImp">
+            <summary>
+            Gamepad input device implementation for the WebAsm platform.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.GamePadDeviceImp.Id">
+            <summary>
+            Returns the ID of the current controller
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.GamePadDeviceImp.Desc">
+            <summary>
+            Description.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.GamePadDeviceImp.Category">
+            <summary>
+            Returns Type of input device.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.GamePadDeviceImp.AxesCount">
+            <summary>
+            How many axes do we have for this device?
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.GamePadDeviceImp.AxisImpDesc">
+            <summary>
+            The axis description implementation
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.GamePadDeviceImp.ButtonCount">
+            <summary>
+            How many buttons do we have for this device
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.GamePadDeviceImp.ButtonImpDesc">
+            <summary>
+            The button description implementation
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.GamePadDeviceImp.AxisValueChanged">
+            <summary>
+            Called when the axis value changes
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.GamePadDeviceImp.ButtonValueChanged">
+            <summary>
+            Called when a button value changes
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.GamePadDeviceImp.GetAxis(System.Int32)">
+            <summary>
+            All Axes on this Device are polled.
+            </summary>
+            <param name="iAxisId">The Axis to be polled.</param>
+            <returns>A float value between -1 and 1 determining the offset of the axis.</returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.GamePadDeviceImp.GetButton(System.Int32)">
+            <summary>
+            All buttons on this device are polled.
+            </summary>
+            <param name="iButtonId">The button to be polled.</param>
+            <returns>A Boolean value determining whether the button is pressed or not.</returns>
+        </member>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp">
+            <summary>
+            Keyboard input device implementation for the WebAsm platform.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.#ctor(WebAssembly.JSObject)">
+            <summary>
+            Should be called by the driver only.
+            </summary>
+            <param name="_">The JavaScript canvas.</param>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.AxesCount">
+            <summary>
+            Returns the number of Axes (==0, keyboard does not support any axes).
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.AxisImpDesc">
+            <summary>
+            Empty enumeration for keyboard, since <see cref="P:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.AxesCount"/> is 0.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.ButtonCount">
+            <summary>
+            Returns the number of enum values of <see cref="T:Fusee.Engine.Common.KeyCodes"/>
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.ButtonImpDesc">
+            <summary>
+            Returns a description for each keyboard button.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.Category">
+            <summary>
+            This is a keyboard device, so this property returns <see cref="F:Fusee.Engine.Common.DeviceCategory.Keyboard"/>.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.Desc">
+            <summary>
+            Human readable description of this device (to be used in dialogs).
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.Id">
+            <summary>
+            Returns a (hopefully) unique ID for this driver. Uniqueness is granted by using the
+            full class name (including name space).
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.AxisValueChanged">
+            <summary>
+            No axes exist on this device, so listeners registered to this event will never get called.
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.ButtonValueChanged">
+            <summary>
+            All buttons exhibited by this device are event-driven buttons, so this is the point to hook to in order
+            to get information from this device.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.GetAxis(System.Int32)">
+            <summary>
+            This device does not support any axes at all. Always throws.
+            </summary>
+            <param name="iAxisId">No matter what you specify here, you'll evoke an exception.</param>
+            <returns>No return, always throws.</returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.GetButton(System.Int32)">
+            <summary>
+            This device does not support to-be-polled-buttons. All keyboard buttons are event-driven. Listen to the <see cref="E:Fusee.Engine.Imp.Graphics.WebAsm.KeyboardDeviceImp.ButtonValueChanged"/>
+            event to receive keyboard notifications from this device.
+            </summary>
+            <param name="iButtonId">No matter what you specify here, you'll evoke an exception.</param>
+            <returns>No return, always throws.</returns>
+        </member>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp">
+            <summary>
+            Mouse input device implementation for the Web platforms.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.#ctor(WebAssembly.JSObject)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp" /> class.
+            </summary>
+            <param name="canvas">The (JavaScript) canvas object.</param>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.AxesCount">
+            <summary>
+            Number of axes. Here seven: "X", "Y" and "Wheel" as well as MinX, MaxX, MinY and MaxY
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.AxisImpDesc">
+            <summary>
+            Returns description information for all axes.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.ButtonCount">
+            <summary>
+            Number of buttons exposed by this device. Here three: Left, Middle and Right mouse buttons.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.ButtonImpDesc">
+            <summary>
+            A mouse exposes three buttons: left, middle and right.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.Category">
+            <summary>
+            Returns <see cref="F:Fusee.Engine.Common.DeviceCategory.Mouse"/>, just because it's a mouse.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.Desc">
+            <summary>
+            Short description string for this device to be used in dialogs.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.Id">
+            <summary>
+            Returns a (hopefully) unique ID for this driver. Uniqueness is granted by using the
+            full class name (including name space).
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.AxisValueChanged">
+            <summary>
+            This exposes mouseX and mouseY as event-based axes, while the mouseWheel is to be polled.
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.ButtonValueChanged">
+            <summary>
+            All three mouse buttons are event-based. Listen to this event to get information about mouse button state changes.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.GetAxis(System.Int32)">
+            <summary>
+            Retrieves values for the X, Y and Wheel axes. No other axes are supported by this device.
+            </summary>
+            <param name="iAxisId">The axis to retrieve information for.</param>
+            <returns>The value at the given axis.</returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.GetButton(System.Int32)">
+            <summary>
+            This device does not support to-be-polled-buttons. All mouse buttons are event-driven. Listen to the <see cref="E:Fusee.Engine.Imp.Graphics.WebAsm.MouseDeviceImp.ButtonValueChanged"/>
+            event to receive keyboard notifications from this device.
+            </summary>
+            <param name="iButtonId">No matter what you specify here, you'll evoke an exception.</param>
+            <returns>No return, always throws.</returns>
+        </member>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp">
+            <summary>
+            Touch input device implementation for the Web platforms. This implementation uses the HTML5 touch api
+            which doesn't seem to provide a value how many simultaneous touchpoints are supported. Thus we
+            assume 5.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.P2F(System.Object)">
+            <summary>
+            Converts the value of a touch point to float.
+            </summary>
+            <param name="o">The value of the point to convert.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.#ctor(WebAssembly.JSObject)">
+            <summary>
+            Implements a touch device for windows.
+            </summary>
+            <param name="canvas"></param>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.Desc">
+            <summary>
+            Short description string for this device to be used in dialogs.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.Id">
+            <summary>
+            Returns a (hopefully) unique ID for this driver. Uniqueness is granted by using the
+            full class name (including namespace).
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.AxisValueChanged">
+            <summary>
+            Occurs on value changes of axes exhibited by this device.
+            Only applies for axes where the <see cref="F:Fusee.Engine.Common.AxisImpDescription.PollAxis" /> is set to false.
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.ButtonValueChanged">
+            <summary>A touchpoints's contact state is communicated by a button.</summary>
+            <see cref="F:Fusee.Engine.Common.ButtonImpDescription.PollButton" />
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.Category">
+            <summary>
+            Returns <see cref="F:Fusee.Engine.Common.DeviceCategory.Touch"/>, just because it's a touch device.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.AxesCount">
+            <summary>
+            Returns the number of axes. Up to five touchpoints (with two axes (X and Y) per touchpoint plus
+            one axis carrying the number of currently touched touchpoints plus four axes describing the minimum and
+            maximum X and Y values.
+            </summary>
+            <value>
+            The axes count.
+            </value>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.AxisImpDesc">
+            <summary>
+            Returns description information for all axes.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.GetAxis(System.Int32)">
+            <summary>
+            Retrieves values for the number of currently active touchpoints and the touches min and max values. The touchpoint X and Y axes themselves are event-based axes.
+            Do not query them here.
+            </summary>
+            <param name="iAxisId">The axis to retrieve information for.</param>
+            <returns>The value at the given axis.</returns>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.ButtonCount">
+            <summary>
+            Retrieves the button count. One button for each of the up to five supported touchpoints signaling that the touchpoint currently has contact.
+            </summary>
+            <value>
+            The button count.
+            </value>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.ButtonImpDesc">
+            <summary>
+            Retrieve a description for each button.
+            </summary>
+            <value>
+            The button imp description.
+            </value>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.TouchDeviceImp.GetButton(System.Int32)">
+            <summary>
+            Gets the button state. This device's buttons signal that a finger (nose, elbow, knee...) currently has contact with the scree surface.
+            </summary>
+            <param name="iButtonId">The button identifier.</param>
+            <returns>true if the button is hit, else false</returns>
+        </member>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp">
+            <summary>
+            This is a default render canvas implementation creating its own rendering window.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.#ctor(WebAssembly.JSObject,Fusee.Engine.Imp.Graphics.WebAsm.WebGL2RenderingContextBase,System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp"/> class.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.Width">
+            <summary>
+            Gets he width of the rendering window.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.Height">
+            <summary>
+            Gets the height of the rendering window.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.Caption">
+            <summary>
+            Gets and sets the caption (title of the rendering window).
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.DeltaTime">
+            <summary>
+            Gets and sets the delta time.
+            The delta time is the time that was required to render the last frame in milliseconds.
+            This value can be used to determine the frames per second of the application.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.VerticalSync">
+            <summary>
+            Gets and sets a value indicating whether vertical synchronization is used.
+            </summary>
+            <remarks> Currently not implemented.</remarks>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.Fullscreen">
+            <summary>
+            Gets and sets a value indicating whether fullscreen is enabled.
+            </summary>
+            <remarks> Currently not implemented.</remarks>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.Init">
+            <summary>
+            Occurs during initialization.
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.UnLoad">
+            <summary>
+            Occurs when unloading.
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.Render">
+            <summary>
+            Occurs when rendering.
+            </summary>
+        </member>
+        <member name="E:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.Resize">
+            <summary>
+            Occurs when resizing.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.CloseGameWindow">
+            <summary>
+            Closes the game window.
+            </summary>
+            <remarks>Not needed in WebGL.</remarks>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.OpenLink(System.String)">
+            <summary>
+            Opens the given URL in the user's standard browser. The link MUST start with "http://".
+            </summary>
+            <param name="link">The URL to open.</param>
+            <remarks>Not needed in WebGL.</remarks>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.Present">
+            <summary>
+            Not needed due to WebGL.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.Run">
+            <summary>
+            Runs this application instance.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.SetCursor(Fusee.Engine.Common.CursorType)">
+            <summary>
+            Set the cursor to one of the predefined types.
+            </summary>
+            <param name="cursorType">THe type of cursor to set.</param>
+            <remarks>Not needed in WebGL.</remarks>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.SetWindowSize(System.Int32,System.Int32,System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Sets the size of the output window for desktop development.
+            </summary>
+            <param name="width">The width of the window.</param>
+            <param name="height">The height of the window.</param>
+            <param name="posx">The x position of the window.</param>
+            <param name="posy">The y position of the window.</param>
+            <param name="borderHidden">Show the window border or not.</param>
+            <remarks>Currently not implemented.</remarks>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.DoRender">
+            <summary>
+            Does the render of this instance.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.DoInit">
+            <summary>
+            Does initialize this instance.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderCanvasImp.DoResize(System.Int32,System.Int32)">
+            <summary>
+            Does the resize on this instance.
+            </summary>
+            <param name="w">The width.</param>
+            <param name="h">The height.</param>
+        </member>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp">
+            <summary>
+            Implementation of the <see cref="T:Fusee.Engine.Common.IRenderContextImp" /> interface on top of WebGLDotNET.
+            </summary>
+        </member>
+        <member name="F:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.gl">
+            <summary>
+            The WebGL rendering context base.
+            </summary>
+        </member>
+        <member name="F:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.gl2">
+            <summary>
+            The WebGL2 rendering context base.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.#ctor(Fusee.Engine.Common.IRenderCanvasImp)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp"/> class.
+            </summary>
+            <param name="renderCanvasImp">The platform specific render canvas implementation.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.CreateTexture(Fusee.Engine.Common.IWritableCubeMap)">
+            <summary>
+            Creates a new CubeMap and binds it to the shader.
+            </summary>
+            <param name="img">A given ImageData object, containing all necessary information for the upload to the graphics card.</param>
+            <returns>An ITextureHandle that can be used for texturing in the shader. In this implementation, the handle is an integer-value which is necessary for OpenTK.</returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.CreateTexture(Fusee.Engine.Common.ITexture)">
+            <summary>
+            Creates a new Texture and binds it to the shader.
+            </summary>
+            <param name="img">A given ImageData object, containing all necessary information for the upload to the graphics card.</param>
+            <returns>An ITextureHandle that can be used for texturing in the shader. In this implementation, the handle is an integer-value which is necessary for OpenTK.</returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.CreateTexture(Fusee.Engine.Common.IWritableTexture)">
+            <summary>
+            Creates a new Texture and binds it to the shader.
+            </summary>
+            <param name="img">A given ImageData object, containing all necessary information for the upload to the graphics card.</param>
+            <returns>An ITextureHandle that can be used for texturing in the shader. In this implementation, the handle is an integer-value which is necessary for OpenTK.</returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.UpdateTextureRegion(Fusee.Engine.Common.ITextureHandle,Fusee.Engine.Common.ITexture,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Updates a specific rectangle of a texture.
+            </summary>
+            <param name="tex">The texture to which the ImageData is bound to.</param>
+            <param name="img">The ImageData struct containing information about the image. </param>
+            <param name="startX">The x-value of the upper left corner of th rectangle.</param>
+            <param name="startY">The y-value of the upper left corner of th rectangle.</param>
+            <param name="width">The width of the rectangle.</param>
+            <param name="height">The height of the rectangle.</param>
+            <remarks> /// <remarks>Look at the VideoTextureExample for further information.</remarks></remarks>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.DeleteFrameBuffer(Fusee.Engine.Common.IBufferHandle)">
+            <summary>
+            Free all allocated gpu memory that belong to a frame-buffer object.
+            </summary>
+            <param name="bh">The platform dependent abstraction of the gpu buffer handle.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.DeleteRenderBuffer(Fusee.Engine.Common.IBufferHandle)">
+            <summary>
+            Free all allocated gpu memory that belong to a render-buffer object.
+            </summary>
+            <param name="bh">The platform dependent abstraction of the gpu buffer handle.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.RemoveTextureHandle(Fusee.Engine.Common.ITextureHandle)">
+            <summary>
+            Free all allocated gpu memory that belong to the given <see cref="T:Fusee.Engine.Common.ITextureHandle"/>.
+            </summary>
+            <param name="textureHandle">The <see cref="T:Fusee.Engine.Common.ITextureHandle"/> which gpu allocated memory will be freed.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.CreateShaderProgram(System.String,System.String,System.String)">
+            <summary>
+            Creates the shader program by using a valid GLSL vertex and fragment shader code. This code is compiled at runtime.
+            Do not use this function in frequent updates.
+            </summary>
+            <param name="vs">The vertex shader code.</param>
+            <param name="gs">The vertex shader code.</param>
+            <param name="ps">The pixel(=fragment) shader code.</param>
+            <returns>An instance of <see cref="T:Fusee.Engine.Common.IShaderHandle" />.</returns>
+            <exception cref="T:System.ApplicationException">
+            </exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.RemoveShader(Fusee.Engine.Common.IShaderHandle)">
+            <inheritdoc />
+            <summary>
+            Removes shader from the GPU
+            </summary>
+            <param name="sp"></param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShader(Fusee.Engine.Common.IShaderHandle)">
+            <summary>
+            Sets the shader program onto the GL render context.
+            </summary>
+            <param name="program">The shader program.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetLineWidth(System.Single)">
+            <summary>
+            Set the width of line primitives.
+            </summary>
+            <param name="width"></param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.GetShaderParam(Fusee.Engine.Common.IShaderHandle,System.String)">
+            <summary>
+            Gets the shader parameter.
+            The Shader parameter is used to bind values inside of shader programs that run on the graphics card.
+            Do not use this function in frequent updates as it transfers information from graphics card to the cpu which takes time.
+            </summary>
+            <param name="shaderProgram">The shader program.</param>
+            <param name="paramName">Name of the parameter.</param>
+            <returns>The Shader parameter is returned if the name is found, otherwise null.</returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.GetParamValue(Fusee.Engine.Common.IShaderHandle,Fusee.Engine.Common.IShaderParam)">
+            <summary>
+            Gets the float parameter value inside a shader program by using a <see cref="T:Fusee.Engine.Common.IShaderParam" /> as search reference.
+            Do not use this function in frequent updates as it transfers information from the graphics card to the cpu which takes time.
+            </summary>
+            <param name="program">The shader program.</param>
+            <param name="param">The parameter.</param>
+            <returns>The current parameter's value.</returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.GetShaderParamList(Fusee.Engine.Common.IShaderHandle)">
+            <summary>
+            Gets the shader parameter list of a specific <see cref="T:Fusee.Engine.Common.IShaderHandle" />.
+            </summary>
+            <param name="shaderProgram">The shader program.</param>
+            <returns>All Shader parameters of a shader program are returned.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParam(Fusee.Engine.Common.IShaderParam,System.Single)">
+            <summary>
+            Sets a float shader parameter.
+            </summary>
+            <param name="param">The parameter.</param>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParam(Fusee.Engine.Common.IShaderParam,Fusee.Math.Core.float2)">
+            <summary>
+            Sets a <see cref="T:Fusee.Math.Core.float2" /> shader parameter.
+            </summary>
+            <param name="param">The parameter.</param>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParam(Fusee.Engine.Common.IShaderParam,Fusee.Math.Core.float3)">
+            <summary>
+            Sets a <see cref="T:Fusee.Math.Core.float3" /> shader parameter.
+            </summary>
+            <param name="param">The parameter.</param>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParam(Fusee.Engine.Common.IShaderParam,Fusee.Math.Core.float3[])">
+            <summary>
+            Sets a <see cref="T:Fusee.Math.Core.float3" /> shader parameter.
+            </summary>
+            <param name="param">The parameter.</param>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParam(Fusee.Engine.Common.IShaderParam,Fusee.Math.Core.float4)">
+            <summary>
+            Sets a <see cref="T:Fusee.Math.Core.float4" /> shader parameter.
+            </summary>
+            <param name="param">The parameter.</param>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParam(Fusee.Engine.Common.IShaderParam,Fusee.Math.Core.float4x4)">
+            <summary>
+            Sets a <see cref="T:Fusee.Math.Core.float4x4" /> shader parameter.
+            </summary>
+            <param name="param">The parameter.</param>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParam(Fusee.Engine.Common.IShaderParam,Fusee.Math.Core.float4[])">
+            <summary>
+                Sets a <see cref="T:Fusee.Math.Core.float4" /> array shader parameter.
+            </summary>
+            <param name="param">The parameter.</param>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParam(Fusee.Engine.Common.IShaderParam,Fusee.Math.Core.float4x4[])">
+            <summary>
+            Sets a <see cref="T:Fusee.Math.Core.float4x4" /> array shader parameter.
+            </summary>
+            <param name="param">The parameter.</param>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParam(Fusee.Engine.Common.IShaderParam,System.Int32)">
+            <summary>
+            Sets a int shader parameter.
+            </summary>
+            <param name="param">The parameter.</param>
+            <param name="val">The value.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetActiveAndBindTexture(Fusee.Engine.Common.IShaderParam,Fusee.Engine.Common.ITextureHandle,Fusee.Engine.Common.TextureType)">
+            <summary>
+            Sets a texture active and binds it.
+            </summary>
+            <param name="param">The shader parameter, associated with this texture.</param>
+            <param name="texId">The texture handle.</param>
+            <param name="texTarget">The texture type, describing to which texture target the texture gets bound to.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetActiveAndBindTexture(Fusee.Engine.Common.IShaderParam,Fusee.Engine.Common.ITextureHandle,Fusee.Engine.Common.TextureType,System.Int32@)">
+            <summary>
+            Sets a texture active and binds it.
+            </summary>
+            <param name="param">The shader parameter, associated with this texture.</param>
+            <param name="texId">The texture handle.</param>
+            <param name="texTarget">The texture type, describing to which texture target the texture gets bound to.</param>
+            <param name="texUnit">The texture unit.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetActiveAndBindTextureArray(Fusee.Engine.Common.IShaderParam,Fusee.Engine.Common.ITextureHandle[],Fusee.Engine.Common.TextureType)">
+            <summary>
+            Sets a given Shader Parameter to a created texture
+            </summary>
+            <param name="param">Shader Parameter used for texture binding</param>
+            <param name="texIds">An array of ITextureHandles returned from CreateTexture method or the ShaderEffectManager.</param>
+            /// <param name="texTarget">The texture type, describing to which texture target the texture gets bound to.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetActiveAndBindTextureArray(Fusee.Engine.Common.IShaderParam,Fusee.Engine.Common.ITextureHandle[],Fusee.Engine.Common.TextureType,System.Int32[]@)">
+            <summary>
+            Sets a texture active and binds it.
+            </summary>
+            <param name="param">The shader parameter, associated with this texture.</param>
+            <param name="texIds">An array of ITextureHandles returned from CreateTexture method or the ShaderEffectManager.</param>
+            <param name="texTarget">The texture type, describing to which texture target the texture gets bound to.</param>
+            <param name="texUnitArray">The texture units.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParamTexture(Fusee.Engine.Common.IShaderParam,Fusee.Engine.Common.ITextureHandle,Fusee.Engine.Common.TextureType)">
+            <summary>
+            Sets a given Shader Parameter to a created texture
+            </summary>
+            <param name="param">Shader Parameter used for texture binding</param>
+            <param name="texId">An ITextureHandle probably returned from CreateTexture method</param>
+            <param name="texTarget">The texture type, describing to which texture target the texture gets bound to.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParamTextureArray(Fusee.Engine.Common.IShaderParam,Fusee.Engine.Common.ITextureHandle[],Fusee.Engine.Common.TextureType)">
+            <summary>
+            Sets a given Shader Parameter to a created texture
+            </summary>
+            <param name="param">Shader Parameter used for texture binding</param>
+            <param name="texIds">An array of ITextureHandles probably returned from CreateTexture method</param>
+            <param name="texTarget">The texture type, describing to which texture target the texture gets bound to.</param>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.ClearColor">
+            <summary>
+            Gets and sets the color of the background.
+            </summary>
+            <value>
+            The color of the clear.
+            </value>
+        </member>
+        <member name="P:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.ClearDepth">
+            <summary>
+            Gets and sets the clear depth value which is used to clear the depth buffer.
+            </summary>
+            <value>
+            Specifies the depth value used when the depth buffer is cleared. The initial value is 1. This value is clamped to the range [0,1].
+            </value>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.Clear(Fusee.Engine.Common.ClearFlags)">
+            <summary>
+            Clears the specified flags.
+            </summary>
+            <param name="flags">The flags.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.Scissor(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Only pixels that lie within the scissor box can be modified by drawing commands.
+            Note that the Scissor test must be enabled for this to work.
+            </summary>
+            <param name="x">X Coordinate of the lower left point of the scissor box.</param>
+            <param name="y">Y Coordinate of the lower left point of the scissor box.</param>
+            <param name="width">Width of the scissor box.</param>
+            <param name="height">Height of the scissor box.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.EnableDepthClamp">
+            <summary>
+            The clipping behavior against the Z position of a vertex can be turned off by activating depth clamping.
+            This is done with glEnable(GL_DEPTH_CLAMP). This will cause the clip-space Z to remain unclipped by the front and rear viewing volume.
+            See: https://www.khronos.org/opengl/wiki/Vertex_Post-Processing#Depth_clamping
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.DisableDepthClamp">
+            <summary>
+            Disables depths clamping. <seealso cref="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.EnableDepthClamp"/>
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.CreateAttributeBuffer(Fusee.Math.Core.float3[],System.String)">
+            <summary>
+            Create one single multi-purpose attribute buffer
+            </summary>
+            <param name="attributes"></param>
+            <param name="attributeName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.DeleteAttributeBuffer(Fusee.Engine.Common.IAttribImp)">
+            <summary>
+            Remove an attribute buffer previously created with <see cref="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.CreateAttributeBuffer(Fusee.Math.Core.float3[],System.String)"/> and release all associated resources
+            allocated on the GPU.
+            </summary>
+            <param name="attribHandle">The attribute handle.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetVertices(Fusee.Engine.Common.IMeshImp,Fusee.Math.Core.float3[])">
+            <summary>
+            Binds the vertices onto the GL render context and assigns an VertexBuffer index to the passed <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.
+            </summary>
+            <param name="mr">The <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.</param>
+            <param name="vertices">The vertices.</param>
+            <exception cref="T:System.ArgumentException">Vertices must not be null or empty</exception>
+            <exception cref="T:System.ApplicationException"></exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetTangents(Fusee.Engine.Common.IMeshImp,Fusee.Math.Core.float4[])">
+            <summary>
+            Binds the tangents onto the GL render context and assigns an TangentBuffer index to the passed <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.
+            </summary>
+            <param name="mr">The <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.</param>
+            <param name="tangents">The tangents.</param>
+            <exception cref="T:System.ArgumentException">Tangents must not be null or empty</exception>
+            <exception cref="T:System.ApplicationException"></exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetBiTangents(Fusee.Engine.Common.IMeshImp,Fusee.Math.Core.float3[])">
+            <summary>
+            Binds the bitangents onto the GL render context and assigns an BiTangentBuffer index to the passed <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.
+            </summary>
+            <param name="mr">The <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.</param>
+            <param name="bitangents">The BiTangents.</param>
+            <exception cref="T:System.ArgumentException">BiTangents must not be null or empty</exception>
+            <exception cref="T:System.ApplicationException"></exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetNormals(Fusee.Engine.Common.IMeshImp,Fusee.Math.Core.float3[])">
+            <summary>
+            Binds the normals onto the GL render context and assigns an NormalBuffer index to the passed <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.
+            </summary>
+            <param name="mr">The <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.</param>
+            <param name="normals">The normals.</param>
+            <exception cref="T:System.ArgumentException">Normals must not be null or empty</exception>
+            <exception cref="T:System.ApplicationException"></exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetBoneIndices(Fusee.Engine.Common.IMeshImp,Fusee.Math.Core.float4[])">
+            <summary>
+            Binds the bone indices onto the GL render context and assigns an BondeIndexBuffer index to the passed <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.
+            </summary>
+            <param name="mr">The <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.</param>
+            <param name="boneIndices">The bone indices.</param>
+            <exception cref="T:System.ArgumentException">BoneIndices must not be null or empty</exception>
+            <exception cref="T:System.ApplicationException"></exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetBoneWeights(Fusee.Engine.Common.IMeshImp,Fusee.Math.Core.float4[])">
+            <summary>
+            Binds the bone weights onto the GL render context and assigns an BondeWeightBuffer index to the passed <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.
+            </summary>
+            <param name="mr">The <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.</param>
+            <param name="boneWeights">The bone weights.</param>
+            <exception cref="T:System.ArgumentException">BoneWeights must not be null or empty</exception>
+            <exception cref="T:System.ApplicationException"></exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetUVs(Fusee.Engine.Common.IMeshImp,Fusee.Math.Core.float2[])">
+            <summary>
+            Binds the UV coordinates onto the GL render context and assigns an UVBuffer index to the passed <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.
+            </summary>
+            <param name="mr">The <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.</param>
+            <param name="uvs">The UV's.</param>
+            <exception cref="T:System.ArgumentException">UVs must not be null or empty</exception>
+            <exception cref="T:System.ApplicationException"></exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetColors(Fusee.Engine.Common.IMeshImp,System.UInt32[])">
+            <summary>
+            Binds the colors onto the GL render context and assigns an ColorBuffer index to the passed <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.
+            </summary>
+            <param name="mr">The <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.</param>
+            <param name="colors">The colors.</param>
+            <exception cref="T:System.ArgumentException">colors must not be null or empty</exception>
+            <exception cref="T:System.ApplicationException"></exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetTriangles(Fusee.Engine.Common.IMeshImp,System.UInt16[])">
+            <summary>
+            Binds the triangles onto the GL render context and assigns an ElementBuffer index to the passed <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.
+            </summary>
+            <param name="mr">The <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.</param>
+            <param name="triangleIndices">The triangle indices.</param>
+            <exception cref="T:System.ArgumentException">triangleIndices must not be null or empty</exception>
+            <exception cref="T:System.ApplicationException"></exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.RemoveVertices(Fusee.Engine.Common.IMeshImp)">
+            <summary>
+            Deletes the buffer associated with the mesh implementation.
+            </summary>
+            <param name="mr">The mesh which buffer respectively GPU memory should be deleted.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.RemoveNormals(Fusee.Engine.Common.IMeshImp)">
+            <summary>
+            Deletes the buffer associated with the mesh implementation.
+            </summary>
+            <param name="mr">The mesh which buffer respectively GPU memory should be deleted.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.RemoveColors(Fusee.Engine.Common.IMeshImp)">
+            <summary>
+            Deletes the buffer associated with the mesh implementation.
+            </summary>
+            <param name="mr">The mesh which buffer respectively GPU memory should be deleted.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.RemoveUVs(Fusee.Engine.Common.IMeshImp)">
+            <summary>
+            Deletes the buffer associated with the mesh implementation.
+            </summary>
+            <param name="mr">The mesh which buffer respectively GPU memory should be deleted.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.RemoveTriangles(Fusee.Engine.Common.IMeshImp)">
+            <summary>
+            Deletes the buffer associated with the mesh implementation.
+            </summary>
+            <param name="mr">The mesh which buffer respectively GPU memory should be deleted.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.RemoveBoneWeights(Fusee.Engine.Common.IMeshImp)">
+            <summary>
+            Deletes the buffer associated with the mesh implementation.
+            </summary>
+            <param name="mr">The mesh which buffer respectively GPU memory should be deleted.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.RemoveBoneIndices(Fusee.Engine.Common.IMeshImp)">
+            <summary>
+            Deletes the buffer associated with the mesh implementation.
+            </summary>
+            <param name="mr">The mesh which buffer respectively GPU memory should be deleted.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.RemoveTangents(Fusee.Engine.Common.IMeshImp)">
+            <summary>
+            Deletes the buffer associated with the mesh implementation.
+            </summary>
+            <param name="mr">The mesh which buffer respectively GPU memory should be deleted.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.RemoveBiTangents(Fusee.Engine.Common.IMeshImp)">
+            <summary>
+            Deletes the buffer associated with the mesh implementation.
+            </summary>
+            <param name="mr">The mesh which buffer respectively GPU memory should be deleted.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.Render(Fusee.Engine.Common.IMeshImp)">
+            <summary>
+            Renders the specified <see cref="T:Fusee.Engine.Common.IMeshImp" />.
+            </summary>
+            <param name="mr">The <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.GetBufferContent(Fusee.Engine.Common.Rectangle,Fusee.Engine.Common.ITextureHandle)">
+            <summary>
+            Gets the content of the buffer.
+            </summary>
+            <param name="quad">The Rectangle where the content is draw into.</param>
+            <param name="texId">The texture identifier.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.CreateMeshImp">
+            <summary>
+            Creates the mesh implementation.
+            </summary>
+            <returns>The <see cref="T:Fusee.Engine.Common.IMeshImp" /> instance.</returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetRenderState(Fusee.Engine.Common.RenderState,System.UInt32)">
+            <summary>
+            Sets the RenderState object onto the current OpenGL based RenderContext.
+            </summary>
+            <param name="renderState">State of the render(enum).</param>
+            <param name="value">The value. See <see cref="T:Fusee.Engine.Common.RenderState"/> for detailed information. </param>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            value
+            or
+            value
+            or
+            value
+            or
+            renderState
+            </exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.GetRenderState(Fusee.Engine.Common.RenderState)">
+            <summary>
+            Retrieves the current value for the given RenderState that is applied to the current WebGL based RenderContext.
+            </summary>
+            <param name="renderState">The RenderState setting to be retrieved. See <see cref="T:Fusee.Engine.Common.RenderState"/> for further information.</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">
+            pm;Value  + ((PolygonMode)pm) +  not handled
+            or
+            depFunc;Value  + ((DepthFunction)depFunc) +  not handled
+            or
+            renderState
+            </exception>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetRenderTarget(Fusee.Engine.Common.IWritableTexture,Fusee.Engine.Common.ITextureHandle)">
+            <summary>
+            Renders into the given texture.
+            </summary>
+            <param name="tex">The texture.</param>
+            <param name="texHandle">The texture handle, associated with the given texture. Should be created by the TextureManager in the RenderContext.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetRenderTarget(Fusee.Engine.Common.IWritableCubeMap,Fusee.Engine.Common.ITextureHandle)">
+            <summary>
+            Renders into the given cube map.
+            </summary>
+            <param name="tex">The texture.</param>
+            <param name="texHandle">The texture handle, associated with the given cube map. Should be created by the TextureManager in the RenderContext.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetRenderTarget(Fusee.Engine.Common.IRenderTarget,Fusee.Engine.Common.ITextureHandle[])">
+            <summary>
+            Renders into the given textures of the RenderTarget.
+            </summary>
+            <param name="renderTarget">The render target.</param>
+            <param name="texHandles">The texture handles, associated with the given textures. Each handle should be created by the TextureManager in the RenderContext.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.DetachTextureFromFbo(Fusee.Engine.Common.IRenderTarget,System.Boolean,System.Int32)">
+            <summary>
+            Detaches a texture from the frame buffer object, associated with the given render target.
+            </summary>
+            <param name="renderTarget">The render target.</param>
+            <param name="attachment">Number of the fbo attachment. For example: attachment = 1 will detach the texture currently associated with <see cref="F:Fusee.Engine.Imp.Graphics.WebAsm.WebGL2RenderingContextBase.COLOR_ATTACHMENT1"/>.</param>
+            <param name="isDepthTex">Determines if the texture is a depth texture. In this case the texture currently associated with <see cref="F:Fusee.Engine.Imp.Graphics.WebAsm.WebGLRenderingContextBase.DEPTH_ATTACHMENT"/> will be detached.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.AttacheTextureToFbo(Fusee.Engine.Common.IRenderTarget,System.Boolean,Fusee.Engine.Common.ITextureHandle,System.Int32)">
+            <summary>
+            Attaches a texture to the frame buffer object, associated with the given render target.
+            </summary>
+            <param name="renderTarget">The render target.</param>
+            <param name="attachment">Number of the fbo attachment. For example: attachment = 1 will attach the texture to <see cref="F:Fusee.Engine.Imp.Graphics.WebAsm.WebGL2RenderingContextBase.COLOR_ATTACHMENT1"/>.</param>
+            <param name="isDepthTex">Determines if the texture is a depth texture. In this case the texture is attached to <see cref="F:Fusee.Engine.Imp.Graphics.WebAsm.WebGLRenderingContextBase.DEPTH_ATTACHMENT"/>.</param>
+            <param name="texHandle">The gpu handle of the texture.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.Viewport(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Set the Viewport of the rendering output window by x,y position and width,height parameters.
+            The Viewport is the portion of the final image window.
+            </summary>
+            <param name="x">The x.</param>
+            <param name="y">The y.</param>
+            <param name="width">The width.</param>
+            <param name="height">The height.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.ColorMask(System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Enable or disable Color channels to be written to the frame buffer (final image).
+            Use this function as a color channel filter for the final image.
+            </summary>
+            <param name="red">if set to <c>true</c> [red].</param>
+            <param name="green">if set to <c>true</c> [green].</param>
+            <param name="blue">if set to <c>true</c> [blue].</param>
+            <param name="alpha">if set to <c>true</c> [alpha].</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.GetHardwareCapabilities(Fusee.Engine.Common.HardwareCapability)">
+            <summary>
+            Returns the capabilities of the underlying graphics hardware
+            </summary>
+            <param name="capability"></param>
+            <returns>uint</returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.GetHardwareDescription">
+            <summary>
+            Returns a human readable description of the underlying graphics hardware. This implementation reports GL_VENDOR, GL_RENDERER, GL_VERSION and GL_EXTENSIONS.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.DebugLine(Fusee.Math.Core.float3,Fusee.Math.Core.float3,Fusee.Math.Core.float4)">
+            <summary>
+            Draws a Debug Line in 3D Space by using a start and end point (float3).
+            </summary>
+            <param name="start">The starting point of the DebugLine.</param>
+            <param name="end">The endpoint of the DebugLine.</param>
+            <param name="color">The color of the DebugLine.</param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.GetPixelColor(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Retrieves a sub-image of the given region.
+            </summary>
+            <param name="x">The x value of the start of the region.</param>
+            <param name="y">The y value of the start of the region.</param>
+            <param name="w">The width to copy.</param>
+            <param name="h">The height to copy.</param>
+            <returns>The specified sub-image</returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.GetPixelDepth(System.Int32,System.Int32)">
+            <summary>
+            Retrieves the Z-value at the given pixel position.
+            </summary>
+            <param name="x">The x value.</param>
+            <param name="y">The y value.</param>
+            <returns>The Z value at (x, y).</returns>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.DetachTextureFromFbo(Fusee.Engine.Common.IRenderTarget,Fusee.Engine.Common.RenderTargetTextureTypes)">
+            <summary>
+            TODO: IMPLEMENT
+            </summary>
+            <param name="renderTarget"></param>
+            <param name="type"></param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.ReatatchTextureFromFbo(Fusee.Engine.Common.IRenderTarget,Fusee.Engine.Common.RenderTargetTextureTypes,Fusee.Engine.Common.ITextureHandle)">
+            <summary>
+            TODO: IMPLEMENT
+            </summary>
+            <param name="renderTarget"></param>
+            <param name="type"></param>
+            <param name="texHandle"></param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParam(Fusee.Engine.Common.IShaderParam,Fusee.Math.Core.float2[])">
+            <summary>
+            TODO: IMPLEMENT
+            </summary>
+            <param name="param"></param>
+            <param name="val"></param>
+        </member>
+        <member name="M:Fusee.Engine.Imp.Graphics.WebAsm.RenderContextImp.SetShaderParamTextureArray(Fusee.Engine.Common.IShaderParam,Fusee.Engine.Common.ITextureHandle[])">
+            <summary>
+            TODO: IMPLEMENT
+            </summary>
+            <param name="param"></param>
+            <param name="texIds"></param>
+        </member>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.ShaderParam">
+            <summary>
+            Implementation of the <see cref="T:Fusee.Engine.Common.IShaderParam" /> interface.
+            This object is passed to shader programs that are running on the graphics card to modify shader values.
+            </summary>
+        </member>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.TextureHandle">
+            <summary>
+            Opaque Texture Implementation for WebAsm.
+            </summary>
+        </member>
+        <member name="T:Fusee.Engine.Imp.Graphics.WebAsm.TexturePixelInfo">
+            <summary>
+            Type that sums up infos about the pixels OpenGl needs to create textures on the GPU.
+            </summary>
+        </member>
+        <member name="T:Fusee.Engine.Imp.WebAsm.AttributeImp">
+            <summary>
+            Contains a handle for any type of attribute buffer stored on GPU memory such as vertices, normals, uvs etc.
+            </summary>
+        </member>
+        <member name="T:Fusee.Engine.Imp.WebAsm.MeshImp">
+            <summary>
+            This is the implementation of the <see cref="T:Fusee.Engine.Common.IMeshImp" /> interface.
+            It is used to check the status of the informations of a mesh and flush informations if required.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.WebAsm.MeshImp.InvalidateVertices">
+            <summary>
+            Invalidates the vertices.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.WebAsm.MeshImp.VerticesSet">
+            <summary>
+            Gets a value indicating whether [vertices set].
+            </summary>
+            <value>
+              <c>true</c> if [vertices set]; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="M:Fusee.Engine.Imp.WebAsm.MeshImp.InvalidateNormals">
+            <summary>
+            Invalidates the normals.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.WebAsm.MeshImp.NormalsSet">
+            <summary>
+            Gets a value indicating whether [normals set].
+            </summary>
+            <value>
+              <c>true</c> if [normals set]; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="M:Fusee.Engine.Imp.WebAsm.MeshImp.InvalidateColors">
+            <summary>
+            Implementation Tasks: Invalidates the colors, e.g. reset the ColorBufferObject of this instance by setting it to 0.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.WebAsm.MeshImp.ColorsSet">
+            <summary>
+            Gets a value indicating whether [colors set].
+            </summary>
+            <value>
+              <c>true</c> if [colors set]; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Fusee.Engine.Imp.WebAsm.MeshImp.UVsSet">
+            <summary>
+            Gets a value indicating whether [u vs set].
+            </summary>
+            <value>
+              <c>true</c> if [u vs set]; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="M:Fusee.Engine.Imp.WebAsm.MeshImp.InvalidateUVs">
+            <summary>
+            Invalidates the UV's.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.WebAsm.MeshImp.BoneIndicesSet">
+            <summary>
+            Gets a value indicating whether [bone indices set].
+            </summary>
+            <value>
+              <c>true</c> if [bone indices set]; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Fusee.Engine.Imp.WebAsm.MeshImp.TangentsSet">
+            <summary>
+            Returns whether the tangents have been set.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.WebAsm.MeshImp.BiTangentsSet">
+            <summary>
+            Returns whether be bi-tangents have been set.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.WebAsm.MeshImp.InvalidateBoneIndices">
+            <summary>
+            Invalidates the BoneIndices.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.WebAsm.MeshImp.InvalidateTangents">
+            <summary>
+            Invalidates the Tangents.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.WebAsm.MeshImp.InvalidateBiTangents">
+            <summary>
+            Invalidates the BiTangents.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.WebAsm.MeshImp.BoneWeightsSet">
+            <summary>
+            Gets a value indicating whether [bone weights set].
+            </summary>
+            <value>
+              <c>true</c> if [bone weights set]; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="M:Fusee.Engine.Imp.WebAsm.MeshImp.InvalidateBoneWeights">
+            <summary>
+            Invalidates the BoneWeight's.
+            </summary>
+        </member>
+        <member name="M:Fusee.Engine.Imp.WebAsm.MeshImp.InvalidateTriangles">
+            <summary>
+            Invalidates the triangles.
+            </summary>
+        </member>
+        <member name="P:Fusee.Engine.Imp.WebAsm.MeshImp.TrianglesSet">
+            <summary>
+            Gets a value indicating whether [triangles set].
+            </summary>
+            <value>
+              <c>true</c> if [triangles set]; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Fusee.Engine.Imp.WebAsm.MeshImp.MeshType">
+            <summary>
+            Type of data of this mesh (e.g. Triangles, Points, Lines, etc.)
+            </summary>
+        </member>
+        <member name="T:Fusee.Engine.Imp.WebAsm.ShaderHandleImp">
+            <summary>
+            Implementation of <see cref="T:Fusee.Engine.Common.IShaderHandle" /> within WebAsm for WebGL.
+            </summary>
+        </member>
+    </members>
+</doc>

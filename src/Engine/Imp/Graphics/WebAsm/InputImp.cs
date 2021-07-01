@@ -1,10 +1,12 @@
 using Fusee.Base.Core;
+using Fusee.Base.Imp.WebAsm;
 using Fusee.Engine.Common;
 using Fusee.Math.Core;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WebAssembly;
+
 
 namespace Fusee.Engine.Imp.Graphics.WebAsm
 {
@@ -17,7 +19,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// Constructor. Use this in platform specific application projects.
         /// </summary>
         /// <param name="renderCanvas">The render canvas to provide mouse and keyboard input for.</param>
-        public RenderCanvasInputDriverImp(IRenderCanvasImp renderCanvas)
+        public RenderCanvasInputDriverImp(IRenderCanvasImp renderCanvas, IJSRuntime runtime)
         {
             if (renderCanvas == null)
                 throw new ArgumentNullException(nameof(renderCanvas));
@@ -29,15 +31,18 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             if (_canvas == null)
                 throw new ArgumentNullException(nameof(_canvas));
 
-            _keyboard = new KeyboardDeviceImp(_canvas);
-            _mouse = new MouseDeviceImp(_canvas);
-            _touch = new TouchDeviceImp(_canvas);
-            _gamePad = new GamePadDeviceImp(_window);
+            this.runtime = runtime;
+
+            _keyboard = new KeyboardDeviceImp(_canvas, runtime);
+            _mouse = new MouseDeviceImp(_canvas, runtime);
+            _touch = new TouchDeviceImp(_canvas, runtime);
+            _gamePad = new GamePadDeviceImp(this.runtime, _window);
         }
 
         // The WebGL canvas. Will be set in the c# constructor
-        internal JSObject _canvas;
-        internal JSObject _window;
+        internal IJSObjectReference _canvas;
+        internal IJSObjectReference _window;
+        internal IJSRuntime runtime;        
         private readonly KeyboardDeviceImp _keyboard;
         private readonly MouseDeviceImp _mouse;
         private readonly TouchDeviceImp _touch;
@@ -113,11 +118,12 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
     {
         private ButtonImpDescription _btnADesc, _btnXDesc, _btnYDesc, _btnBDesc, _btnStartDesc, _btnSelectDesc, _dpadUpDesc, _dpadDownDesc, _dpadLeftDesc, _dpadRightDesc, _btnLeftDesc, _btnRightDesc, _btnL3Desc, _btnR3Desc;
         private readonly int DeviceID;
+        private IJSRuntime runtime;
 
-        internal GamePadDeviceImp(JSObject _, int deviceID = 1)
+        internal GamePadDeviceImp(IJSRuntime runtime, IJSObjectReference _, int deviceID = 1)
         {
             DeviceID = deviceID;
-
+            this.runtime = runtime;
             _btnADesc = new ButtonImpDescription
             {
                 ButtonDesc = new ButtonDescription
@@ -255,28 +261,28 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             {
                 var Index = "0";
 
-                using (var navigator = (JSObject)Runtime.GetGlobalObject("navigator"))
+                using (var navigator = ((IJSInProcessRuntime)runtime).GetGlobalObject<IJSInProcessObjectReference>("navigator"))
                 {
-                    using var Gamepads = (JSObject)navigator.Invoke("getGamepads");
+                    var Gamepads = navigator.Invoke<IJSInProcessObjectReference[]>("getGamepads");
                     Diagnostics.Debug($"Trying to connect to {Gamepads.Length} gamepads:");
 
                     for (var i = 0; i < Gamepads.Length; i++)
                     {
-                        using var Gamepad = (JSObject)Gamepads.GetObjectProperty(i.ToString());
+                        using var Gamepad = Gamepads.GetObjectProperty<IJSInProcessObjectReference>(i.ToString());
                         //Checks if the connected gamepads are actual gamepads or just dummy connections.
                         if (Gamepad == null)
                             Diagnostics.Debug($"Gamepad {i} can not be accessed.");
                         if (Gamepad != null)
                         {
-                            var id = (string)Gamepad.GetObjectProperty("id");
+                            var id = Gamepad.GetObjectProperty<string>("id");
                             Diagnostics.Debug($"Gamepad {i}: ID={id}");
                         }
                     }
-                    using (var Gamepad = (JSObject)Gamepads.GetObjectProperty(DeviceID.ToString()))
+                    using (var Gamepad = Gamepads.GetObjectProperty<IJSInProcessObjectReference>(DeviceID.ToString()))
                     {
                         if (Gamepad != null)
                         {
-                            var _index = (string)Gamepad.GetObjectProperty("id");
+                            var _index = Gamepad.GetObjectProperty<string>("id");
                             {
                                 Index = _index;
                             }
@@ -414,23 +420,23 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <returns>A float value between -1 and 1 determining the offset of the axis.</returns>
         public float GetAxis(int iAxisId)
         {
-            JSObject _GamePad;
-            JSObject Axes;
-            using (var navigator = (JSObject)Runtime.GetGlobalObject("navigator"))
+            IJSInProcessObjectReference _GamePad;
+            IJSInProcessObjectReference Axes;
+            using (var navigator = runtime.GetGlobalObject<IJSInProcessObjectReference>("navigator"))
             {
-                using var Gamepads = (JSObject)navigator.Invoke("getGamepads");
-                using (_GamePad = (JSObject)Gamepads.GetObjectProperty(DeviceID.ToString()))
+                using var Gamepads = navigator.Invoke<IJSInProcessObjectReference>("getGamepads");
+                using (_GamePad = Gamepads.GetObjectProperty<IJSInProcessObjectReference>(DeviceID.ToString()))
                 {
                     if (_GamePad != null)
                     {
-                        using (Axes = (JSObject)_GamePad.GetObjectProperty("axes"))
+                        using (Axes = _GamePad.GetObjectProperty<IJSInProcessObjectReference>("axes"))
                         {
                             return iAxisId switch
                             {
-                                0 => (float)Axes.GetObjectProperty("[0]"),
-                                1 => (float)Axes.GetObjectProperty("[1]"),
-                                2 => (float)Axes.GetObjectProperty("[2]"),
-                                3 => (float)Axes.GetObjectProperty("[3]"),
+                                0 => Axes.GetObjectProperty<float>("[0]"),
+                                1 => Axes.GetObjectProperty<float>("[1]"),
+                                2 => Axes.GetObjectProperty<float>("[2]"),
+                                3 => Axes.GetObjectProperty<float>("[3]"),
                                 _ => throw new InvalidOperationException($"Unsupported axis {iAxisId}."),
                             };
                         }
@@ -447,32 +453,32 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <returns>A Boolean value determining whether the button is pressed or not.</returns>
         public bool GetButton(int iButtonId)
         {
-            JSObject _GamePad;
-            JSObject Buttons;
-            using (var navigator = (JSObject)Runtime.GetGlobalObject("navigator"))
-            using (var Gamepads = (JSObject)navigator.Invoke("getGamepads"))
-            using (_GamePad = (JSObject)Gamepads.GetObjectProperty(DeviceID.ToString()))
+            IJSInProcessObjectReference _GamePad;
+            IJSInProcessObjectReference Buttons;
+            using (var navigator = runtime.GetGlobalObject<IJSInProcessObjectReference>("navigator"))
+            using (var Gamepads = navigator.Invoke<IJSInProcessObjectReference>("getGamepads"))
+            using (_GamePad = Gamepads.GetObjectProperty<IJSInProcessObjectReference>(DeviceID.ToString()))
             {
                 if (_GamePad != null)
                 {
-                    using (Buttons = (JSObject)_GamePad.GetObjectProperty("buttons"))
+                    using (Buttons = _GamePad.GetObjectProperty<IJSInProcessObjectReference>("buttons"))
                     {
                         return iButtonId switch
                         {
-                            0 => ((int)Buttons.GetObjectProperty("[0]")) != 0,
-                            1 => ((int)Buttons.GetObjectProperty("[1]")) != 0,
-                            2 => ((int)Buttons.GetObjectProperty("[2]")) != 0,
-                            3 => ((int)Buttons.GetObjectProperty("[3]")) != 0,
-                            4 => ((int)Buttons.GetObjectProperty("[4]")) != 0,
-                            5 => ((int)Buttons.GetObjectProperty("[5]")) != 0,
-                            6 => ((int)Buttons.GetObjectProperty("[6]")) != 0,
-                            7 => ((int)Buttons.GetObjectProperty("[7]")) != 0,
-                            8 => ((int)Buttons.GetObjectProperty("[8]")) != 0,
-                            9 => ((int)Buttons.GetObjectProperty("[9]")) != 0,
-                            10 => ((int)Buttons.GetObjectProperty("[10]")) != 0,
-                            11 => ((int)Buttons.GetObjectProperty("[11]")) != 0,
-                            12 => ((int)Buttons.GetObjectProperty("[12]")) != 0,
-                            13 => ((int)Buttons.GetObjectProperty("[13]")) != 0,
+                            0 => (Buttons.GetObjectProperty<int>("[0]")) != 0,
+                            1 => (Buttons.GetObjectProperty<int>("[1]")) != 0,
+                            2 => (Buttons.GetObjectProperty<int>("[2]")) != 0,
+                            3 => (Buttons.GetObjectProperty<int>("[3]")) != 0,
+                            4 => (Buttons.GetObjectProperty<int>("[4]")) != 0,
+                            5 => (Buttons.GetObjectProperty<int>("[5]")) != 0,
+                            6 => (Buttons.GetObjectProperty<int>("[6]")) != 0,
+                            7 => (Buttons.GetObjectProperty<int>("[7]")) != 0,
+                            8 => (Buttons.GetObjectProperty<int>("[8]")) != 0,
+                            9 => (Buttons.GetObjectProperty<int>("[9]")) != 0,
+                            10 => (Buttons.GetObjectProperty<int>("[10]")) != 0,
+                            11 => (Buttons.GetObjectProperty<int>("[11]")) != 0,
+                            12 => (Buttons.GetObjectProperty<int>("[12]")) != 0,
+                            13 => (Buttons.GetObjectProperty<int>("[13]")) != 0,
                             _ => throw new InvalidOperationException($"Unsupported button {iButtonId}."),
                         };
                     }
@@ -494,9 +500,9 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
         private void ConnectCanvasEvents()
         {
-            using var document = (JSObject)Runtime.GetGlobalObject("document");
-            document.SetObjectProperty("onkeydown", new Action<JSObject>(evt => OnCanvasKeyDown((int)evt.GetObjectProperty("keyCode"))));
-            document.SetObjectProperty("onkeyup", new Action<JSObject>(evt => OnCanvasKeyUp((int)evt.GetObjectProperty("keyCode"))));
+            using var document = runtime.GetGlobalObject<IJSInProcessObjectReference>("document");
+            document.SetObjectProperty("onkeydown", new Action<IJSInProcessObjectReference>(evt => OnCanvasKeyDown(evt.GetObjectProperty<int>("keyCode"))));
+            document.SetObjectProperty("onkeyup", new Action<IJSInProcessObjectReference>(evt => OnCanvasKeyUp(evt.GetObjectProperty<int>("keyCode"))));
         }
         #endregion
 
@@ -523,8 +529,10 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// Should be called by the driver only.
         /// </summary>
         /// <param name="_">The JavaScript canvas.</param>
-        internal KeyboardDeviceImp(JSObject _)
+        internal KeyboardDeviceImp(IJSObjectReference _, IJSRuntime runtime)
         {
+            this.runtime = runtime;
+
             _keyDescriptions = new Dictionary<int, ButtonDescription>();
             var enumName = Enum.GetNames(typeof(KeyCodes)).GetEnumerator();
             var enumValue = Enum.GetValues(typeof(KeyCodes)).GetEnumerator();
@@ -536,6 +544,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
             ConnectCanvasEvents();
         }
+
+        private IJSRuntime runtime;
 
         /// <summary>
         /// Returns the number of Axes (==0, keyboard does not support any axes).
@@ -628,10 +638,10 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         #region JSExternals
         private void ConnectCanvasEvents()
         {
-            _canvas.SetObjectProperty("onmousedown", new Action<JSObject>(evt => OnCanvasMouseDown((int)evt.GetObjectProperty("button"))));
-            _canvas.SetObjectProperty("onmouseup", new Action<JSObject>(evt => OnCanvasMouseUp((int)evt.GetObjectProperty("button"))));
-            _canvas.SetObjectProperty("onmousemove", new Action<JSObject>(evt => OnCanvasMouseMove(new float2((int)evt.GetObjectProperty("offsetX"), (int)evt.GetObjectProperty("offsetY")))));
-            _canvas.SetObjectProperty("onwheel", new Action<JSObject>(evt => { evt.Invoke("preventDefault"); OnCanvasMouseWheel((int)evt.GetObjectProperty("deltaY")); }));
+            _canvas.SetObjectProperty("onmousedown", new Action<IJSInProcessObjectReference>(evt => OnCanvasMouseDown((int)evt.GetObjectProperty<int>("button"))));
+            _canvas.SetObjectProperty("onmouseup", new Action<IJSInProcessObjectReference>(evt => OnCanvasMouseUp(evt.GetObjectProperty<int>("button"))));
+            _canvas.SetObjectProperty("onmousemove", new Action<IJSInProcessObjectReference>(evt => OnCanvasMouseMove(new float2(evt.GetObjectProperty<float>("offsetX"), evt.GetObjectProperty<float>("offsetY")))));
+            _canvas.SetObjectProperty("onwheel", new Action<IJSInProcessObjectReference>(evt => { evt.InvokeVoid("preventDefault"); OnCanvasMouseWheel(evt.GetObjectProperty<float>("deltaY")); }));
 
             // TODO: Unify WHEEL values among browsers
             // var FU_is_edge = navigator.appVersion.toLowerCase().indexOf('edge') > -1;
@@ -657,14 +667,14 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
         private float GetWindowWidth()
         {
-            using var w = (JSObject)Runtime.GetGlobalObject("window");
-            return (int)w.GetObjectProperty("innerWidth");
+            using var w = _runtime.GetGlobalObject< IJSInProcessObjectReference>("window");
+            return w.GetObjectProperty<int>("innerWidth");
         }
 
         private float GetWindowHeight()
         {
-            using var w = (JSObject)Runtime.GetGlobalObject("window");
-            return (int)w.GetObjectProperty("innerHeight");
+            using var w = _runtime.GetGlobalObject<IJSInProcessObjectReference>("window");
+            return w.GetObjectProperty<int>("innerHeight");
         }
         #endregion
 
@@ -739,19 +749,25 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         }
         #endregion
 
-        private readonly JSObject _canvas;
+        private readonly IJSObjectReference _canvas;
+        private readonly IJSRuntime _runtime;
+        
         private ButtonImpDescription _btnLeftDesc, _btnRightDesc, _btnMiddleDesc;
         private AxisImpDescription _mouseXDesc, _mouseYDesc;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MouseDeviceImp" /> class.
         /// </summary>
         /// <param name="canvas">The (JavaScript) canvas object.</param>
-        public MouseDeviceImp(JSObject canvas)
+        public MouseDeviceImp(IJSObjectReference canvas, IJSRuntime runtime)
         {
+        
+
             _currentMouseWheel = 0;
 
             _canvas = canvas;
+            _runtime = runtime;
             ConnectCanvasEvents();
 
             _btnLeftDesc = new ButtonImpDescription
@@ -993,7 +1009,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         private readonly Dictionary<int, ButtonImpDescription> _tpButtonDescs;
         private readonly Dictionary<int, int> _activeTouchpoints;
         private readonly int _nTouchPointsSupported = 5;
-        private readonly JSObject _canvas;
+        private readonly IJSObjectReference _canvas;
 
         /// <summary>
         /// Converts the value of a touch point to float.
@@ -1015,62 +1031,62 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         #region JSExternals
         private void ConnectCanvasEvents()
         {
-            _canvas.Invoke("addEventListener", new object[] { "touchstart", new Action<JSObject>(
-                (JSObject evt) => {
-                    evt.Invoke("preventDefault");
-                    using var touches = (JSObject) evt.GetObjectProperty("changedTouches"); var nTouches = touches.Length;
+            ((IJSInProcessObjectReference)_canvas).InvokeVoid("addEventListener", new object[] { "touchstart", new Action<IJSInProcessObjectReference>(
+                (IJSInProcessObjectReference evt) => {
+                    evt.InvokeVoid("preventDefault");
+                    var touches = evt.GetObjectProperty<IJSInProcessObjectReference[]>("changedTouches"); var nTouches = touches.Length;
                         for (var i = 0; i < nTouches; i++)
                         {
-                            using var touch = (JSObject) touches.GetObjectProperty(i.ToString());
+                            using var touch = touches.GetObjectProperty<IJSInProcessObjectReference>(i.ToString());
                             OnCanvasTouchStart(
-                                (int)touch.GetObjectProperty("identifier"),
-                                P2F(touch.GetObjectProperty("pageX")),
-                                P2F(touch.GetObjectProperty("pageY")));
+                                touch.GetObjectProperty<int>("identifier"),
+                                P2F(touch.GetObjectProperty<object>("pageX")),
+                                P2F(touch.GetObjectProperty<object>("pageY")));
                         }
                 }
             )});
 
-            _canvas.Invoke("addEventListener", new object[] { "touchmove", new Action<JSObject>(
-                (JSObject evt) => {
-                    evt.Invoke("preventDefault");
-                    using var touches = (JSObject) evt.GetObjectProperty("changedTouches"); var nTouches = touches.Length;
+            ((IJSInProcessObjectReference)_canvas).InvokeVoid("addEventListener", new object[] { "touchmove", new Action<IJSInProcessObjectReference>(
+                (IJSInProcessObjectReference evt) => {
+                    evt.InvokeVoid("preventDefault");
+                    var touches = evt.GetObjectProperty<IJSInProcessObjectReference[]>("changedTouches"); var nTouches = touches.Length;
                         for (var i = 0; i < nTouches; i++)
                         {
-                            using var touch = (JSObject) touches.GetObjectProperty(i.ToString());
+                            using var touch = touches.GetObjectProperty<IJSInProcessObjectReference>(i.ToString());
                         OnCanvasTouchMove(
-                            (int)touch.GetObjectProperty("identifier"),
-                            P2F(touch.GetObjectProperty("pageX")),
-                            P2F(touch.GetObjectProperty("pageY")));
+                            touch.GetObjectProperty < int >("identifier"),
+                            P2F(touch.GetObjectProperty<object>("pageX")),
+                            P2F(touch.GetObjectProperty<object>("pageY")));
                         }
                 }
             )});
 
-            _canvas.Invoke("addEventListener", new object[] { "touchend", new Action<JSObject>(
-                (JSObject evt) => {
-                    evt.Invoke("preventDefault");
-                    using var touches = (JSObject) evt.GetObjectProperty("changedTouches"); var nTouches = touches.Length;
+            ((IJSInProcessObjectReference)_canvas).InvokeVoid("addEventListener", new object[] { "touchend", new Action<IJSInProcessObjectReference>(
+                (IJSInProcessObjectReference evt) => {
+                    evt.InvokeVoid("preventDefault");
+                    var touches = evt.GetObjectProperty<IJSInProcessObjectReference[]>("changedTouches"); var nTouches = touches.Length;
                         for (var i = 0; i < nTouches; i++)
                         {
-                            using var touch = (JSObject) touches.GetObjectProperty(i.ToString());
+                            using var touch = touches.GetObjectProperty<IJSInProcessObjectReference>(i.ToString());
                         OnCanvasTouchEnd(
-                            (int)touch.GetObjectProperty("identifier"),
-                            P2F(touch.GetObjectProperty("pageX")),
-                            P2F(touch.GetObjectProperty("pageY")));
+                            touch.GetObjectProperty<int>("identifier"),
+                            P2F(touch.GetObjectProperty<object>("pageX")),
+                            P2F(touch.GetObjectProperty<object>("pageY")));
                         }
                 }
             )});
 
-            _canvas.Invoke("addEventListener", new object[] { "touchcancel", new Action<JSObject>(
-                (JSObject evt) => {
-                    evt.Invoke("preventDefault");
-                    using var touches = (JSObject) evt.GetObjectProperty("changedTouches"); var nTouches = touches.Length;
+            ((IJSInProcessObjectReference)_canvas).InvokeVoid("addEventListener", new object[] { "touchcancel", new Action<IJSInProcessObjectReference>(
+                (IJSInProcessObjectReference evt) => {
+                    evt.InvokeVoid("preventDefault");
+                    var touches = evt.GetObjectProperty<IJSInProcessObjectReference[]>("changedTouches"); var nTouches = touches.Length;
                         for (var i = 0; i < nTouches; i++)
                         {
-                            using var touch = (JSObject) touches.GetObjectProperty(i.ToString());
+                            using var touch = touches.GetObjectProperty<IJSInProcessObjectReference>(i.ToString());
                         OnCanvasTouchCancel(
-                            (int)touch.GetObjectProperty("identifier"),
-                            P2F(touch.GetObjectProperty("pageX")),
-                            P2F(touch.GetObjectProperty("pageY")));
+                            touch.GetObjectProperty<int>("identifier"),
+                            P2F(touch.GetObjectProperty<object>("pageX")),
+                            P2F(touch.GetObjectProperty<object>("pageY")));
                         }
                 }
             )});
@@ -1079,14 +1095,14 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
         private float GetWindowWidth()
         {
-            using var w = (JSObject)Runtime.GetGlobalObject("window");
-            return (int)w.GetObjectProperty("innerWidth");
+            using var w = _runtime.GetGlobalObject<IJSInProcessObjectReference>("window");
+            return w.GetObjectProperty<int>("innerWidth");
         }
 
         private float GetWindowHeight()
         {
-            using var w = (JSObject)Runtime.GetGlobalObject("window");
-            return (int)w.GetObjectProperty("innerHeight");
+            using var w = _runtime.GetGlobalObject<IJSInProcessObjectReference>("window");
+            return w.GetObjectProperty<int>("innerHeight");
         }
         #endregion
 
@@ -1148,13 +1164,16 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         }
         #endregion
 
+        private readonly IJSRuntime _runtime;
+
         /// <summary>
         /// Implements a touch device for windows.
         /// </summary>
         /// <param name="canvas"></param>
-        public TouchDeviceImp(JSObject canvas)
+        public TouchDeviceImp(IJSObjectReference canvas, IJSRuntime runtime)
         {
             _canvas = canvas;
+            _runtime = runtime;
             ConnectCanvasEvents();
             _tpAxisDescs = new Dictionary<int, AxisImpDescription>((_nTouchPointsSupported * 2) + 5);
             _activeTouchpoints = new Dictionary<int, int>(_nTouchPointsSupported);

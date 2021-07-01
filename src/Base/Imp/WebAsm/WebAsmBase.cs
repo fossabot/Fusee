@@ -1,6 +1,6 @@
 ﻿using Fusee.Engine.Imp.Graphics.WebAsm;
 using Fusee.Math.Core;
-using WebAssembly;
+using Microsoft.JSInterop;
 
 namespace Fusee.Base.Imp.WebAsm
 {
@@ -22,7 +22,7 @@ namespace Fusee.Base.Imp.WebAsm
         /// <summary>
         /// The canvas itself, retrieved / created
         /// </summary>
-        protected JSObject canvas;
+        protected IJSObjectReference canvas;
 
         /// <summary>
         /// The current canvas width
@@ -39,20 +39,24 @@ namespace Fusee.Base.Imp.WebAsm
         /// </summary>
         public virtual bool EnableFullScreen => true;
 
+        public IJSRuntime runtime { get; private set; }
+
         /// <summary>
         /// This method generates the WebGL2 context
         /// </summary>
         /// <param name="canvas"></param>
+        /// <param name="runtime"></param>
         /// <param name="clearColor"></param>
-        public virtual void Init(JSObject canvas, float4 clearColor)
+        public virtual void Init(IJSObjectReference canvas, IJSRuntime runtime, float4 clearColor)
         {
             this.clearColor = clearColor;
             this.canvas = canvas;
+            this.runtime = runtime;
 
-            canvasWidth = (int)canvas.GetObjectProperty("width");
-            canvasHeight = (int)canvas.GetObjectProperty("height");
+            canvasWidth = canvas.GetObjectProperty<int>("width");
+            canvasHeight = canvas.GetObjectProperty<int>("height");
 
-            gl = new WebGL2RenderingContext(canvas, new WebGLContextAttributes
+            gl = new WebGL2RenderingContext(canvas, runtime, new WebGLContextAttributes
             {
                 Alpha = true,
                 Antialias = true,
@@ -76,6 +80,7 @@ namespace Fusee.Base.Imp.WebAsm
         /// <param name="elapsedMilliseconds"></param>
         public virtual void Update(double elapsedMilliseconds)
         {
+
         }
 
         /// <summary>

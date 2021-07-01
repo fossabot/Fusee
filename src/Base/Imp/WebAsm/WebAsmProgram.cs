@@ -1,6 +1,7 @@
 ﻿using Fusee.Math.Core;
+using Microsoft.JSInterop;
 using System;
-using WebAssembly;
+
 
 namespace Fusee.Base.Imp.WebAsm
 {
@@ -12,7 +13,8 @@ namespace Fusee.Base.Imp.WebAsm
         private static readonly float4 CanvasColor = new float4(255, 0, 255, 255);
         private static readonly Action<double> loop = new Action<double>(Loop);
         private static double previousMilliseconds;
-        private static JSObject window;
+        private static IJSObjectReference window;
+        private static IJSRuntime Runtime;
 
         private static string divCanvasName;
         private static string canvasName;
@@ -22,13 +24,16 @@ namespace Fusee.Base.Imp.WebAsm
         /// <summary>
         /// Starts the WASM program
         /// </summary>
+        /// <param name="runtime"></param>
         /// <param name="wasm"></param>
-        public static void Start(WebAsmBase wasm)
+        public static void Start(WebAsmBase wasm, IJSRuntime runtime)
         {
+            Runtime = runtime;
+
             // Let's first check if we can continue with WebGL2 instead of crashing.
             if (!IsBrowserSupportsWebGL2())
             {
-                HtmlHelper.AddParagraph("We are sorry, but your browser does not seem to support WebGL2.");
+                HtmlHelper.AddParagraph(wasm.runtime, "We are sorry, but your browser does not seem to support WebGL2.");
                 return;
             }
 
@@ -38,13 +43,13 @@ namespace Fusee.Base.Imp.WebAsm
             divCanvasName = "div_canvas";
             canvasName = "canvas";
 
-            using (var window = (JSObject)Runtime.GetGlobalObject("window"))
+            using (var window = Runtime.GetGlobalObject<IJSInProcessObjectReference>("window"))
             {
-                var windowWidth = (int)window.GetObjectProperty("innerWidth");
-                var windowHeight = (int)window.GetObjectProperty("innerHeight");
+                var windowWidth = window.GetObjectProperty<int>("innerWidth");
+                var windowHeight = window.GetObjectProperty<int>("innerHeight");
 
-                using var canvas = HtmlHelper.AddCanvas(divCanvasName, canvasName, windowWidth, windowHeight);
-                mainExecutable.Init(canvas, CanvasColor);
+                using var canvas = (IJSInProcessObjectReference)HtmlHelper.AddCanvas(wasm.runtime, divCanvasName, canvasName, windowWidth, windowHeight);
+                mainExecutable.Init(canvas, Runtime, CanvasColor);
                 mainExecutable.Run();
             }
 
@@ -56,18 +61,18 @@ namespace Fusee.Base.Imp.WebAsm
 
         private static void AddResizeHandler()
         {
-            using var window = (JSObject)Runtime.GetGlobalObject("window");
-            window.Invoke("addEventListener", "resize", new Action<JSObject>((o) =>
+            using var window = Runtime.GetGlobalObject<IJSInProcessObjectReference>("window");
+            window.InvokeVoid("addEventListener", "resize", new Action<IJSInProcessObjectReference>((o) =>
             {
-                using (var d = (JSObject)Runtime.GetGlobalObject("document"))
-                using (var w = (JSObject)Runtime.GetGlobalObject("window"))
+                using (var d = Runtime.GetGlobalObject<IJSInProcessObjectReference>("document"))
+                using (var w = Runtime.GetGlobalObject<IJSInProcessObjectReference>("window"))
                 {
-                    var canvasObject = (JSObject)d.Invoke("getElementById", canvasName);
+                    using var canvasObject = d.Invoke<IJSInProcessObjectReference>("getElementById", canvasName);
 
-                    var windowWidth = (int)w.GetObjectProperty("innerWidth");
-                    var windowHeight = (int)w.GetObjectProperty("innerHeight");
+                    var windowWidth = w.GetObjectProperty<int>("innerWidth");
+                    var windowHeight = w.GetObjectProperty<int>("innerHeight");
 
-                    var cobj = (string)canvasObject.GetObjectProperty("id");
+                    var cobj = canvasObject.GetObjectProperty<string>("id");
 
                     canvasObject.SetObjectProperty("width", windowWidth);
                     canvasObject.SetObjectProperty("height", windowHeight);
@@ -79,44 +84,42 @@ namespace Fusee.Base.Imp.WebAsm
             }), false);
         }
 
-        private static void RequestFullscreen(JSObject canvas)
+        private static void RequestFullscreen(IJSInProcessObjectReference canvas)
         {
-            if (canvas.GetObjectProperty("requestFullscreen") != null)
-                canvas.Invoke("requestFullscreen");
-            if (canvas.GetObjectProperty("webkitRequestFullscreen") != null)
-                canvas.Invoke("webkitRequestFullscreen");
-            if (canvas.GetObjectProperty("msRequestFullscreen") != null)
-                canvas.Invoke("msRequestFullscreen");
+            if (canvas.GetObjectProperty<IJSInProcessObjectReference>("requestFullscreen") != null)
+                canvas.InvokeVoid("requestFullscreen");
+            if (canvas.GetObjectProperty<IJSInProcessObjectReference>("webkitRequestFullscreen") != null)
+                canvas.InvokeVoid("webkitRequestFullscreen");
+            if (canvas.GetObjectProperty<IJSInProcessObjectReference>("msRequestFullscreen") != null)
+                canvas.InvokeVoid("msRequestFullscreen");
 
         }
 
         private static void AddEnterFullScreenHandler()
         {
-            using (var canvas = (JSObject)Runtime.GetGlobalObject(canvasName))
-            {
-                canvas.Invoke("addEventListener", "dblclick", new Action<JSObject>((o) =>
-                {
-                    using (var d = (JSObject)Runtime.GetGlobalObject("document"))
-                    {
-                        var canvasObject = (JSObject)d.Invoke("getElementById", canvasName);
+            using var canvas = Runtime.GetGlobalObject<IJSInProcessObjectReference>(canvasName);
+            canvas.InvokeVoid("addEventListener", "dblclick", new Action<IJSInProcessObjectReference>((o) =>
+           {
+               using (var d = Runtime.GetGlobalObject<IJSInProcessObjectReference>("document"))
+               {
+                   var canvasObject = d.Invoke<IJSInProcessObjectReference>("getElementById", canvasName);
 
-                        RequestFullscreen(canvasObject);
+                   RequestFullscreen(canvasObject);
 
-                        var width = (int)canvasObject.GetObjectProperty("clientWidth");
-                        var height = (int)canvasObject.GetObjectProperty("clientHeight");
+                   var width = canvasObject.GetObjectProperty<int>("clientWidth");
+                   var height = canvasObject.GetObjectProperty<int>("clientHeight");
 
-                        SetNewCanvasSize(canvasObject, width, height);
+                   SetNewCanvasSize(canvasObject, width, height);
 
                         // call fusee resize
                         mainExecutable.Resize(width, height);
-                    }
+               }
 
-                    o.Dispose();
-                }), false);
-            }
+               o.Dispose();
+           }), false);
         }
 
-        private static void SetNewCanvasSize(JSObject canvasObject, int newWidth, int newHeight)
+        private static void SetNewCanvasSize(IJSInProcessObjectReference canvasObject, int newWidth, int newHeight)
         {
             canvasObject.SetObjectProperty("width", newWidth);
             canvasObject.SetObjectProperty("height", newHeight);
@@ -138,21 +141,21 @@ namespace Fusee.Base.Imp.WebAsm
         {
             if (window == null)
             {
-                window = (JSObject)Runtime.GetGlobalObject();
+                window = Runtime.GetGlobalObject<IJSObjectReference>("window");
             }
 
-            window.Invoke("requestAnimationFrame", loop);
+            ((IJSInProcessObjectReference)window).InvokeVoid("requestAnimationFrame", loop);
         }
 
         private static bool IsBrowserSupportsWebGL2()
         {
             if (window == null)
             {
-                window = (JSObject)Runtime.GetGlobalObject();
+                window = Runtime.GetGlobalObject<IJSObjectReference>("window");
             }
 
             // This is a very simple check for WebGL2 support.
-            return window.GetObjectProperty("WebGL2RenderingContext") != null;
+            return window.GetObjectProperty<IJSObjectReference>("WebGL2RenderingContext") != null;
         }
     }
 
@@ -164,26 +167,27 @@ namespace Fusee.Base.Imp.WebAsm
         /// <summary>
         /// Creates an attaches a canvas to the HTML page
         /// </summary>
+        /// <param name="runtime"></param>
         /// <param name="divId"></param>
         /// <param name="canvasId"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns></returns>
-        public static JSObject AddCanvas(string divId, string canvasId, int width = 800, int height = 600)
+        public static IJSObjectReference AddCanvas(IJSRuntime runtime, string divId, string canvasId, int width = 800, int height = 600)
         {
-            using var document = (JSObject)Runtime.GetGlobalObject("document");
-            using var body = (JSObject)document.GetObjectProperty("body");
-            var canvas = (JSObject)document.Invoke("createElement", "canvas");
+            using var document = runtime.GetGlobalObject<IJSInProcessObjectReference>("document");
+            using var body = document.GetObjectProperty<IJSInProcessObjectReference>("body");
+            var canvas = document.Invoke<IJSInProcessObjectReference>("createElement", "canvas");
             canvas.SetObjectProperty("width", width);
             canvas.SetObjectProperty("height", height);
             canvas.SetObjectProperty("id", canvasId);
 
-            using (var canvasDiv = (JSObject)document.Invoke("createElement", "div"))
+            using (var canvasDiv = document.Invoke<IJSInProcessObjectReference>("createElement", "div"))
             {
                 canvasDiv.SetObjectProperty("id", divId);
-                canvasDiv.Invoke("appendChild", canvas);
+                canvasDiv.InvokeVoid("appendChild", canvas);
 
-                body.Invoke("appendChild", canvasDiv);
+                body.InvokeVoid("appendChild", canvasDiv);
             }
 
             return canvas;
@@ -192,14 +196,15 @@ namespace Fusee.Base.Imp.WebAsm
         /// <summary>
         /// Adds a paragraph to the current HTML page
         /// </summary>
+        /// <param name="runtime"
         /// <param name="text"></param>
-        public static void AddParagraph(string text)
+        public static void AddParagraph(IJSRuntime runtime, string text)
         {
-            using var document = (JSObject)Runtime.GetGlobalObject("document");
-            using var body = (JSObject)document.GetObjectProperty("body");
-            using var paragraph = (JSObject)document.Invoke("createElement", "p");
+            using var document = runtime.GetGlobalObject<IJSInProcessObjectReference>("document");
+            using var body = document.GetObjectProperty<IJSInProcessObjectReference>("body");
+            using var paragraph = document.Invoke<IJSInProcessObjectReference>("createElement", "p");
             paragraph.SetObjectProperty("innerHTML", text);
-            body.Invoke("appendChild", paragraph);
+            body.InvokeVoid("appendChild", paragraph);
         }
     }
 }
