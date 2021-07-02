@@ -15,6 +15,11 @@
         <DocumentationFile>$(OutputPath)\$(RootNamespace).xml</DocumentationFile>
     </PropertyGroup>
 
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="$(FuseeEngineRoot)\src\Math\Core\Fusee.Math.Core.csproj">
             <PrivateAssets>analyzers</PrivateAssets>
@@ -32,9 +37,9 @@
             <PrivateAssets>analyzers</PrivateAssets>
         </ProjectReference>
 
-        <!--<Reference Include="SharpFontManaged">
+       <Reference Include="SharpFontManaged">
             <HintPath>$(FuseeEngineRoot)\ext\SharpFontManaged\$(Configuration)\SharpFontManaged.dll</HintPath>
-        </Reference>-->
+        </Reference>
 
     </ItemGroup>
 </Project>

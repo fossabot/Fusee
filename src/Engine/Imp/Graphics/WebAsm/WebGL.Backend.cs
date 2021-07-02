@@ -315,19 +315,54 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         public new bool IsSupported => CheckWindowPropertyExists(WindowPropertyName);
 
         public void TexImage2D(
-            uint target,
-            int level,
-            int internalformat,
-            int width,
-            int height,
-            int border,
-            uint format,
-            uint type,
-            ReadOnlySpan<byte> source)
+         uint target,
+         int level,
+         int internalformat,
+         int width,
+         int height,
+         int border,
+         uint format,
+         uint type,
+         IntPtr source)
         {
-            // TODO(MR): managed to native via javscript (implement & test)
-            //using var nativeArray = Uint8Array.From(source);
-            TexImage2D(target, level, internalformat, width, height, border, format, type, source);
+            //// TODO(MR): managed to native via javscript (implement & test)
+            ////using var nativeArray = Uint8Array.From(source);
+            GLTexImage2D(target, level, internalformat, width, height, border, format, type, source);
+
+        }
+
+        //public void TexImage2D(
+        //  uint target,
+        //  int level,
+        //  int internalformat,
+        //  int width,
+        //  int height,
+        //  int border,
+        //  uint format,
+        //  uint type,
+        //  ReadOnlySpan<byte> source)
+        //{
+        //  //// TODO(MR): managed to native via javscript (implement & test)
+        //  ////using var nativeArray = Uint8Array.From(source);
+        //  GLTexImage2D(target, level, internalformat, width, height, border, format, type, source.ToArray());
+    
+        //}
+
+        public void TexImage2D(
+          uint target,
+          int level,
+          int internalformat,
+          int width,
+          int height,
+          int border,
+          uint format,
+          uint type,
+          Array source)
+        {
+            //// TODO(MR): managed to native via javscript (implement & test)
+            ////using var nativeArray = Uint8Array.From(source);
+            GLTexImage2D(target, level, internalformat, width, height, border, format, type, source);
+
         }
 
         public void TexImage3D(
@@ -340,11 +375,11 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             int border,
             uint format,
             uint type,
-            ReadOnlySpan<byte> source)
+            Array source)
         {
             // TODO(MR): managed to native via javscript (implement & test)
             //using var nativeArray = Uint8Array.From(source);
-            TexImage3D(target, level, internalformat, width, height, depth, border, format, type, source);
+            GLTexImage3D(target, level, internalformat, width, height, depth, border, format, type, source);
         }
 
         public void TexSubImage3D(
@@ -358,7 +393,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             int depth,
             uint format,
             uint type,
-            ReadOnlySpan<byte> source)
+            Array source)
         {
             // TODO(MR): managed to native via javscript (implement & test)
             //using var nativeArray = Uint8Array.From(source);
@@ -385,11 +420,11 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             int height,
             uint format,
             uint type,
-            ReadOnlySpan<byte> source)
+            Array source)
         {
             // TODO(MR): managed to native via javscript (implement & test)
             //using var nativeArray = Uint8Array.From(source);
-            TexSubImage2D(
+            GLTexSubImage2D(
                 target,
                 level,
                 xoffset,

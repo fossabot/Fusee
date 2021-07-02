@@ -5,13 +5,22 @@ using Fusee.Engine.Core;
 using Fusee.Engine.Core.Scene;
 using Fusee.Engine.Imp.Graphics.WebAsm;
 using Fusee.Serialization;
+using ProtoBuf;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using SixLabors.ImageSharp.Advanced;
 
 using Path = System.IO.Path;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Fusee.Examples.Simple.Blazor
 {
@@ -37,13 +46,13 @@ namespace Fusee.Examples.Simple.Blazor
             fap.RegisterTypeHandler(
                 new AssetHandler
                 {
-                    ReturnedType = typeof(Font),
+                    ReturnedType = typeof(Base.Core.Font),
                     Decoder = (_, __) => throw new NotImplementedException("Non-async decoder isn't supported in WebAsmBuilds"),
                     DecoderAsync = async (string id, object storage) =>
                     {
                         if (Path.GetExtension(id).IndexOf("ttf", System.StringComparison.OrdinalIgnoreCase) >= 0)
                         {
-                            var font = new Font
+                            var font = new Base.Core.Font
                             {
                                 _fontImp = await Task.Factory.StartNew(() => new FontImp((Stream)storage)).ConfigureAwait(false)
                             };
@@ -66,10 +75,10 @@ namespace Fusee.Examples.Simple.Blazor
                     Decoder = (_, __) => throw new NotImplementedException("Non-async decoder isn't supported in WebAsmBuilds"),
                     DecoderAsync = async (string id, object storage) =>
                     {
-                        //if (Path.GetExtension(id).IndexOf("fus", System.StringComparison.OrdinalIgnoreCase) >= 0)
-                        //{
-                            //return await Task.Factory.StartNew(() => FusSceneConverter.ConvertFrom(Serializer.Deserialize<FusFile>((Stream)storage)));
-                        //}
+                        if (Path.GetExtension(id).IndexOf("fus", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            return await Task.Factory.StartNew(() => FusSceneConverter.ConvertFrom(Serializer.Deserialize<FusFile>((Stream)storage)));
+                        }
                         return null;
                     },
                     Checker = (string id) =>
@@ -85,78 +94,61 @@ namespace Fusee.Examples.Simple.Blazor
                 Decoder = (_, __) => throw new NotImplementedException("Non-async decoder isn't supported in WebAsmBuilds"),
                 DecoderAsync = async (string id, object storage) =>
                 {
-                    //var ext = Path.GetExtension(id).ToLower();
-                    //switch (ext)
-                    //{
-                    //    case ".png":
-                    //    case ".bmp":
-                    //        using (var bitmap = await Task<SKBitmap>.Factory.StartNew(() => SKBitmap.Decode((Stream)storage)))
-                    //        {
-                    //            var rotated = new SKBitmap(bitmap.Width, bitmap.Height, true);
+                    var ext = Path.GetExtension(id).ToLower();
+                    using var image = await Image.LoadAsync<Rgba32>((Stream)storage);
+                    image.Mutate(x => x.AutoOrient());
 
-                    //            using (var surface = new SKCanvas(rotated))
-                    //            {
-                    //                surface.Clear();
-                    //                surface.Scale(1, -1, 0, bitmap.Height / 2.0f); // this mirrors the image within its x-axis
-                    //                surface.DrawBitmap(bitmap, 0, 0);
-                    //            }
+                    var ret = new ImageData(ReadPixels(image), image.Width, image.Height,
+                            new ImagePixelFormat(ColorFormat.RGBA));
 
-                    //            var img = new Base.Core.ImageData(rotated.Width, rotated.Height)
-                    //            {
-                    //                PixelData = rotated.Bytes
-                    //            };
+                    return ret;
 
-                    //            ((Stream)storage).Close();
-
-                    //            return img;
-                    //        }
-                    //}
-                    return null;
+                    // inner method to prevent Span<T> inside async method error
+                    static byte[] ReadPixels(Image<Rgba32> image)
+                    {                        
+                        image.TryGetSinglePixelSpan(out var res);
+                        var resBytes = MemoryMarshal.AsBytes<Rgba32>(res.ToArray());
+                        return resBytes.ToArray();
+                    };
                 },
                 Checker = (string id) =>
                 {
                     var ext = Path.GetExtension(id).ToLower();
-                    switch (ext)
-                    {
-                        case ".png":
-                        case ".bmp":
-                            return true;
-                    }
-                    return false;
+                    return true;
                 }
-            });
+});
 
-            AssetStorage.RegisterProvider(fap);
+AssetStorage.RegisterProvider(fap);
 
-            #endregion
+#endregion
 
-            _app = new Core.Simple();
+_app = new Core.Simple();
 
-            // Inject Fusee.Engine InjectMe dependencies (hard coded)
-            _canvasImp = new RenderCanvasImp(canvas, Runtime, gl, canvasWidth, canvasHeight);
-            _app.CanvasImplementor = _canvasImp;
-            _app.ContextImplementor = new RenderContextImp(_app.CanvasImplementor);
-            Input.AddDriverImp(new RenderCanvasInputDriverImp(_app.CanvasImplementor, Runtime));
+// Inject Fusee.Engine InjectMe dependencies (hard coded)
+_canvasImp = new RenderCanvasImp(canvas, Runtime, gl, canvasWidth, canvasHeight);
+_app.CanvasImplementor = _canvasImp;
+_app.ContextImplementor = new RenderContextImp(_app.CanvasImplementor);
+Input.AddDriverImp(new RenderCanvasInputDriverImp(_app.CanvasImplementor, Runtime));
 
-            // Start the app
-            _app.Run();
+// Start the app
+_app.Run();
         }
 
         public override void Update(double elapsedMilliseconds)
-        {
-            if (_canvasImp != null)
-                _canvasImp.DeltaTime = (float)(elapsedMilliseconds / 1000.0);
-        }
+{
+    if (_canvasImp != null)
+        _canvasImp.DeltaTime = (float)(elapsedMilliseconds / 1000.0);
+}
 
-        public override void Draw()
-        {
-            _canvasImp?.DoRender();
-        }
+public override void Draw()
+{
+    _canvasImp?.DoRender();
+}
 
-        public override void Resize(int width, int height)
-        {
-            base.Resize(width, height);
-            _canvasImp.DoResize(width, height);
-        }
+public override void Resize(int width, int height)
+{
+    base.Resize(width, height);
+    _canvasImp.DoResize(width, height);
+}
     }
 }

@@ -21,6 +21,8 @@
         <PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="6.0.0-preview.5.21301.17" />
         
         <PackageReference Include="Mono.WebAssembly.Interop" Version="5.0.0-preview.4.20257.10" />
+        
+        <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
     </ItemGroup>
 
     <ItemGroup>
@@ -28,7 +30,6 @@
       <ProjectReference Include="..\..\..\..\..\src\Engine\Imp\Graphics\WebAsm\Fusee.Engine.Imp.Graphics.WebAsm.csproj" />
       <ProjectReference Include="..\..\Core\Fusee.Examples.Simple.Core.csproj" />
     </ItemGroup>
-
 
     <ItemGroup>
         <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />

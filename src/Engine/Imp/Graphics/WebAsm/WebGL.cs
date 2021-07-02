@@ -1281,12 +1281,12 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("stencilOpSeparate", face, fail, zfail, zpass);
         }
 
-        public void TexImage2D(uint target, int level, uint internalformat, int width, int height, int border, uint format, uint type, Memory<byte> pixels)
+        public void GLTexImage2D(uint target, int level, uint internalformat, int width, int height, int border, uint format, uint type, Memory<byte> pixels)
         {
             Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, pixels);
         }
 
-        public void TexImage2D(uint target, int level, uint internalformat, uint format, uint type, object source)
+        public void GLTexImage2D(uint target, int level, uint internalformat, uint format, uint type, object source)
         {
             Invoke("texImage2D", target, level, internalformat, format, type, source);
         }
@@ -1301,12 +1301,12 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("texParameteri", target, pname, param);
         }
 
-        public void TexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, Memory<byte> pixels)
+        public void GLTexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, Array pixels)
         {
             Invoke("texSubImage2D", target, level, xoffset, yoffset, width, height, format, type, pixels);
         }
 
-        public void TexSubImage2D(uint target, int level, int xoffset, int yoffset, uint format, uint type, object source)
+        public void GLTexSubImage2D(uint target, int level, int xoffset, int yoffset, uint format, uint type, object source)
         {
             Invoke("texSubImage2D", target, level, xoffset, yoffset, format, type, source);
         }
@@ -2127,52 +2127,52 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("texStorage3D", target, levels, internalformat, width, height, depth);
         }
 
-        public void TexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, uint pboOffset)
+        public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, uint pboOffset)
         {
             Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, pboOffset);
         }
 
-        public void TexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, object source)
+        public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, object source)
         {
             Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, source);
         }
 
-        public void TexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, Memory<byte> srcData, uint srcOffset)
+        public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, Memory<byte> srcData, uint srcOffset)
         {
-            Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, srcData, srcOffset);
+            Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, srcData.ToArray(), srcOffset);
         }
 
-        public void TexImage3D(uint target, int level, int internalformat, int width, int height, int depth, int border, uint format, uint type, uint pboOffset)
+        public void GLTexImage3D(uint target, int level, int internalformat, int width, int height, int depth, int border, uint format, uint type, uint pboOffset)
         {
             Invoke("texImage3D", target, level, internalformat, width, height, depth, border, format, type, pboOffset);
         }
 
-        public void TexImage3D(uint target, int level, int internalformat, int width, int height, int depth, int border, uint format, uint type, object source)
+        public void GLTexImage3D(uint target, int level, int internalformat, int width, int height, int depth, int border, uint format, uint type, object source)
         {
             Invoke("texImage3D", target, level, internalformat, width, height, depth, border, format, type, source);
         }
 
-        public void TexImage3D(uint target, int level, int internalformat, int width, int height, int depth, int border, uint format, uint type, Memory<byte> srcData)
+        public void GLTexImage3D(uint target, int level, int internalformat, int width, int height, int depth, int border, uint format, uint type, Memory<byte> srcData)
         {
-            Invoke("texImage3D", target, level, internalformat, width, height, depth, border, format, type, srcData);
+            Invoke("texImage3D", target, level, internalformat, width, height, depth, border, format, type, srcData.ToArray());
         }
 
-        public void TexImage3D(uint target, int level, int internalformat, int width, int height, int depth, int border, uint format, uint type, Memory<byte> srcData, uint srcOffset)
+        public void GLTexImage3D(uint target, int level, int internalformat, int width, int height, int depth, int border, uint format, uint type, Memory<byte> srcData, uint srcOffset)
         {
-            Invoke("texImage3D", target, level, internalformat, width, height, depth, border, format, type, srcData, srcOffset);
+            Invoke("texImage3D", target, level, internalformat, width, height, depth, border, format, type, srcData.ToArray(), srcOffset);
         }
 
-        public void TexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, uint pboOffset)
+        public void GLTexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, uint pboOffset)
         {
             Invoke("texSubImage2D", target, level, xoffset, yoffset, width, height, format, type, pboOffset);
         }
 
-        public void TexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, object source)
+        public void GLTexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, object source)
         {
             Invoke("texSubImage2D", target, level, xoffset, yoffset, width, height, format, type, source);
         }
 
-        public void TexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, Memory<byte> srcData, uint srcOffset)
+        public void GLTexSubImage2D(uint target, int level, int xoffset, int yoffset, int width, int height, uint format, uint type, Array srcData, uint srcOffset)
         {
             Invoke("texSubImage2D", target, level, xoffset, yoffset, width, height, format, type, srcData, srcOffset);
         }

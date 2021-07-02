@@ -154,49 +154,49 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                 case ColorFormat.RGBA:
                     internalFormat = RGBA;
                     format = RGBA;
-                    pxType = UNSIGNED_BYTE;
+                    pxType = UNSIGNED_SHORT_4_4_4_4;
                     break;
-                case ColorFormat.RGB:
-                    internalFormat = RGB;
-                    format = RGB;
-                    pxType = UNSIGNED_BYTE;
-                    break;
-                // TODO: Handle Alpha-only / Intensity-only and AlphaIntensity correctly.
+                //case ColorFormat.RGB:
+                //    internalFormat = RGB;
+                //    format = RGB;
+                //    pxType = UNSIGNED_BYTE;
+                //    break;
+                //// TODO: Handle Alpha-only / Intensity-only and AlphaIntensity correctly.
                 case ColorFormat.Intensity:
                     internalFormat = ALPHA;
                     format = ALPHA;
                     pxType = UNSIGNED_BYTE;
                     break;
-                case ColorFormat.Depth24:
-                    internalFormat = DEPTH_COMPONENT24;
-                    format = DEPTH_COMPONENT;
-                    pxType = FLOAT;
-                    break;
-                case ColorFormat.Depth16:
-                    internalFormat = DEPTH_COMPONENT16;
-                    format = DEPTH_COMPONENT;
-                    pxType = FLOAT;
-                    break;
-                case ColorFormat.uiRgb8:
-                    internalFormat = RGBA8UI;
-                    format = RGBA;
-                    pxType = UNSIGNED_BYTE;
-
-                    break;
-                case ColorFormat.fRGB32:
-                    internalFormat = RGB32F;
-                    format = RGB;
-                    pxType = FLOAT;
-
-                    break;
-                case ColorFormat.fRGB16:
-                    internalFormat = RGB16F;
-                    format = RGB;
-                    pxType = FLOAT;
-
-                    break;
+                //case ColorFormat.Depth24:
+                //    internalFormat = DEPTH_COMPONENT24;
+                //    format = DEPTH_COMPONENT;
+                //    pxType = FLOAT;
+                //    break;
+                //case ColorFormat.Depth16:
+                //    internalFormat = DEPTH_COMPONENT16;
+                //    format = DEPTH_COMPONENT;
+                //    pxType = FLOAT;
+                //    break;
+                //case ColorFormat.uiRgb8:
+                //    internalFormat = RGBA8UI;
+                //    format = RGBA;
+                //    pxType = UNSIGNED_BYTE;
+                //
+                //    break;
+                //case ColorFormat.fRGB32:
+                //    internalFormat = RGB32F;
+                //    format = RGB;
+                //    pxType = FLOAT;
+                //
+                //    break;
+                //case ColorFormat.fRGB16:
+                //    internalFormat = RGB16F;
+                //    format = RGB;
+                //    pxType = FLOAT;
+                //
+                //    break;
                 default:
-                    throw new ArgumentOutOfRangeException("CreateTexture: Image pixel format not supported");
+                    throw new ArgumentOutOfRangeException($"CreateTexture: Image pixel format not supported {tex.PixelFormat.ColorFormat}");
             }
 
             return new TexturePixelInfo()
@@ -289,10 +289,10 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
             //var imageData = gl2.CastNativeArray(img.PixelData);
             // TODO(MR): Add native C# to javascript interop
-            gl2.TexImage2D(TEXTURE_2D, 0, pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, img.PixelData);
+            gl2.TexImage2D(TEXTURE_2D, 0, (int)pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, img.PixelData);
 
-            if (img.DoGenerateMipMaps)
-                gl2.GenerateMipmap(TEXTURE_2D);
+            //if (img.DoGenerateMipMaps)
+            //    gl2.GenerateMipmap(TEXTURE_2D);
 
             gl2.TexParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, magFilter);
             gl2.TexParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, minFilter);
@@ -322,9 +322,9 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             var glWrapMode = GetWrapMode(img.WrapMode);
             var pxInfo = GetTexturePixelInfo(img);
 
-            var imgData = GetEmptyArray(img);
+            //var imgData = GetEmptyArray(img);
 
-            gl2.TexImage2D(TEXTURE_2D, 0, (int)pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, imgData);
+            gl2.TexImage2D(TEXTURE_2D, 0, (int)pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, IntPtr.Zero);
 
             if (img.DoGenerateMipMaps)
                 gl2.GenerateMipmap(TEXTURE_2D);
@@ -355,33 +355,33 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <remarks> /// <remarks>Look at the VideoTextureExample for further information.</remarks></remarks>
         public void UpdateTextureRegion(ITextureHandle tex, ITexture img, int startX, int startY, int width, int height)
         {
-            var pixelFormat = GetTexturePixelInfo(img).Format;
+            var info = GetTexturePixelInfo(img);
+            var format = info.Format;
+            var pxType = info.PxType;
 
-            // copy the bytes from image to GPU texture
-            var bytesTotal = width * height * img.PixelFormat.BytesPerPixel;
+            // copy the bytes from img to GPU texture
+            int bytesTotal = width * height * img.PixelFormat.BytesPerPixel;
             var scanlines = img.ScanLines(startX, startY, width, height);
-            var bytes = new byte[bytesTotal];
-            var offset = 0;
+            byte[] bytes = new byte[bytesTotal];
+            int offset = 0;
             do
             {
                 if (scanlines.Current != null)
                 {
                     var lineBytes = scanlines.Current.GetScanLineBytes();
-                    Buffer.BlockCopy(lineBytes, 0, bytes, offset, lineBytes.Length);
+                    System.Buffer.BlockCopy(lineBytes, 0, bytes, offset, lineBytes.Length);
                     offset += lineBytes.Length;
                 }
 
             } while (scanlines.MoveNext());
 
             gl2.BindTexture(TEXTURE_2D, ((TextureHandle)tex).TexHandle);
-            //var imageData = gl2.CastNativeArray(bytes);
-            // TODO(MR): Add native C# to javascript interop
-            gl2.TexSubImage2D(TEXTURE_2D, 0, startX, startY, width, height, pixelFormat, UNSIGNED_BYTE, new ReadOnlySpan<byte>(bytes));
+            gl2.TexSubImage2D(TEXTURE_2D, 0, startX, startY, width, height, format, pxType, bytes);
 
-            gl2.GenerateMipmap(TEXTURE_2D);
+            //GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
-            gl2.TexParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, (int)LINEAR_MIPMAP_LINEAR);
-            gl2.TexParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, (int)LINEAR_MIPMAP_LINEAR);
+            gl2.TexParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, (int)NEAREST);
+            gl2.TexParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, (int)NEAREST);
         }
 
         /// <summary>
@@ -740,13 +740,13 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                     break;
                 case TextureType.Texture2D:
                     Console.WriteLine($"Texture handle {((TextureHandle)texId).TexHandle.Handle}");
-                    gl.BindTexture(TEXTURE_2D, ((TextureHandle)texId).TexHandle);
+                    gl2.BindTexture(TEXTURE_2D, ((TextureHandle)texId).TexHandle);
                     break;
                 case TextureType.Texture3D:
-                    gl.BindTexture(TEXTURE_3D, ((TextureHandle)texId).TexHandle);
+                    gl2.BindTexture(TEXTURE_3D, ((TextureHandle)texId).TexHandle);
                     break;
                 case TextureType.TextureCubeMap:
-                    gl.BindTexture(TEXTURE_CUBE_MAP, ((TextureHandle)texId).TexHandle);
+                    gl2.BindTexture(TEXTURE_CUBE_MAP, ((TextureHandle)texId).TexHandle);
                     break;
                 default:
                     break;
@@ -760,12 +760,13 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <param name="texId">The texture handle.</param>
         /// <param name="texTarget">The texture type, describing to which texture target the texture gets bound to.</param>
         public void SetActiveAndBindTexture(IShaderParam param, ITextureHandle texId, TextureType texTarget)
-        {
+        { 
+
             var iParam = ((ShaderParam)param).handle;
             if (!_shaderParam2TexUnit.TryGetValue(iParam, out var texUnit))
             {
                 _textureCountPerShader++;
-                //texUnit = _textureCountPerShader;
+                texUnit = _textureCountPerShader;
                 _shaderParam2TexUnit[iParam] = texUnit;
             }
 
@@ -1386,7 +1387,6 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             gl2.BindBuffer(ELEMENT_ARRAY_BUFFER, ((MeshImp)mr).ElementBufferObject);
             gl2.BufferData(ELEMENT_ARRAY_BUFFER, triangleIndices, STATIC_DRAW);
             vboBytes = (int)gl2.GetBufferParameter(ELEMENT_ARRAY_BUFFER, BUFFER_SIZE);
-            // TODO: Check but this should differ due to uint16
             if (vboBytes != trisBytes)
                 throw new ApplicationException(string.Format("Problem uploading vertex buffer to VBO (offsets). Tried to upload {0} bytes, uploaded {1}.", trisBytes, vboBytes));
 
@@ -1553,30 +1553,30 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                         gl2.DrawElements(TRIANGLES, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
                         break;
                     case OpenGLPrimitiveType.Points:
-                        gl.DrawElements(POINTS, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
+                        gl2.DrawElements(POINTS, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
                         break;
                     case OpenGLPrimitiveType.Lines:
-                        gl.DrawElements(LINES, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
+                        gl2.DrawElements(LINES, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
                         break;
                     case OpenGLPrimitiveType.LineLoop:
-                        gl.DrawElements(LINE_LOOP, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
+                        gl2.DrawElements(LINE_LOOP, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
                         break;
                     case OpenGLPrimitiveType.LineStrip:
-                        gl.DrawElements(LINE_STRIP, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
+                        gl2.DrawElements(LINE_STRIP, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
                         break;
                     case OpenGLPrimitiveType.Patches:
-                        gl.DrawElements(TRIANGLES, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
+                        gl2.DrawElements(TRIANGLES, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
                         Diagnostics.Warn("Mesh type set to triangles due to unavailability of PATCHES");
                         break;
                     case OpenGLPrimitiveType.QuadStrip:
-                        gl.DrawElements(TRIANGLES, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
+                        gl2.DrawElements(TRIANGLES, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
                         Diagnostics.Warn("Mesh type set to triangles due to unavailability of QUAD_STRIP");
                         break;
                     case OpenGLPrimitiveType.TriangleFan:
-                        gl.DrawElements(TRIANGLE_FAN, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
+                        gl2.DrawElements(TRIANGLE_FAN, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
                         break;
                     case OpenGLPrimitiveType.TriangleStrip:
-                        gl.DrawElements(TRIANGLE_STRIP, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
+                        gl2.DrawElements(TRIANGLE_STRIP, ((MeshImp)mr).NElements, UNSIGNED_SHORT, 0);
                         break;
                 }
             }
@@ -2410,24 +2410,22 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// TODO: IMPLEMENT
-        /// </summary>
-        /// <param name="param"></param>
-        /// <param name="texIds"></param>
-        public void SetShaderParamTextureArray(IShaderParam param, ITextureHandle[] texIds)
-        {
-            throw new NotImplementedException();
-        }
 
         public void SetTextureFilterMode(ITextureHandle tex, TextureFilterMode filterMode)
         {
-            throw new NotImplementedException();
+            gl2.BindTexture(TEXTURE_2D, ((TextureHandle)tex).TexHandle);
+            var glMinMagFilter = GetMinMagFilter(filterMode);
+            gl2.TexParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, (int)glMinMagFilter.Item1);
+            gl2.TexParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, (int)glMinMagFilter.Item2);
         }
 
         public void SetTextureWrapMode(ITextureHandle tex, TextureWrapMode wrapMode)
         {
-            throw new NotImplementedException();
+            gl2.BindTexture(TEXTURE_2D, ((TextureHandle)tex).TexHandle);
+            var glWrapMode = GetWrapMode(wrapMode);
+            gl2.TexParameteri(TEXTURE_2D, TEXTURE_WRAP_S, (int)glWrapMode);
+            gl2.TexParameteri(TEXTURE_2D, TEXTURE_WRAP_T, (int)glWrapMode);
+            gl2.TexParameteri(TEXTURE_2D, TEXTURE_WRAP_R, (int)glWrapMode);
         }
 
         public ITextureHandle CreateTexture(IWritableArrayTexture img)
