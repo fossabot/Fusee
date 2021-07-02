@@ -13,7 +13,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
     {
         internal WebGL2RenderingContextBase _gl;
         internal IJSObjectReference _canvas;
-        internal IJSRuntime _runtime;
+        static internal IJSRuntime _runtime;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderCanvasImp"/> class.

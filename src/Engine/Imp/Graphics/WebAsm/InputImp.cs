@@ -19,6 +19,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// Constructor. Use this in platform specific application projects.
         /// </summary>
         /// <param name="renderCanvas">The render canvas to provide mouse and keyboard input for.</param>
+        /// <param name="runtime"></param>
         public RenderCanvasInputDriverImp(IRenderCanvasImp renderCanvas, IJSRuntime runtime)
         {
             if (renderCanvas == null)
@@ -36,13 +37,13 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             _keyboard = new KeyboardDeviceImp(_canvas, runtime);
             _mouse = new MouseDeviceImp(_canvas, runtime);
             _touch = new TouchDeviceImp(_canvas, runtime);
-            _gamePad = new GamePadDeviceImp(this.runtime, _window);
+            //_gamePad = new GamePadDeviceImp(_window, runtime);
         }
 
         // The WebGL canvas. Will be set in the c# constructor
         internal IJSObjectReference _canvas;
         internal IJSObjectReference _window;
-        internal IJSRuntime runtime;        
+        internal IJSRuntime runtime;
         private readonly KeyboardDeviceImp _keyboard;
         private readonly MouseDeviceImp _mouse;
         private readonly TouchDeviceImp _touch;
@@ -58,7 +59,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                 yield return _mouse;
                 yield return _keyboard;
                 yield return _touch;
-                yield return _gamePad;
+                //yield return _gamePad;
             }
         }
 
@@ -120,7 +121,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         private readonly int DeviceID;
         private IJSRuntime runtime;
 
-        internal GamePadDeviceImp(IJSRuntime runtime, IJSObjectReference _, int deviceID = 1)
+        internal GamePadDeviceImp(IJSObjectReference window, IJSRuntime runtime, int deviceID = 1)
         {
             DeviceID = deviceID;
             this.runtime = runtime;
@@ -528,7 +529,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <summary>
         /// Should be called by the driver only.
         /// </summary>
-        /// <param name="_">The JavaScript canvas.</param>
+        /// <param name="">The JavaScript canvas.</param>
+        /// <param name="runtime"></param>
         internal KeyboardDeviceImp(IJSObjectReference _, IJSRuntime runtime)
         {
             this.runtime = runtime;
@@ -542,7 +544,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                 _keyDescriptions[(int)enumValue.Current] = new ButtonDescription { Id = (int)enumValue.Current, Name = (string)enumName.Current };
             }
 
-            ConnectCanvasEvents();
+            // disabled for now
+           // ConnectCanvasEvents();
         }
 
         private IJSRuntime runtime;
@@ -638,10 +641,10 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         #region JSExternals
         private void ConnectCanvasEvents()
         {
-            _canvas.SetObjectProperty("onmousedown", new Action<IJSInProcessObjectReference>(evt => OnCanvasMouseDown((int)evt.GetObjectProperty<int>("button"))));
-            _canvas.SetObjectProperty("onmouseup", new Action<IJSInProcessObjectReference>(evt => OnCanvasMouseUp(evt.GetObjectProperty<int>("button"))));
-            _canvas.SetObjectProperty("onmousemove", new Action<IJSInProcessObjectReference>(evt => OnCanvasMouseMove(new float2(evt.GetObjectProperty<float>("offsetX"), evt.GetObjectProperty<float>("offsetY")))));
-            _canvas.SetObjectProperty("onwheel", new Action<IJSInProcessObjectReference>(evt => { evt.InvokeVoid("preventDefault"); OnCanvasMouseWheel(evt.GetObjectProperty<float>("deltaY")); }));
+            ((IJSInProcessObjectReference)_canvas).SetObjectProperty("onmousedown", new Action<IJSInProcessObjectReference>(evt => OnCanvasMouseDown((int)evt.GetObjectProperty<int>("button"))));
+            ((IJSInProcessObjectReference)_canvas).SetObjectProperty("onmouseup", new Action<IJSInProcessObjectReference>(evt => OnCanvasMouseUp(evt.GetObjectProperty<int>("button"))));
+            ((IJSInProcessObjectReference)_canvas).SetObjectProperty("onmousemove", new Action<IJSInProcessObjectReference>(evt => OnCanvasMouseMove(new float2(evt.GetObjectProperty<float>("offsetX"), evt.GetObjectProperty<float>("offsetY")))));
+            ((IJSInProcessObjectReference)_canvas).SetObjectProperty("onwheel", new Action<IJSInProcessObjectReference>(evt => { evt.InvokeVoid("preventDefault"); OnCanvasMouseWheel(evt.GetObjectProperty<float>("deltaY")); }));
 
             // TODO: Unify WHEEL values among browsers
             // var FU_is_edge = navigator.appVersion.toLowerCase().indexOf('edge') > -1;
@@ -667,7 +670,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
         private float GetWindowWidth()
         {
-            using var w = _runtime.GetGlobalObject< IJSInProcessObjectReference>("window");
+            using var w = _runtime.GetGlobalObject<IJSInProcessObjectReference>("window");
             return w.GetObjectProperty<int>("innerWidth");
         }
 
@@ -768,7 +771,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
             _canvas = canvas;
             _runtime = runtime;
-            ConnectCanvasEvents();
+            
+            //ConnectCanvasEvents();
 
             _btnLeftDesc = new ButtonImpDescription
             {
@@ -1174,7 +1178,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         {
             _canvas = canvas;
             _runtime = runtime;
-            ConnectCanvasEvents();
+            //ConnectCanvasEvents();
             _tpAxisDescs = new Dictionary<int, AxisImpDescription>((_nTouchPointsSupported * 2) + 5);
             _activeTouchpoints = new Dictionary<int, int>(_nTouchPointsSupported);
 

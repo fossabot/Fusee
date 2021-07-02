@@ -18,6 +18,7 @@ namespace Fusee.Engine.Imp.WebAsm
     public class MeshImp : IMeshImp
     {
         #region Internal Fields
+        internal WebGLVertexArrayObject VertexArrayObject;
         internal WebGLBuffer VertexBufferObject;
         internal WebGLBuffer NormalBufferObject;
         internal WebGLBuffer ColorBufferObject;
@@ -28,6 +29,8 @@ namespace Fusee.Engine.Imp.WebAsm
         internal WebGLBuffer TangentBufferObject;
         internal WebGLBuffer BitangentBufferObject;
         internal int NElements;
+
+
         #endregion
 
         #region Public Fields & Members pairs

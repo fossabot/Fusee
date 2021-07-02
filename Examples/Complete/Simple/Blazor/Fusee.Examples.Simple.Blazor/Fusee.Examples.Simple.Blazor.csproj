@@ -1,16 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">    
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <ServiceWorkerAssetsManifest>../service-worker-assets.js</ServiceWorkerAssetsManifest>
-        <RunAOTCompilation>true</RunAOTCompilation>
-        <BlazorCacheBootResources>false</BlazorCacheBootResources>
+        <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+        <!--<RunAOTCompilation>true</RunAOTCompilation>-->
+        <!--<BlazorCacheBootResources>false</BlazorCacheBootResources>-->
         <Nullable>disable</Nullable>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
 
+
+
     <PropertyGroup>
-        <OutputPath>$(BaseOutputPath)\Examples\Simple\</OutputPath>
+        <OutputPath>$(MSBuildThisFileDirectory)\bin\$(Configuration)</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>

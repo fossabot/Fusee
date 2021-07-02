@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace Fusee.Engine.Imp.Graphics.WebAsm
 {
@@ -14,14 +15,14 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <param name="array">The array to parse.</param>
         /// <param name="cast">The cast to make.</param>
         /// <returns></returns>
-        public static T[] ToArray<T>(this WebAssembly.Core.Array array, Func<object, T> cast)
+        public static T[] ToArray<T>(this IList array, Func<object, T> cast)
         {
             if (array == null)
             {
                 return null;
             }
 
-            var length = array.Length;
+            var length = array.Count;
             var result = new T[length];
 
             for (int i = 0; i < length; i++)

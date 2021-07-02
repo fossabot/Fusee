@@ -1,7 +1,7 @@
 using Fusee.Base.Common;
 using Fusee.Base.Core;
 using Fusee.Math.Core;
-using SharpFontManaged;
+//using SharpFontManaged;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +19,7 @@ namespace Fusee.Base.Imp.WebAsm
     public class FontImp : IFontImp
     {
 
-        internal FontFace _face;
+        //internal FontFace _face;
 
         /// <summary>
         /// Font implementation for WebAsm
@@ -27,7 +27,7 @@ namespace Fusee.Base.Imp.WebAsm
         /// <param name="stream"></param>
         public FontImp(Stream stream)
         {
-            _face = new FontFace(stream);
+           // _face = new FontFace(stream);
             PixelHeight = 18;
             UseKerning = false;
         }
@@ -54,51 +54,51 @@ namespace Fusee.Base.Imp.WebAsm
             {
                 CurveParts = new List<CurvePart>()
             };
-            var glyph = _face.GetGlyphUnscaled(new CodePoint((char)c));
-            var orgPointCoords = glyph.Points.Select(pt => new PointF(new Vector2((int)pt.X, (int)pt.Y), pt.Type)).ToArray();
-            var ptTypeAsList = orgPointCoords.Select(pt => pt.Type).ToList();
-            var ptTypeAsByteArray = new List<byte>();
+            //var glyph = _face.GetGlyphUnscaled(new CodePoint((char)c));
+            //var orgPointCoords = glyph.Points.Select(pt => new PointF(new Vector2((int)pt.X, (int)pt.Y), pt.Type)).ToArray();
+            //var ptTypeAsList = orgPointCoords.Select(pt => pt.Type).ToList();
+            //var ptTypeAsByteArray = new List<byte>();
 
-            foreach (var pt in ptTypeAsList)
-            {
-                switch (pt)
-                {
-                    case PointType.OnCurve:
-                        ptTypeAsByteArray.AddRange(new byte[] { 1 });
-                        break;
-                    case PointType.Quadratic:
-                        ptTypeAsByteArray.AddRange(new byte[] { 0 });
-                        break;
-                    case PointType.Cubic:
-                        throw new NotImplementedException("Cubic pattern not yet implemented and/or available (*.TTF)");
-                }
-            }
+            //foreach (var pt in ptTypeAsList)
+            //{
+                //switch (pt)
+                //{
+                    //case PointType.OnCurve:
+                        //ptTypeAsByteArray.AddRange(new byte[] { 1 });
+                        //break;
+                    //case PointType.Quadratic:
+                        //ptTypeAsByteArray.AddRange(new byte[] { 0 });
+                        //break;
+                    //case PointType.Cubic:
+                        //throw new NotImplementedException("Cubic pattern not yet implemented and/or available (*.TTF)");
+                //}
+            //}
 
-            var pointTags = ptTypeAsByteArray.ToArray();
-            if (orgPointCoords == null) return curve;
+            //var pointTags = ptTypeAsByteArray.ToArray();
+            //if (orgPointCoords == null) return curve;
 
-            // Freetype contours are defined by their end points.
-            var curvePartEndPoints = glyph.ContourEndpoints.Select(pt => (short)pt).ToArray();
+            //// Freetype contours are defined by their end points.
+            //var curvePartEndPoints = glyph.ContourEndpoints.Select(pt => (short)pt).ToArray();
 
-            var partTags = new List<byte>();
-            var partVerts = new List<float3>();
+            //var partTags = new List<byte>();
+            //var partVerts = new List<float3>();
 
-            //Writes points of a freetype contour into a CurvePart,
-            for (var i = 0; i <= orgPointCoords.Length; i++)
-            {
-                //If a certain index of outline points is in array of contour end points - create new CurvePart and add it to Curve.CurveParts
-                if (!curvePartEndPoints.Contains((short)i)) continue;
+            ////Writes points of a freetype contour into a CurvePart,
+            //for (var i = 0; i <= orgPointCoords.Length; i++)
+            //{
+                ////If a certain index of outline points is in array of contour end points - create new CurvePart and add it to Curve.CurveParts
+                //if (!curvePartEndPoints.Contains((short)i)) continue;
 
-                partVerts.Clear();
-                partTags.Clear();
+                //partVerts.Clear();
+                //partTags.Clear();
 
-                var part = SplitToCurvePartHelper.CreateCurvePart(orgPointCoords, pointTags, curvePartEndPoints, i,
-                    partVerts, partTags);
-                curve.CurveParts.Add(part);
+                //var part = SplitToCurvePartHelper.CreateCurvePart(orgPointCoords, pointTags, curvePartEndPoints, i,
+                    //partVerts, partTags);
+                //curve.CurveParts.Add(part);
 
-                var segments = SplitToCurveSegmentHelper.SplitPartIntoSegments(part, partTags, partVerts);
-                SplitToCurveSegmentHelper.CombineCurveSegmentsAndAddThemToCurvePart(segments, part);
-            }
+                //var segments = SplitToCurveSegmentHelper.SplitPartIntoSegments(part, partTags, partVerts);
+                //SplitToCurveSegmentHelper.CombineCurveSegmentsAndAddThemToCurvePart(segments, part);
+            //}
 
             return curve;
 
@@ -113,23 +113,31 @@ namespace Fusee.Base.Imp.WebAsm
         {
             GlyphInfo ret;
 
-            var cp = new CodePoint((char)c);
-            var glyph = _face.GetGlyph(cp, PixelHeight);
+            //var cp = new CodePoint((char)c);
+            //var glyph = _face.GetGlyph(cp, PixelHeight);
 
-            if (glyph == null)
+            //if (glyph == null)
+            //{
+            //return new GlyphInfo
+            //{ Height = 1, Width = 1 };
+            //}
+
+            //ret.CharCode = c;
+            //ret.AdvanceX = glyph.HorizontalMetrics.Advance;
+            //ret.AdvanceY = glyph.VerticalMetrics.Advance;
+
+            //ret.Width = glyph.Width;
+            //ret.Height = glyph.Height;
+
+            // return ret;
+            return new GlyphInfo
             {
-                return new GlyphInfo
-                { Height = 1, Width = 1 };
-            }
-
-            ret.CharCode = c;
-            ret.AdvanceX = glyph.HorizontalMetrics.Advance;
-            ret.AdvanceY = glyph.VerticalMetrics.Advance;
-
-            ret.Width = glyph.Width;
-            ret.Height = glyph.Height;
-
-            return ret;
+                AdvanceX = 0,
+                AdvanceY = 0,
+                Width = 0,
+                CharCode = 0,
+                Height = 0                
+            };
         }
 
 
@@ -141,8 +149,9 @@ namespace Fusee.Base.Imp.WebAsm
         /// <returns></returns>
         public float GetKerning(uint leftC, uint rightC)
         {
-            var kern = _face.GetKerning(new CodePoint((char)leftC), new CodePoint((char)rightC), PixelHeight);
-            return kern;
+            // var kern = _face.GetKerning(new CodePoint((char)leftC), new CodePoint((char)rightC), PixelHeight);
+            //return kern;
+            return 0;
         }
 
         /// <summary>
@@ -152,9 +161,10 @@ namespace Fusee.Base.Imp.WebAsm
         /// <returns></returns>
         public float GetUnscaledAdvance(uint c)
         {
-            var unscaledGlyph = _face.GetGlyphUnscaled(new CodePoint((char)c));
+            //  var unscaledGlyph = _face.GetGlyphUnscaled(new CodePoint((char)c));
 
-            return unscaledGlyph.Advance;
+            //  return unscaledGlyph.Advance;
+            return 0;
         }
 
         /// <summary>
@@ -166,7 +176,8 @@ namespace Fusee.Base.Imp.WebAsm
         public float GetUnscaledKerning(uint leftC, uint rightC)
         {
             // TODO: Implement unscaled kerning
-            return _face.GetKerning(new CodePoint((char)leftC), new CodePoint((char)rightC), PixelHeight);
+            // return _face.GetKerning(new CodePoint((char)leftC), new CodePoint((char)rightC), PixelHeight);
+            return 0;
         }
 
         /// <summary>
@@ -178,73 +189,76 @@ namespace Fusee.Base.Imp.WebAsm
         /// <returns></returns>
         public IImageData RenderGlyph(uint c, out int bitmapLeft, out int bitmapTop)
         {
-            var surface = RenderGlyph(_face, (char)c);
-            var glyph = _face.GetGlyph(new CodePoint((char)c), PixelHeight);
-            var metric = _face.GetFaceMetrics(PixelHeight);
+            //var surface = RenderGlyph(_face, (char)c);
+            //var glyph = _face.GetGlyph(new CodePoint((char)c), PixelHeight);
+            //var metric = _face.GetFaceMetrics(PixelHeight);
 
-            var ret = new ImageData(new byte[surface.Height * surface.Width], surface.Width, surface.Height, new ImagePixelFormat(ColorFormat.Intensity));
+            //var ret = new ImageData(new byte[surface.Height * surface.Width], surface.Width, surface.Height, new ImagePixelFormat(ColorFormat.Intensity));
 
-            bitmapLeft = 0;
-            bitmapTop = 0;
+            //bitmapLeft = 0;
+            //bitmapTop = 0;
 
-            if (surface.Bits == IntPtr.Zero) return ret;
+            //if (surface.Bits == IntPtr.Zero) return ret;
 
-            var imgBytes = new byte[surface.Height * surface.Width];
+            //var imgBytes = new byte[surface.Height * surface.Width];
 
-            unsafe
-            {
-                var idx = 0;
+            //unsafe
+            //{
+            //var idx = 0;
 
-                for (var y = 0; y < surface.Height; y++)
-                {
-                    var src = (byte*)surface.Bits + (y * surface.Pitch);
+            //for (var y = 0; y < surface.Height; y++)
+            //{
+            //var src = (byte*)surface.Bits + (y * surface.Pitch);
 
-                    for (var x = 0; x < surface.Width; x++)
-                    {
-                        imgBytes[idx++] = *src++;
-                    }
-                }
-            }
+            //for (var x = 0; x < surface.Width; x++)
+            //{
+            //imgBytes[idx++] = *src++;
+            //}
+            //}
+            //}
 
-            ret.PixelData = imgBytes;
+            //ret.PixelData = imgBytes;
 
-            bitmapTop = (int)(glyph.Height + glyph.VerticalMetrics.Bearing.Y);
-            bitmapLeft = 0;
+            //bitmapTop = (int)(glyph.Height + glyph.VerticalMetrics.Bearing.Y);
+            //bitmapLeft = 0;
 
-
-            return ret;
+            bitmapLeft = bitmapTop = 0;
+            return new ImageData();
         }
 
-        private unsafe Surface RenderGlyph(FontFace typeface, char c)
-        {
-            var glyph = typeface.GetGlyph(c, PixelHeight);
-            if (glyph == null)
-            {
-                return new Surface
-                {
-                    Height = 1,
-                    Width = 1
-                };
-            }
+        //private unsafe Surface RenderGlyph(FontFace typeface, char c)
+        //{
+            //var glyph = typeface.GetGlyph(c, PixelHeight);
+            //if (glyph == null)
+            //{
+                //return new Surface
+                //{
+                    //Height = 1,
+                    //Width = 1
+                //};
+            //}
 
-            var surface = new Surface
-            {
-                Bits = Marshal.AllocHGlobal(glyph.RenderWidth * glyph.RenderHeight),
-                Width = glyph.RenderWidth,
-                Height = glyph.RenderHeight,
-                Pitch = glyph.RenderWidth
-            };
+            //var surface = new Surface
+            //{
+                //Bits = Marshal.AllocHGlobal(glyph.RenderWidth * glyph.RenderHeight),
+                //Width = glyph.RenderWidth,
+                //Height = glyph.RenderHeight,
+                //Pitch = glyph.RenderWidth
+            //};
 
-            var stuff = (byte*)surface.Bits;
+            //var stuff = (byte*)surface.Bits;
 
-            for (var i = 0; i < surface.Width * surface.Height; i++)
-                *stuff++ = 0;
+            //for (var i = 0; i < surface.Width * surface.Height; i++)
+                //*stuff++ = 0;
 
-            glyph.RenderTo(surface);
+            //glyph.RenderTo(surface);
 
-            return surface;
+            //return surface;
+        //}
+
+        internal struct PointF {
+            internal Vector2 P;
         }
-
 
         internal static class SplitToCurvePartHelper
         {

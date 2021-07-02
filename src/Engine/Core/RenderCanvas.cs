@@ -157,9 +157,9 @@ namespace Fusee.Engine.Core
             RC.Viewport(0, 0, Width, Height);
             RC.SetRenderStateSet(RenderStateSet.Default);
 
-            Audio.Instance.AudioImp = AudioImplementor;
-            Network.Instance.NetworkImp = NetworkImplementor;
-            VideoManager.Instance.VideoManagerImp = VideoManagerImplementor;
+            //Audio.Instance.AudioImp = AudioImplementor;
+            //Network.Instance.NetworkImp = NetworkImplementor;
+            //VideoManager.Instance.VideoManagerImp = VideoManagerImplementor;
 
             CanvasImplementor.Init += delegate { Init(); };
             CanvasImplementor.UnLoad += delegate { DeInit(); };
@@ -167,7 +167,7 @@ namespace Fusee.Engine.Core
             CanvasImplementor.Render += delegate
             {
                 // pre-rendering
-                Network.Instance.OnUpdateFrame();
+                //Network.Instance.OnUpdateFrame();
                 Input.Instance.PreRender();
                 Time.Instance.DeltaTimeIncrement = CanvasImplementor.DeltaTime;
 

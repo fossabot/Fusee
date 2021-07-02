@@ -1,10 +1,7 @@
 ﻿@page "/"
 @using System.Runtime.CompilerServices
 @using System.Diagnostics.CodeAnalysis
-@using Fusee.Base.Imp.WebAsm
 @inject IJSRuntime JS
-
-<canvas id="c" width="200" height="200" style="width: 200px; height: 200px"></canvas>
 
 
 @code
@@ -14,7 +11,10 @@
     {
         if (firstRender)
         {
-            WebAsmProgram.Start(new Runner(), JS);
+            Console.WriteLine("Hello world");
+            var program = new Fusee.Base.Imp.WebAsm.WebAsmProgram();
+            var runner = new Runner();
+            program.Start(runner, JS);
         }
         await base.OnAfterRenderAsync(firstRender);
     }

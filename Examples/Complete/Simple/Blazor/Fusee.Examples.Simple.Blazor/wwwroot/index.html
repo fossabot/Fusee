@@ -11,18 +11,81 @@
     <link href="Fusee.Examples.Simple.Blazor.styles.css" rel="stylesheet" />
     <link href="manifest.json" rel="manifest" />
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
+
+  
 </head>
 
 <body>
-    <div id="app">Loading...</div>
-
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
+    <div id="app">
     </div>
+
+
     <script src="_framework/blazor.webassembly.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
+
+
+    <script>
+        function HelloWorld() {
+            console.log("Hallo Welt");
+        }
+        window.init = (instance) => {
+            window.theInstance = instance;
+            window.requestAnimationFrame(gameLoop);
+        };
+
+        function custom_fill_buffer(target, data, usage) {
+            console.log("Custom fill Buffer data", target, data, usage);
+
+            const gl = document.getElementsByTagName("canvas")[0].getContext('webgl2');
+            console.log("Found gl context", gl);
+
+            if (target == gl.ARRAY_BUFFER) {
+                const dataPtr = Blazor.platform.getArrayEntryPtr(data, 0, 8);
+                const length = Blazor.platform.getArrayLength(data);
+                var floats = new Float32Array(Module.HEAPU8.buffer, dataPtr, length);
+                gl.bufferData(target, floats, usage);
+            }
+            else if (target == gl.ELEMENT_ARRAY_BUFFER) {
+                const dataPtr = Blazor.platform.getArrayEntryPtr(data, 0, 2);
+                const length = Blazor.platform.getArrayLength(data);
+                var ints = new Uint16Array(Module.HEAPU8.buffer, dataPtr, length);
+                gl.bufferData(target, ints, usage);
+            } else {
+                console.log("Error: Buffer type not found:", target);
+                console.log("gl.ARRAY_BUFFER is ", gl.ARRAY_BUFFER);
+                console.log("gl.ELEMENT_BUFFER is ", gl.ELEMENT_ARRAY_BUFFER);
+            }
+        }
+
+        function gameLoop(timeStamp) {
+            window.requestAnimationFrame(gameLoop);
+            theInstance.invokeMethod('Loop', timeStamp);
+        }
+
+        function SetObjectProperty(reference, propertyIdentifier, val) {
+            console.log("SetObjectProperty", reference, propertyIdentifier, val);
+            console.log("Before", reference[propertyIdentifier]);
+            reference[propertyIdentifier] = val;
+            console.log("After", reference[propertyIdentifier]);
+        }
+        function GetObjectProperty(reference, property) {
+            console.log("GetObjectProperty", reference, property);
+            console.log("Res", reference[property])
+            return reference[property];
+        }
+        function GetObject(objectToRetrive) {
+            console.log("GetObject", objectToRetrive);
+
+            if (objectToRetrive === 'window')
+                return window;
+
+            if (objectToRetrive === 'document')
+                return window.document;
+
+            return document.getElementsByTagName(objectToRetrive)[0];
+        }
+    </script>
+
 </body>
 
 </html>

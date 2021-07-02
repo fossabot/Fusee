@@ -42,7 +42,7 @@ namespace Fusee.Base.Imp.WebAsm
         /// <summary>
         /// The Javascript runtime instance
         /// </summary>
-        public IJSRuntime Runtime { get; private set; }
+        public static IJSRuntime Runtime { get; private set; }
 
         /// <summary>
         /// This method generates the WebGL2 context
@@ -54,16 +54,15 @@ namespace Fusee.Base.Imp.WebAsm
         {
             this.clearColor = clearColor;
             this.canvas = canvas;
-            this.Runtime = runtime;
+            Runtime = runtime;
 
-            canvasWidth = canvas.GetObjectProperty<int>("width");
-            canvasHeight = canvas.GetObjectProperty<int>("height");
+            canvasWidth = canvas.GetObjectProperty<int>(runtime, "width");
+            canvasHeight = canvas.GetObjectProperty<int>(runtime, "height");
 
-            gl = new WebGL2RenderingContext(canvas, runtime, new WebGLContextAttributes
+            gl = new WebGL2RenderingContext(canvas, runtime, new WebGLContextAttributes(canvas)
             {
                 Alpha = true,
                 Antialias = true,
-                PreferLowPowerToHighPerformance = false,
                 Depth = true,
                 PowerPreference = "high-performance",
                 Desynchronized = true

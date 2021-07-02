@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using Fusee.Engine.Imp.Graphics.WebAsm;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,34 +14,32 @@ namespace Fusee.Base.Imp.WebAsm
     /// </summary>
     public static class WebAsmExtensions
     {
+        public static IJSRuntime Runtime;
+
         public static void SetObjectProperty<T>(this IJSInProcessObjectReference reference, string propertyIdentifier, T val)
         {
-            // TODO(MR): Implement in static injectable javascript
-            reference.Invoke<T>("SetObjectProperty", propertyIdentifier, val);
+            ((IJSInProcessRuntime)Runtime).Invoke<T>("SetObjectProperty", reference, propertyIdentifier, val);
         }
 
         public static T GetObjectProperty<T>(this IJSInProcessObjectReference reference, string property)
         {
-            // TODO(MR): Implement in static injectable javascript
-            return reference.Invoke<T>("GetObjectProperty", property);
+
+            return ((IJSInProcessRuntime)Runtime).Invoke<T>("GetObjectProperty", reference, property);
         }
 
         public static T GetObjectProperty<T>(this IJSInProcessObjectReference[] reference, string property)
         {
-            // TODO(MR): Implement in static injectable javascript
-            return reference[0].Invoke<T>("GetObjectProperty", property);
+            return ((IJSInProcessRuntime)Runtime).Invoke<T>("GetObjectProperty", reference, property);
         }
 
         public static void SetObjectProperty<T>(this IJSObjectReference reference, string propertyIdentifier, T val)
         {
-            // TODO(MR): Implement in static injectable javascript
-            ((IJSInProcessObjectReference)reference).Invoke<T>("SetObjectProperty", propertyIdentifier, val);
+            ((IJSInProcessRuntime)Runtime).Invoke<T>("SetObjectProperty", reference, propertyIdentifier, val);
         }
 
-        public static T GetObjectProperty<T>(this IJSObjectReference reference, string property)
+        public static T GetObjectProperty<T>(this IJSObjectReference reference, IJSRuntime runtime, string property)
         {
-            // TODO(MR): Implement in static injectable javascript
-            return ((IJSInProcessObjectReference)reference).Invoke<T>("GetObjectProperty", property);
+            return ((IJSInProcessRuntime)runtime).Invoke<T>("GetObjectProperty", reference, property);
         }
 
         public static T GetGlobalObject<T>(this IJSRuntime runtime, string objectToRetrive)

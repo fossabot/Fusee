@@ -3,6 +3,7 @@ using Fusee.Base.Core;
 using Fusee.Engine.Common;
 using Fusee.Engine.Core;
 using Fusee.Engine.Core.Effects;
+using Fusee.Engine.Core.Primitives;
 using Fusee.Engine.Core.Scene;
 using Fusee.Engine.Core.ShaderShards;
 using Fusee.Engine.GUI;
@@ -41,20 +42,37 @@ namespace Fusee.Examples.Simple.Core
         // Init is called on startup.
         public override void Init()
         {
-            _gui = CreateGui();
+            //_gui = CreateGui();
 
             // Create the interaction handler
-            _sih = new SceneInteractionHandler(_gui);
+            // no input, yet
+            //_sih = new SceneInteractionHandler(_gui);
 
             // Set the clear color for the backbuffer to white (100% intensity in all color channels R, G, B, A).
             RC.ClearColor = new float4(1, 1, 1, 1);
 
             // Load the rocket model
-            _rocketScene = AssetStorage.Get<SceneContainer>("RocketFus.fus");
+            _rocketScene = new SceneContainer
+            {
+                Children = new List<SceneNode>
+                {
+                    new SceneNode
+                    {
+                        Components = new List<SceneComponent>
+                        {
+                            new Transform
+                            {
+                                Scale = new float3(1,1,1)
+                            },
+                            new Cube()
+                        }
+                    }
+                }
+            };//await AssetStorage.GetAsync<SceneContainer>("RocketFus.fus");
 
             // Wrap a SceneRenderer around the model.
             _sceneRenderer = new SceneRendererForward(_rocketScene);
-            _guiRenderer = new SceneRendererForward(_gui);
+            //_guiRenderer = new SceneRendererForward(_gui);
         }
 
         // RenderAFrame is called once a frame
@@ -118,14 +136,14 @@ namespace Fusee.Examples.Simple.Core
             //Constantly check for interactive objects.
 
             RC.Projection = orthographic;
-            if (!Mouse.Desc.Contains("Android"))
-                _sih.CheckForInteractiveObjects(RC, Mouse.Position, Width, Height);
-            if (Touch.GetTouchActive(TouchPoints.Touchpoint_0) && !Touch.TwoPoint)
-            {
-                _sih.CheckForInteractiveObjects(RC, Touch.GetPosition(TouchPoints.Touchpoint_0), Width, Height);
-            }
+            //if (!Mouse.Desc.Contains("Android"))
+            //    _sih.CheckForInteractiveObjects(RC, Mouse.Position, Width, Height);
+            //if (Touch.GetTouchActive(TouchPoints.Touchpoint_0) && !Touch.TwoPoint)
+            //{
+            //    _sih.CheckForInteractiveObjects(RC, Touch.GetPosition(TouchPoints.Touchpoint_0), Width, Height);
+            //}
 
-            _guiRenderer.Render(RC);
+            //_guiRenderer.Render(RC);
 
             // Swap buffers: Show the contents of the backbuffer (containing the currently rendered frame) on the front buffer.
             Present();

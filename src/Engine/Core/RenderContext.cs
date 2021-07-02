@@ -785,7 +785,7 @@ namespace Fusee.Engine.Core
             DefaultState = new RenderContextDefaultState();
             GlobalFXParams = new Dictionary<string, object>();
 
-            SetGlobalEffectParam(UniformNameDeclarations.FuseePlatformId, _rci.FuseePlatformId);
+            //SetGlobalEffectParam(UniformNameDeclarations.FuseePlatformId, _rci.FuseePlatformId);
 
             RenderFrustum = new FrustumF();
 
@@ -1020,7 +1020,10 @@ namespace Fusee.Engine.Core
                     {
                         surfEffect.VertexShaderSrc.Add(new KeyValuePair<ShardCategory, string>(ShardCategory.Main, ShaderShards.Vertex.VertMain.VertexMain(surfEffect.LightingSetup)));
                         foreach (var dcl in SurfaceEffect.CreateForwardLightingParamDecls(ShaderShards.Fragment.Lighting.NumberOfLightsForward))
-                            surfEffect.ParamDecl.Add(dcl.Name, dcl);
+                        {
+                            if(!surfEffect.ParamDecl.ContainsKey(dcl.Name))
+                                surfEffect.ParamDecl.Add(dcl.Name, dcl);
+                        }
                     }
 
                     if (renderForward)

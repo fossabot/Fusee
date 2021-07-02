@@ -2,6 +2,8 @@
 using Fusee.Base.Imp.WebAsm;
 using Microsoft.JSInterop;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 
@@ -38,20 +40,11 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         }
     }
 
-    public partial class WebGLActiveInfo : JSHandler
-    {
-    }
-
     public partial class WebGLContextAttributes : JSHandler
     {
-        // TODO(MR): Check for runtime error, fix it with initialization of a Handle object
-        //public WebGLContextAttributes()
-        //{
-        //Handle = new IJSObjectReference();
-        //}
-
-        public WebGLContextAttributes()
+        public WebGLContextAttributes(IJSObjectReference canvas)
         {
+            Handle = canvas;
         }
     }
 
@@ -95,16 +88,18 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             WebGLContextAttributes contextAttributes,
             string windowPropertyName = WindowPropertyName)
         {
-            if (!CheckWindowPropertyExists(windowPropertyName))
-            {
-                throw new PlatformNotSupportedException(
-                    $"The context '{contextType}' is not supported in this browser");
-            }
             this.runtime = runtime;
+
+            //if (!CheckWindowPropertyExists(windowPropertyName))
+            //{
+            //    throw new PlatformNotSupportedException(
+            //        $"The context '{contextType}' is not supported in this browser");
+            //}
+            
             gl = ((IJSInProcessObjectReference)canvas).Invoke<IJSObjectReference>("getContext", contextType, contextAttributes?.Handle);
         }
 
-        public bool IsSupported => CheckWindowPropertyExists(WindowPropertyName);
+        //public bool IsSupported => CheckWindowPropertyExists(WindowPropertyName);
 
         public static bool IsVerbosityEnabled { get; set; } = false;
 
@@ -139,9 +134,9 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         protected bool CheckWindowPropertyExists(string property)
         {
             var window = runtime.GetGlobalObject<IJSObjectReference>("window");
-            var exists = window.GetObjectProperty<bool>(property);
+            var exists = ((IJSInProcessObjectReference)window).GetObjectProperty<object>(property);
 
-            return exists;
+            return exists != null;
         }
 
         private void DisposeArrayTypes(object[] args)
@@ -152,54 +147,33 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
                 //if (arg is ITypedArray typedArray && typedArray != null)
                 //{
-                    //var disposable = (IDisposable)typedArray;
-                    //disposable.Dispose();
+                //var disposable = (IDisposable)typedArray;
+                //disposable.Dispose();
                 //}
                 //if (arg is WebAssembly.Core.Array jsArray && jsArray != null)
                 //{
-                    //var disposable = (IDisposable)jsArray;
-                    //disposable.Dispose();
+                //var disposable = (IDisposable)jsArray;
+                //disposable.Dispose();
 
                 //}
             }
         }
 
-        protected object Invoke(string method, params object[] args)
+        protected void Invoke(string method, params object[] args)
         {
             var actualArgs = Translate(args);
-            var result = ((IJSInProcessObjectReference)gl).Invoke<IJSObjectReference>(method, actualArgs);
-            //DisposeArrayTypes(actualArgs); TODO(MR): Later
-
-            //if (IsVerbosityEnabled)
-            //{
-                //var dump = new StringBuilder();
-                //dump.Append(method).Append('(');
-
-                //for (var i = 0; i < args.Length; i++)
-                //{
-                    //var item = args[i];
-                    //dump.Append(Dump(item));
-
-                    //if (i < (args.Length - 1))
-                    //{
-                        //dump.Append(", ");
-                    //}
-                //}
-
-                //dump.Append(") = ").Append(Dump(result));
-            //}
-
-            return result;
+            ((IJSInProcessObjectReference)gl).InvokeVoid(method, actualArgs);
         }
 
         protected T Invoke<T>(string method, params object[] args)
             where T : JSHandler, new()
         {
-            var rawResult = Invoke(method, args);
+            var actualArgs = Translate(args);
+            var rawResult = ((IJSInProcessObjectReference)gl).Invoke<IJSObjectReference>(method, actualArgs);
 
             return new T
             {
-                Handle = (IJSObjectReference)rawResult
+                Handle = rawResult
             };
         }
 
@@ -222,25 +196,27 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             return result;
         }
 
+        // TODO: Make unmarshalled with custom javascript function
         protected T[] InvokeForArray<T>(string method, params object[] args)
         {
-            using (var rawResult = (WebAssembly.Core.Array)Invoke(method, args))
-            {
-                return rawResult.ToArray(item => (T)item);
-            }
+            var rawResult = ((IJSInProcessObjectReference)gl).Invoke<IJSUnmarshalledObjectReference[]>(method, args);
+            return rawResult.ToArray(item => (T)item);
+
         }
 
+        // TODO: Make unmarshalled with custom javascript function
         protected T[] InvokeForJavaScriptArray<T>(string method, params object[] args)
             where T : JSHandler, new()
         {
-            using var rawResult = (WebAssembly.Core.Array)Invoke(method, args);
+            var rawResult = ((IJSInProcessObjectReference)gl).Invoke<IJSUnmarshalledObjectReference[]>(method, args);
             return rawResult.ToArray(item => new T { Handle = (IJSObjectReference)item });
         }
 
         protected T InvokeForBasicType<T>(string method, params object[] args)
             where T : IConvertible
         {
-            var result = Invoke(method, args);
+            var actualArgs = Translate(args);
+            var result = ((IJSInProcessObjectReference)gl).Invoke<T>(method, actualArgs);
 
             return (T)result;
         }
@@ -276,10 +252,10 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                     }
                     else
                     {
-                        var argArray = new WebAssembly.Core.Array();
+                        var argArray = new List<object>();
                         foreach (var item in (System.Array)arg)
                         {
-                            argArray.Push(item);
+                            argArray.Add(item);
                         }
                         arg = argArray;
                     }
