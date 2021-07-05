@@ -20,7 +20,6 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.0-preview.4.21253.5" PrivateAssets="all" />
         <PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="6.0.0-preview.5.21301.17" />
         
-        <PackageReference Include="Mono.WebAssembly.Interop" Version="5.0.0-preview.4.20257.10" />
         
         <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
     </ItemGroup>
