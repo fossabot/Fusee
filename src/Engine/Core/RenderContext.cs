@@ -785,7 +785,7 @@ namespace Fusee.Engine.Core
             DefaultState = new RenderContextDefaultState();
             GlobalFXParams = new Dictionary<string, object>();
 
-            //SetGlobalEffectParam(UniformNameDeclarations.FuseePlatformId, _rci.FuseePlatformId);
+            SetGlobalEffectParam(UniformNameDeclarations.FuseePlatformId, _rci.FuseePlatformId);
 
             RenderFrustum = new FrustumF();
 

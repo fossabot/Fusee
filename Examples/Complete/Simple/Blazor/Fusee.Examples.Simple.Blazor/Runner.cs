@@ -97,7 +97,7 @@ namespace Fusee.Examples.Simple.Blazor
                     var ext = Path.GetExtension(id).ToLower();
                     using var image = await Image.LoadAsync<Rgba32>((Stream)storage);
                     image.Mutate(x => x.AutoOrient());
-
+                    image.Mutate(x => x.RotateFlip(RotateMode.None, FlipMode.Vertical));
                     var ret = new ImageData(ReadPixels(image), image.Width, image.Height,
                             new ImagePixelFormat(ColorFormat.RGBA));
 
@@ -105,7 +105,7 @@ namespace Fusee.Examples.Simple.Blazor
 
                     // inner method to prevent Span<T> inside async method error
                     static byte[] ReadPixels(Image<Rgba32> image)
-                    {                        
+                    {
                         image.TryGetSinglePixelSpan(out var res);
                         var resBytes = MemoryMarshal.AsBytes<Rgba32>(res.ToArray());
                         return resBytes.ToArray();
@@ -116,39 +116,39 @@ namespace Fusee.Examples.Simple.Blazor
                     var ext = Path.GetExtension(id).ToLower();
                     return true;
                 }
-});
+            });
 
-AssetStorage.RegisterProvider(fap);
+            AssetStorage.RegisterProvider(fap);
 
-#endregion
+            #endregion
 
-_app = new Core.Simple();
+            _app = new Core.Simple();
 
-// Inject Fusee.Engine InjectMe dependencies (hard coded)
-_canvasImp = new RenderCanvasImp(canvas, Runtime, gl, canvasWidth, canvasHeight);
-_app.CanvasImplementor = _canvasImp;
-_app.ContextImplementor = new RenderContextImp(_app.CanvasImplementor);
-Input.AddDriverImp(new RenderCanvasInputDriverImp(_app.CanvasImplementor, Runtime));
+            // Inject Fusee.Engine InjectMe dependencies (hard coded)
+            _canvasImp = new RenderCanvasImp(canvas, Runtime, gl, canvasWidth, canvasHeight);
+            _app.CanvasImplementor = _canvasImp;
+            _app.ContextImplementor = new RenderContextImp(_app.CanvasImplementor);
+            Input.AddDriverImp(new RenderCanvasInputDriverImp(_app.CanvasImplementor, Runtime));
 
-// Start the app
-_app.Run();
+            // Start the app
+            _app.Run();
         }
 
         public override void Update(double elapsedMilliseconds)
-{
-    if (_canvasImp != null)
-        _canvasImp.DeltaTime = (float)(elapsedMilliseconds / 1000.0);
-}
+        {
+            if (_canvasImp != null)
+                _canvasImp.DeltaTime = (float)(elapsedMilliseconds / 1000.0);
+        }
 
-public override void Draw()
-{
-    _canvasImp?.DoRender();
-}
+        public override void Draw()
+        {
+            _canvasImp?.DoRender();
+        }
 
-public override void Resize(int width, int height)
-{
-    base.Resize(width, height);
-    _canvasImp.DoResize(width, height);
-}
+        public override void Resize(int width, int height)
+        {
+            base.Resize(width, height);
+            _canvasImp.DoResize(width, height);
+        }
     }
 }

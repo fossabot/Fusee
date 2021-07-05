@@ -2,7 +2,7 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-        <!--<RunAOTCompilation>true</RunAOTCompilation>-->
+        <RunAOTCompilation>true</RunAOTCompilation>
         <!--<BlazorCacheBootResources>false</BlazorCacheBootResources>-->
         <Nullable>disable</Nullable>
         <Platforms>AnyCPU</Platforms>
@@ -34,5 +34,6 @@
     <ItemGroup>
         <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
     </ItemGroup>
+
 
 </Project>

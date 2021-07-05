@@ -8,6 +8,7 @@
         <Platforms>AnyCPU</Platforms>
         <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
         <DefineConstants>$(DefineConstants);PLATFORM_WASM</DefineConstants>
+        <RunAOTCompilation>true</RunAOTCompilation>
     </PropertyGroup>
 
   <PropertyGroup>

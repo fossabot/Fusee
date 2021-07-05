@@ -170,11 +170,11 @@ namespace Fusee.Base.Imp.Desktop
         /// </returns>
         public IImageData RenderGlyph(uint c, out int bitmapLeft, out int bitmapTop)
         {
-            _face.LoadChar(c, LoadFlags.Default, LoadTarget.Normal);
-            _face.Glyph.RenderGlyph(RenderMode.Normal);
+            _face.LoadChar(c, LoadFlags.Default, LoadTarget.Mono);
+            _face.Glyph.RenderGlyph(RenderMode.Mono);
 
             FTBitmap bmp = _face.Glyph.Bitmap;
-            byte[] pixelData = new byte[0]; // empty??
+            byte[] pixelData = new byte[0]; 
             if (bmp.Width != 0 && bmp.Rows != 0)
             {
                 pixelData = new byte[bmp.BufferData.Length];

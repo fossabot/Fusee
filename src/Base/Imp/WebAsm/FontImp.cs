@@ -154,7 +154,6 @@ namespace Fusee.Base.Imp.WebAsm
             var unscaledGlyph = _face.GetGlyphUnscaled(new CodePoint((char)c));
 
             return unscaledGlyph.Advance;
-            return 0;
         }
 
         /// <summary>
@@ -211,7 +210,6 @@ namespace Fusee.Base.Imp.WebAsm
             bitmapTop = (int)(glyph.Height + glyph.VerticalMetrics.Bearing.Y);
             bitmapLeft = 0;
 
-            bitmapLeft = bitmapTop = 0;
             return ret;
         }
 

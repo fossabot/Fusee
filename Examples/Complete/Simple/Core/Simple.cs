@@ -48,6 +48,7 @@ namespace Fusee.Examples.Simple.Core
             // Load the rocket model
             _rocketScene = await AssetStorage.GetAsync<SceneContainer>("RocketFus.fus");
 
+
             // Wrap a SceneRenderer around the model.
             _sceneRenderer = new SceneRendererForward(_rocketScene);
             _guiRenderer = new SceneRendererForward(_gui);
@@ -76,7 +77,7 @@ namespace Fusee.Examples.Simple.Core
 
             // Clear the backbuffer
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
-
+            RC.ClearColor = new float4(1, 0, 1, 1);
             RC.Viewport(0, 0, Width, Height);
 
             // Mouse and keyboard movement
@@ -147,6 +148,8 @@ namespace Fusee.Examples.Simple.Core
 
         private async Task<SceneContainer> CreateGui()
         {
+            
+
             var vsTex = await AssetStorage.GetAsync<string>("texture.vert");
             var psTex = await AssetStorage.GetAsync<string>("texture.frag");
             var psText = await AssetStorage.GetAsync<string>("text.frag");

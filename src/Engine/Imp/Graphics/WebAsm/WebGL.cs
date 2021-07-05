@@ -14,67 +14,51 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 #pragma warning disable 1591
     public partial class WebGLContextAttributes
     {
-        [JsonPropertyName("alpha")]
-        public bool Alpha { get; set; }
-        //{
-        //    get => (bool)Handle.InvokeUnmarshalled<bool>("alpha");
-        //    set => Handle.InvokeUnmarshalled<bool, int>("alpha", value);
-        //}
-        [JsonPropertyName("depth")]
-        public bool Depth { get; set; }
-        //{
-        //    get => (bool)Handle.InvokeUnmarshalled<bool>("depth");
-        //    set => Handle.InvokeUnmarshalled<bool, int>("depth", value);
-        //}
-        [JsonPropertyName("stencil")]
-        public bool Stencil { get; set; }
-        //{
-        //    get => (bool)Handle.InvokeUnmarshalled<bool>("stencil");
-        //    set => Handle.InvokeUnmarshalled<bool, int>("stencil", value);
-        //}
-        [JsonPropertyName("antialias")]
-        public bool Antialias { get; set; }
-        //{
-        //    get => (bool)Handle.InvokeUnmarshalled<bool>("antialias");
-        //    set => Handle.InvokeUnmarshalled<bool, int>("antialias", value);
-        //}
-        [JsonPropertyName("premultipliedAlpha")]
-        public bool PremultipliedAlpha { get; set; }
-        //{
-        //    get => (bool)Handle.InvokeUnmarshalled<bool>("premultipliedAlpha");
-        //    set => Handle.InvokeUnmarshalled<bool, int>("premultipliedAlpha", value);
-        //}
-        [JsonPropertyName("preserveDrawingBuffer")]
-        public bool PreserveDrawingBuffer { get; set; }
-        //{
-        //    get => (bool)Handle.InvokeUnmarshalled<bool>("preserveDrawingBuffer");
-        //    set => Handle.InvokeUnmarshalled<bool, int>("preserveDrawingBuffer", value);
-        //}
-        //[JsonPropertyName("alpha")]
-        //public bool PreferLowPowerToHighPerformance { get; set; }
-        //{
-        //    get => (bool)Handle.InvokeUnmarshalled<bool>("preferLowPowerToHighPerformance");
-        //    set => Handle.InvokeUnmarshalled<bool, int>("preferLowPowerToHighPerformance", value);
-        //}
-        [JsonPropertyName("failIfMajorPerformanceCaveat")]
-        public bool FailIfMajorPerformanceCaveat { get; set; }
-        //{
-        //    get => (bool)Handle.InvokeUnmarshalled<bool>("failIfMajorPerformanceCaveat");
-        //    set => Handle.InvokeUnmarshalled<bool, int>("failIfMajorPerformanceCaveat", value);
-        //}
-        [JsonPropertyName("desynchronized")]
-        public bool Desynchronized { get; set; }
-        //{
-        //    get => (bool)Handle.InvokeUnmarshalled<bool>("desynchronized");
-        //    set => Handle.InvokeUnmarshalled<bool, int>("desynchronized", value);
-        //}
-        [JsonPropertyName("powerPreference")]
-        public string PowerPreference { get; set; } = "high-performance";
-        //{
-        //    get => (string)Handle.InvokeUnmarshalled<string>("powerPreference");
-        //    set => Handle.InvokeUnmarshalled<string, int>("powerPreference", value);
-        //}
-
+        public bool Alpha
+        {
+            get => ((IJSInProcessObjectReference)Handle).GetObjectProperty<bool>("alpha");
+            set => ((IJSInProcessObjectReference)Handle).SetObjectProperty("alpha", value);
+        }
+        public bool Depth
+        {
+            get => ((IJSInProcessObjectReference)Handle).GetObjectProperty<bool>("depth");
+            set => ((IJSInProcessObjectReference)Handle).SetObjectProperty("depth", value);
+        }
+        public bool Stencil
+        {
+            get => ((IJSInProcessObjectReference)Handle).GetObjectProperty<bool>("stencil");
+            set => ((IJSInProcessObjectReference)Handle).SetObjectProperty("stencil", value);
+        }
+        public bool Antialias
+        {
+            get => ((IJSInProcessObjectReference)Handle).GetObjectProperty<bool>("antialias");
+            set => ((IJSInProcessObjectReference)Handle).SetObjectProperty("antialias", value);
+        }
+        public bool PremultipliedAlpha
+        {
+            get => ((IJSInProcessObjectReference)Handle).GetObjectProperty<bool>("premultipliedAlpha");
+            set => ((IJSInProcessObjectReference)Handle).SetObjectProperty("premultipliedAlpha", value);
+        }
+        public bool PreserveDrawingBuffer
+        {
+            get => ((IJSInProcessObjectReference)Handle).GetObjectProperty<bool>("preserveDrawingBuffer");
+            set => ((IJSInProcessObjectReference)Handle).SetObjectProperty("preserveDrawingBuffer", value);
+        }       
+        public bool FailIfMajorPerformanceCaveat
+        {
+            get => ((IJSInProcessObjectReference)Handle).GetObjectProperty<bool>("failIfMajorPerformanceCaveat");
+            set => ((IJSInProcessObjectReference)Handle).SetObjectProperty("failIfMajorPerformanceCaveat", value);
+        }
+        public bool Desynchronized
+        {
+            get => ((IJSInProcessObjectReference)Handle).GetObjectProperty<bool>("desynchronized");
+            set => ((IJSInProcessObjectReference)Handle).SetObjectProperty("desynchronized", value);
+        }
+        public string PowerPreference
+        {
+            get => ((IJSInProcessObjectReference)Handle).GetObjectProperty<string>("powerPreference");
+            set => ((IJSInProcessObjectReference)Handle).SetObjectProperty("powerPreference", value);
+        }
 
     }
 
@@ -772,14 +756,6 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
         public void BindBuffer(uint target, WebGLBuffer buffer)
         {
-            //if(buffer == null)
-            //{
-            //    ((IJSInProcessRuntime)Runtime).InvokeVoid("bindBuffer", gl, target, null, target == ARRAY_BUFFER);
-            //    return;
-            //
-            //}
-            //((IJSInProcessRuntime)Runtime).InvokeVoid("bindBuffer", gl, target, buffer.Handle, target == ARRAY_BUFFER);
-
             Invoke("bindBuffer", target, buffer);
         }
 
@@ -2127,14 +2103,20 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("texStorage3D", target, levels, internalformat, width, height, depth);
         }
 
+        public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, IntPtr data)
+        {
+            Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, data);
+        }
+
         public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, uint pboOffset)
         {
             Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, pboOffset);
         }
 
-        public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, object source)
+        public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, int[] source)
         {
-            Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, source);
+            ((IJSInProcessRuntime)runtime).InvokeVoid("custom_fill_texture", target, level, internalformat, width, height, border, format, type, source);
+            //Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, source);
         }
 
         public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, Memory<byte> srcData, uint srcOffset)

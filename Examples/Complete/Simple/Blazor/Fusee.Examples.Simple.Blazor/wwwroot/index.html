@@ -12,7 +12,7 @@
     <link href="manifest.json" rel="manifest" />
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
 
-  
+
 </head>
 
 <body>
@@ -26,18 +26,47 @@
 
     <script>
         function HelloWorld() {
-            console.log("Hallo Welt");
+            //console.log("Hallo Welt");
         }
         window.init = (instance) => {
             window.theInstance = instance;
             window.requestAnimationFrame(gameLoop);
         };
 
-        function custom_fill_buffer(target, data, usage) {
-            console.log("Custom fill Buffer data", target, data, usage);
+        function get_intern_context() {
+            console.log("get_context_intern");
+            return document.getElementsByTagName("canvas")[0].getContext('webgl2', {
+                alpha: false,
+                antialias: true,
+                premultipliedAlpha: false,
+                depth: true              
+            });
+        }
 
-            const gl = document.getElementsByTagName("canvas")[0].getContext('webgl2');
-            console.log("Found gl context", gl);
+        function custom_fill_texture(target, level, internalformat, width, height, border, format, type, source) {
+            const gl2 = document.getElementsByTagName("canvas")[0].getContext('webgl2', {
+                alpha : false,
+                antialias: true,
+                premultipliedAlpha: false,
+                depth: true
+                });
+            //console.log("custom_fill_texture", target, level, internalformat, width, height, border, format, type, source);
+
+            const data = new Uint8Array(source);
+            gl2.pixelStorei(gl2.UNPACK_ALIGNMENT, 1);
+            gl2.texImage2D(target, level, internalformat, width, height, border, format, type, data);
+
+        }
+
+        function custom_fill_buffer(target, data, usage) {
+            //console.log("Custom fill Buffer data", target, data, usage);
+
+            const gl = document.getElementsByTagName("canvas")[0].getContext('webgl2', {
+                alpha: false,
+                antialias: true,
+                premultipliedAlpha: false,
+                depth: true
+            });
 
             if (target == gl.ARRAY_BUFFER) {
                 const dataPtr = Blazor.platform.getArrayEntryPtr(data, 0, 8);
@@ -51,9 +80,9 @@
                 var ints = new Uint16Array(Module.HEAPU8.buffer, dataPtr, length);
                 gl.bufferData(target, ints, usage);
             } else {
-                console.log("Error: Buffer type not found:", target);
-                console.log("gl.ARRAY_BUFFER is ", gl.ARRAY_BUFFER);
-                console.log("gl.ELEMENT_BUFFER is ", gl.ELEMENT_ARRAY_BUFFER);
+                //console.log("Error: Buffer type not found:", target);
+                //console.log("gl.ARRAY_BUFFER is ", gl.ARRAY_BUFFER);
+                //console.log("gl.ELEMENT_BUFFER is ", gl.ELEMENT_ARRAY_BUFFER);
             }
         }
 
@@ -63,18 +92,18 @@
         }
 
         function SetObjectProperty(reference, propertyIdentifier, val) {
-            console.log("SetObjectProperty", reference, propertyIdentifier, val);
-            console.log("Before", reference[propertyIdentifier]);
+            //console.log("SetObjectProperty", reference, propertyIdentifier, val);
+            //console.log("Before", reference[propertyIdentifier]);
             reference[propertyIdentifier] = val;
-            console.log("After", reference[propertyIdentifier]);
+            //console.log("After", reference[propertyIdentifier]);
         }
         function GetObjectProperty(reference, property) {
-            console.log("GetObjectProperty", reference, property);
-            console.log("Res", reference[property])
+            //console.log("GetObjectProperty", reference, property);
+            //console.log("Res", reference[property])
             return reference[property];
         }
         function GetObject(objectToRetrive) {
-            console.log("GetObject", objectToRetrive);
+            //console.log("GetObject", objectToRetrive);
 
             if (objectToRetrive === 'window')
                 return window;

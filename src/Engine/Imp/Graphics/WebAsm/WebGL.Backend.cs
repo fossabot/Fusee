@@ -96,41 +96,15 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             //        $"The context '{contextType}' is not supported in this browser");
             //}
             
-            gl = ((IJSInProcessObjectReference)canvas).Invoke<IJSObjectReference>("getContext", contextType, contextAttributes?.Handle);
+            gl = ((IJSInProcessRuntime)runtime).Invoke<IJSObjectReference>("get_intern_context");
+
+
         }
 
         //public bool IsSupported => CheckWindowPropertyExists(WindowPropertyName);
 
         public static bool IsVerbosityEnabled { get; set; } = false;
-
-        //public ITypedArray CastNativeArray(object managedArray)
-        //{
-        //    var arrayType = managedArray.GetType();
-
-        //    // Here are listed some JavaScript array types:
-        //    // https://github.com/mono/mono/blob/a7f5952c69ae76015ccaefd4dfa8be2274498a21/sdks/wasm/bindings-test.cs
-        //    if (arrayType == typeof(byte[]))
-        //    {
-        //        return Uint8Array.From((byte[])managedArray);
-        //    }
-        //    else if (arrayType == typeof(float[]))
-        //    {
-        //        return Float32Array.From((float[])managedArray);
-        //    }
-        //    else if (arrayType == typeof(ushort[]))
-        //    {
-        //        return Uint16Array.From((ushort[])managedArray);
-        //    }
-        //    else if (arrayType == typeof(uint[]))
-        //    {
-        //        return Uint32Array.From((uint[])managedArray);
-        //    }
-        //
-        //    var ex = new ArgumentException("Type {managedArray} not convertible!");
-        //    Diagnostics.Error("Error converting managed array to javascript array!", ex);
-        //    throw ex;
-        //}
-
+       
         protected bool CheckWindowPropertyExists(string property)
         {
             var window = runtime.GetGlobalObject<IJSObjectReference>("window");
@@ -357,7 +331,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
           int border,
           uint format,
           uint type,
-          Array source)
+          int[] source)
         {
             //// TODO(MR): managed to native via javscript (implement & test)
             ////using var nativeArray = Uint8Array.From(source);
