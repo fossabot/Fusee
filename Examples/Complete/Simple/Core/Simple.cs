@@ -77,7 +77,6 @@ namespace Fusee.Examples.Simple.Core
 
             // Clear the backbuffer
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
-            RC.ClearColor = new float4(1, 0, 1, 1);
             RC.Viewport(0, 0, Width, Height);
 
             // Mouse and keyboard movement

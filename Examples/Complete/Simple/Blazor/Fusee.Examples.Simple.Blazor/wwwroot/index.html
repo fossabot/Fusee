@@ -44,16 +44,10 @@
         }
 
         function custom_fill_texture(target, level, internalformat, width, height, border, format, type, source) {
-            const gl2 = document.getElementsByTagName("canvas")[0].getContext('webgl2', {
-                alpha : false,
-                antialias: true,
-                premultipliedAlpha: false,
-                depth: true
-                });
-            //console.log("custom_fill_texture", target, level, internalformat, width, height, border, format, type, source);
+            const gl2 = document.getElementsByTagName("canvas")[0].getContext('webgl2');
+            console.log("custom_fill_texture", target, level, internalformat, width, height, border, format, type, source);
 
             const data = new Uint8Array(source);
-            gl2.pixelStorei(gl2.UNPACK_ALIGNMENT, 1);
             gl2.texImage2D(target, level, internalformat, width, height, border, format, type, data);
 
         }

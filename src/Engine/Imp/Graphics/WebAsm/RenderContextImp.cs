@@ -162,8 +162,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                     pxType = UNSIGNED_BYTE;
                     break;
                 case ColorFormat.Intensity:
-                    internalFormat = ALPHA;
-                    format = ALPHA;
+                    internalFormat = R8;
+                    format = RED;
                     pxType = UNSIGNED_BYTE;
                     break;
                 case ColorFormat.Depth24:
@@ -290,18 +290,15 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
             var glWrapMode = GetWrapMode(img.WrapMode);
             var pxInfo = GetTexturePixelInfo(img);
-
-            //var imageData = gl2.CastNativeArray(img.PixelData);
-            // TODO(MR): Add native C# to javascript interop
-
+                      
             var dataToInt  = img.PixelData.Select(x => (int)x).ToArray();
             gl2.TexImage2D(TEXTURE_2D, 0, (int)pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, dataToInt);
 
             if (img.DoGenerateMipMaps && img.PixelFormat.ColorFormat != ColorFormat.Intensity)
                 gl2.GenerateMipmap(TEXTURE_2D);
 
-            //gl2.TexParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, magFilter);
-            //gl2.TexParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, minFilter);
+            gl2.TexParameteri(TEXTURE_2D, TEXTURE_MAG_FILTER, (int)NEAREST);
+            gl2.TexParameteri(TEXTURE_2D, TEXTURE_MIN_FILTER, (int)NEAREST);
             gl2.TexParameteri(TEXTURE_2D, TEXTURE_WRAP_S, glWrapMode);
             gl2.TexParameteri(TEXTURE_2D, TEXTURE_WRAP_T, glWrapMode);
             gl2.TexParameteri(TEXTURE_2D, TEXTURE_WRAP_R, glWrapMode);
@@ -920,7 +917,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             set => gl2.ClearDepth(value);
         }
 
-        public FuseePlatformId FuseePlatformId => FuseePlatformId.Wasm;
+        public FuseePlatformId FuseePlatformId => FuseePlatformId.Desktop;
 
         /// <summary>
         /// Clears the specified flags.
