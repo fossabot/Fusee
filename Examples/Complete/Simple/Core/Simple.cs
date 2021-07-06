@@ -45,9 +45,12 @@ namespace Fusee.Examples.Simple.Core
         {
             _gui = await CreateGui();
 
+            // Create the interaction handler
+            // no input, yet
+            _sih = new SceneInteractionHandler(_gui);
+
             // Load the rocket model
             _rocketScene = await AssetStorage.GetAsync<SceneContainer>("RocketFus.fus");
-
 
             // Wrap a SceneRenderer around the model.
             _sceneRenderer = new SceneRendererForward(_rocketScene);
@@ -59,15 +62,13 @@ namespace Fusee.Examples.Simple.Core
         public override void Init()
         {
 
-            // Create the interaction handler
-            // no input, yet
-            //_sih = new SceneInteractionHandler(_gui);
+
 
             // Set the clear color for the backbuffer to white (100% intensity in all color channels R, G, B, A).
             RC.ClearColor = new float4(1, 1, 1, 1);
 
             Load();
-            
+
         }
 
         // RenderAFrame is called once a frame
@@ -91,13 +92,13 @@ namespace Fusee.Examples.Simple.Core
                 _angleVelHorz = -RotationSpeed * Mouse.XVel * DeltaTime * 0.0005f;
                 _angleVelVert = -RotationSpeed * Mouse.YVel * DeltaTime * 0.0005f;
             }
-            else if (Touch.GetTouchActive(TouchPoints.Touchpoint_0))
-            {
-                _keys = false;
-                var touchVel = Touch.GetVelocity(TouchPoints.Touchpoint_0);
-                _angleVelHorz = -RotationSpeed * touchVel.x * DeltaTime * 0.0005f;
-                _angleVelVert = -RotationSpeed * touchVel.y * DeltaTime * 0.0005f;
-            }
+            //else if (Touch.GetTouchActive(TouchPoints.Touchpoint_0))
+            //{
+                //_keys = false;
+                //var touchVel = Touch.GetVelocity(TouchPoints.Touchpoint_0);
+                //_angleVelHorz = -RotationSpeed * touchVel.x * DeltaTime * 0.0005f;
+                //_angleVelVert = -RotationSpeed * touchVel.y * DeltaTime * 0.0005f;
+            //}
             else
             {
                 if (_keys)
@@ -130,13 +131,12 @@ namespace Fusee.Examples.Simple.Core
             _sceneRenderer.Render(RC);
 
             //Constantly check for interactive objects.
-
             RC.Projection = orthographic;
-            //if (!Mouse.Desc.Contains("Android"))
-            //    _sih.CheckForInteractiveObjects(RC, Mouse.Position, Width, Height);
+            if (!Mouse.Desc.Contains("Android"))
+                _sih.CheckForInteractiveObjects(RC, Mouse.Position, Width, Height);
             //if (Touch.GetTouchActive(TouchPoints.Touchpoint_0) && !Touch.TwoPoint)
             //{
-            //    _sih.CheckForInteractiveObjects(RC, Touch.GetPosition(TouchPoints.Touchpoint_0), Width, Height);
+                //_sih.CheckForInteractiveObjects(RC, Touch.GetPosition(TouchPoints.Touchpoint_0), Width, Height);
             //}
 
             _guiRenderer.Render(RC);
@@ -147,7 +147,7 @@ namespace Fusee.Examples.Simple.Core
 
         private async Task<SceneContainer> CreateGui()
         {
-            
+
 
             var vsTex = await AssetStorage.GetAsync<string>("texture.vert");
             var psTex = await AssetStorage.GetAsync<string>("texture.frag");

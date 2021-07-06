@@ -36,7 +36,6 @@ namespace Fusee.Base.Imp.WebAsm
             Runtime = runtime;
             loop = Loop;
 
-            ((IJSInProcessRuntime)Runtime).InvokeVoid("HelloWorld");
             WebAsmExtensions.Runtime = runtime; // set runtime for extension methods
 
             // Let's first check if we can continue with WebGL2 instead of crashing.

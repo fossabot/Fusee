@@ -104,7 +104,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <remarks>Not needed in WebGL.</remarks>
         public void OpenLink(string link)
         {
-            using var window = _runtime.GetGlobalObject<IJSInProcessObjectReference>("window");
+            var window = _runtime.GetGlobalObject<IJSInProcessObjectReference>("window");
             window.InvokeVoid("open", link);
         }
 

@@ -16,6 +16,16 @@ namespace Fusee.Base.Imp.WebAsm
     {
         public static IJSRuntime Runtime;
 
+        public static void AddEventListener<T>(this IJSInProcessObjectReference reference, string propertyIdentifier, T val)
+        {
+            ((IJSInProcessRuntime)Runtime).Invoke<T>("AddEventListener", reference, propertyIdentifier, val);
+        }
+
+        public static void SetAttribute<T>(this IJSInProcessObjectReference reference, string propertyIdentifier, T val)
+        {
+            ((IJSInProcessRuntime)Runtime).Invoke<T>("SetAttribute", reference, propertyIdentifier, val);
+        }
+
         public static void SetObjectProperty<T>(this IJSInProcessObjectReference reference, string propertyIdentifier, T val)
         {
             ((IJSInProcessRuntime)Runtime).Invoke<T>("SetObjectProperty", reference, propertyIdentifier, val);

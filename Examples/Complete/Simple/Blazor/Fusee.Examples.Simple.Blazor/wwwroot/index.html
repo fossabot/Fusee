@@ -31,6 +31,19 @@
         window.init = (instance) => {
             window.theInstance = instance;
             window.requestAnimationFrame(gameLoop);
+
+            var cvs = document.getElementById("canvas");
+            window.addEventListener("keydown", (evt) => { evt.preventDefault(); DotNet.invokeMethod('Fusee.Engine.Imp.Graphics.WebAsm', 'OnKeyDown', evt.keyCode); });
+            window.addEventListener("keyup", (evt) => { evt.preventDefault(); DotNet.invokeMethod('Fusee.Engine.Imp.Graphics.WebAsm', 'OnKeyUp', evt.keyCode); });
+
+
+            cvs.addEventListener("mousedown", (evt) => DotNet.invokeMethod('Fusee.Engine.Imp.Graphics.WebAsm', 'OnMouseDown', evt.button));
+            cvs.addEventListener("mouseup", (evt) => DotNet.invokeMethod('Fusee.Engine.Imp.Graphics.WebAsm', 'OnMouseUp', evt.button));
+            cvs.addEventListener("mousemove", (evt) => DotNet.invokeMethod('Fusee.Engine.Imp.Graphics.WebAsm', 'OnMouseMove', evt.offsetX, evt.offsetY));
+            cvs.addEventListener("wheel", (evt) => {
+                evt.preventDefault();
+                DotNet.invokeMethod('Fusee.Engine.Imp.Graphics.WebAsm', 'OnMouseWheel', evt.deltaY);
+            });
         };
 
         function get_intern_context() {
@@ -39,7 +52,7 @@
                 alpha: false,
                 antialias: true,
                 premultipliedAlpha: false,
-                depth: true              
+                depth: true
             });
         }
 
@@ -85,12 +98,23 @@
             theInstance.invokeMethod('Loop', timeStamp);
         }
 
+        function AddEventListener(reference, propertyIdentifier, val) {
+            console.log("AddEventListener", reference, propertyIdentifier, val);
+            reference.addEventListener(propertyIdentifier, val);
+        }
+
         function SetObjectProperty(reference, propertyIdentifier, val) {
             //console.log("SetObjectProperty", reference, propertyIdentifier, val);
             //console.log("Before", reference[propertyIdentifier]);
             reference[propertyIdentifier] = val;
             //console.log("After", reference[propertyIdentifier]);
         }
+
+        function SetAttribute(reference, propertyIdentifier, val) {
+            console.log("SetAttribute", reference, propertyIdentifier, val);
+            reference.setAttribute(propertyIdentifier, val);
+        }
+
         function GetObjectProperty(reference, property) {
             //console.log("GetObjectProperty", reference, property);
             //console.log("Res", reference[property])
