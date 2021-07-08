@@ -2,6 +2,7 @@ using Fusee.Base.Core;
 using Fusee.Base.Imp.WebAsm;
 using Fusee.Engine.Common;
 using Fusee.Math.Core;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -55,6 +56,33 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         public static void Wheel(float delta)
         {
             OnMouseWheel?.Invoke(null, delta);
+        }
+
+        // Deserialzation of EventArgs seems to be broken
+        [JSInvokable("OnTouchStart")]
+        public static void TouchStart(TouchEventArgs args)
+        {
+            var dbgBreak = args;
+        }
+
+
+        [JSInvokable("OnTouchEnd")]
+        public static void TouchEnd(TouchEventArgs delta)
+        {
+           
+        }
+
+
+        [JSInvokable("OnTouchCancel")]
+        public static void TouchCancel(TouchEventArgs delta)
+        {
+           
+        }
+
+
+        [JSInvokable("OnTouchMove")]
+        public static void TouchMove(TouchEventArgs delta)
+        {
         }
     }
 

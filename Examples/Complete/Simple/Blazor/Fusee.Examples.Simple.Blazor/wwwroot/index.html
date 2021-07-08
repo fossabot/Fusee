@@ -42,6 +42,11 @@
                 evt.preventDefault();
                 DotNet.invokeMethod('Fusee.Engine.Imp.Graphics.WebAsm', 'OnMouseWheel', evt.deltaY);
             });
+
+            cvs.addEventListener("touchstart", (evt) => { evt.preventDefault(); DotNet.invokeMethod('Fusee.Engine.Imp.Graphics.WebAsm', 'OnTouchStart', evt); });
+            cvs.addEventListener("touchmove", (evt) => { evt.preventDefault(); DotNet.invokeMethod('Fusee.Engine.Imp.Graphics.WebAsm', 'OnTouchMove', evt); });
+            cvs.addEventListener("touchcancel", (evt) => { evt.preventDefault(); DotNet.invokeMethod('Fusee.Engine.Imp.Graphics.WebAsm', 'OnTouchCancel', evt); });
+            cvs.addEventListener("touchend", (evt) => { evt.preventDefault(); DotNet.invokeMethod('Fusee.Engine.Imp.Graphics.WebAsm', 'OnTouchEnd', evt); });
         };
 
         function customTexImage2D(params, source) {
@@ -92,8 +97,7 @@
             theInstance.invokeMethod('Loop', timeStamp);
         }
 
-        function addEventListener(reference, propertyIdentifier, val) {
-            console.log("AddEventListener", reference, propertyIdentifier, val);
+        function customAddEventListener(reference, propertyIdentifier, val) {
             reference.addEventListener(propertyIdentifier, val);
         }
 

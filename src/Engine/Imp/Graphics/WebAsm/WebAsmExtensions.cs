@@ -18,7 +18,7 @@ namespace Fusee.Base.Imp.WebAsm
 
         public static void AddEventListener<T>(this IJSInProcessObjectReference reference, string propertyIdentifier, T val)
         {
-            ((IJSInProcessRuntime)Runtime).Invoke<T>("addEventListener", reference, propertyIdentifier, val);
+            ((IJSInProcessRuntime)Runtime).Invoke<T>("customAddEventListener", reference, propertyIdentifier, val);
         }
 
         public static void SetAttribute<T>(this IJSInProcessObjectReference reference, string propertyIdentifier, T val)
@@ -34,12 +34,12 @@ namespace Fusee.Base.Imp.WebAsm
         public static T GetObjectProperty<T>(this IJSInProcessObjectReference reference, string property)
         {
 
-            return ((IJSInProcessRuntime)Runtime).Invoke<T>("GetObjectProperty", reference, property);
+            return ((IJSInProcessRuntime)Runtime).Invoke<T>("getObjectProperty", reference, property);
         }
 
         public static T GetObjectProperty<T>(this IJSInProcessObjectReference[] reference, string property)
         {
-            return ((IJSInProcessRuntime)Runtime).Invoke<T>("GetObjectProperty", reference, property);
+            return ((IJSInProcessRuntime)Runtime).Invoke<T>("getObjectProperty", reference, property);
         }
 
         public static void SetObjectProperty<T>(this IJSObjectReference reference, string propertyIdentifier, T val)
