@@ -3,13 +3,10 @@
         <TargetFramework>net6.0</TargetFramework>
         <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
         <RunAOTCompilation>true</RunAOTCompilation>
-                <!--<BlazorCacheBootResources>false</BlazorCacheBootResources>-->
+        <!--<BlazorCacheBootResources>false</BlazorCacheBootResources>-->
         <Nullable>disable</Nullable>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
-
-
-
 
     <PropertyGroup>
         <OutputPath>$(BaseOutputPath)\Examples\Simple\WebAsm\</OutputPath>

@@ -12,11 +12,7 @@
         <DocumentationFile>$(OutputPath)\$(RootNamespace).xml</DocumentationFile>
     </PropertyGroup>
 
-    <ItemGroup>       
-        <Reference Include="protobuf-net.Core">
-            <HintPath>$(FuseeEngineRoot)\ext\protobuf\protobuf-net.Core.dll</HintPath>
-        </Reference>
-    </ItemGroup>
+ 
 
     <ItemGroup>
         <ProjectReference Include="$(FuseeEngineRoot)\src\Math\Core\Fusee.Math.Core.csproj">
