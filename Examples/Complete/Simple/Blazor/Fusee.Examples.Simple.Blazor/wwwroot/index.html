@@ -25,9 +25,7 @@
 
 
     <script>
-        function HelloWorld() {
-            //console.log("Hallo Welt");
-        }
+
         window.init = (instance) => {
             window.theInstance = instance;
             window.requestAnimationFrame(gameLoop);
@@ -46,51 +44,46 @@
             });
         };
 
-        function get_intern_context() {
-            console.log("get_context_intern");
-            return document.getElementsByTagName("canvas")[0].getContext('webgl2', {
-                alpha: false,
-                antialias: true,
-                premultipliedAlpha: false,
-                depth: true
-            });
-        }
-
-        // interpret as array via array view
-        function custom_fill_texture(target, level, internalformat, width, height, border, format, type, source) {
+        function customTexImage2D(params, source) {
             const gl2 = document.getElementsByTagName("canvas")[0].getContext('webgl2');
-            console.log("custom_fill_texture", target, level, internalformat, width, height, border, format, type, source);
 
-            const data = new Uint8Array(source);
+            // extract setting params from array
+            const paramPtr = Blazor.platform.getArrayEntryPtr(params, 0, 4);
+            const paramLength = Blazor.platform.getArrayLength(params);
+            var parameter = new Int32Array(Module.HEAPU8.buffer, paramPtr, paramLength);
+
+            const target = parameter[0];
+            const level = parameter[1];
+            const internalformat = parameter[2];
+            const width = parameter[3];
+            const height = parameter[4];
+            const border = parameter[5];
+            const format = parameter[6];
+            const type = parameter[7];
+
+            const dataPtr = Blazor.platform.getArrayEntryPtr(source, 0, 2);
+            const length = Blazor.platform.getArrayLength(source);
+            const data = new Uint8Array(Module.HEAPU8.buffer, dataPtr, length);
             gl2.texImage2D(target, level, internalformat, width, height, border, format, type, data);
-
         }
 
-        function custom_fill_buffer(target, data, usage) {
-            //console.log("Custom fill Buffer data", target, data, usage);
+        function customBufferData(target, data, usage) {
 
-            const gl = document.getElementsByTagName("canvas")[0].getContext('webgl2', {
-                alpha: false,
-                antialias: true,
-                premultipliedAlpha: false,
-                depth: true
-            });
+            const gl2 = document.getElementsByTagName("canvas")[0].getContext('webgl2');
 
-            if (target == gl.ARRAY_BUFFER) {
+            if (target == gl2.ARRAY_BUFFER) {
                 const dataPtr = Blazor.platform.getArrayEntryPtr(data, 0, 8);
                 const length = Blazor.platform.getArrayLength(data);
                 var floats = new Float32Array(Module.HEAPU8.buffer, dataPtr, length);
-                gl.bufferData(target, floats, usage);
+                gl2.bufferData(target, floats, usage);
             }
-            else if (target == gl.ELEMENT_ARRAY_BUFFER) {
+            else if (target == gl2.ELEMENT_ARRAY_BUFFER) {
                 const dataPtr = Blazor.platform.getArrayEntryPtr(data, 0, 2);
                 const length = Blazor.platform.getArrayLength(data);
                 var ints = new Uint16Array(Module.HEAPU8.buffer, dataPtr, length);
-                gl.bufferData(target, ints, usage);
+                gl2.bufferData(target, ints, usage);
             } else {
-                //console.log("Error: Buffer type not found:", target);
-                //console.log("gl.ARRAY_BUFFER is ", gl.ARRAY_BUFFER);
-                //console.log("gl.ELEMENT_BUFFER is ", gl.ELEMENT_ARRAY_BUFFER);
+                console.error("Error: Buffer type not found:", target);
             }
         }
 
@@ -99,39 +92,31 @@
             theInstance.invokeMethod('Loop', timeStamp);
         }
 
-        function AddEventListener(reference, propertyIdentifier, val) {
+        function addEventListener(reference, propertyIdentifier, val) {
             console.log("AddEventListener", reference, propertyIdentifier, val);
             reference.addEventListener(propertyIdentifier, val);
         }
 
-        function SetObjectProperty(reference, propertyIdentifier, val) {
-            //console.log("SetObjectProperty", reference, propertyIdentifier, val);
-            //console.log("Before", reference[propertyIdentifier]);
+        function setObjectProperty(reference, propertyIdentifier, val) {
             reference[propertyIdentifier] = val;
-            //console.log("After", reference[propertyIdentifier]);
         }
 
-        function SetAttribute(reference, propertyIdentifier, val) {
-            console.log("SetAttribute", reference, propertyIdentifier, val);
+        function setAttribute(reference, propertyIdentifier, val) {
             reference.setAttribute(propertyIdentifier, val);
         }
 
-        function GetObjectProperty(reference, property) {
-            //console.log("GetObjectProperty", reference, property);
-            //console.log("Res", reference[property])
+        function getObjectProperty(reference, property) {
             return reference[property];
         }
-        function GetObject(objectToRetrive) {
-            //console.log("GetObject", objectToRetrive);
 
+        function getObject(objectToRetrive) {
             if (objectToRetrive === 'window')
                 return window;
-
             if (objectToRetrive === 'document')
                 return window.document;
-
             return document.getElementsByTagName(objectToRetrive)[0];
         }
+
     </script>
 
 </body>

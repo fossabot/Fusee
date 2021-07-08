@@ -18,17 +18,17 @@ namespace Fusee.Base.Imp.WebAsm
 
         public static void AddEventListener<T>(this IJSInProcessObjectReference reference, string propertyIdentifier, T val)
         {
-            ((IJSInProcessRuntime)Runtime).Invoke<T>("AddEventListener", reference, propertyIdentifier, val);
+            ((IJSInProcessRuntime)Runtime).Invoke<T>("addEventListener", reference, propertyIdentifier, val);
         }
 
         public static void SetAttribute<T>(this IJSInProcessObjectReference reference, string propertyIdentifier, T val)
         {
-            ((IJSInProcessRuntime)Runtime).Invoke<T>("SetAttribute", reference, propertyIdentifier, val);
+            ((IJSInProcessRuntime)Runtime).Invoke<T>("setAttribute", reference, propertyIdentifier, val);
         }
 
         public static void SetObjectProperty<T>(this IJSInProcessObjectReference reference, string propertyIdentifier, T val)
         {
-            ((IJSInProcessRuntime)Runtime).Invoke<T>("SetObjectProperty", reference, propertyIdentifier, val);
+            ((IJSInProcessRuntime)Runtime).Invoke<T>("setObjectProperty", reference, propertyIdentifier, val);
         }
 
         public static T GetObjectProperty<T>(this IJSInProcessObjectReference reference, string property)
@@ -44,22 +44,22 @@ namespace Fusee.Base.Imp.WebAsm
 
         public static void SetObjectProperty<T>(this IJSObjectReference reference, string propertyIdentifier, T val)
         {
-            ((IJSInProcessRuntime)Runtime).Invoke<T>("SetObjectProperty", reference, propertyIdentifier, val);
+            ((IJSInProcessRuntime)Runtime).Invoke<T>("setObjectProperty", reference, propertyIdentifier, val);
         }
 
         public static T GetObjectProperty<T>(this IJSObjectReference reference, IJSRuntime runtime, string property)
         {
-            return ((IJSInProcessRuntime)runtime).Invoke<T>("GetObjectProperty", reference, property);
+            return ((IJSInProcessRuntime)runtime).Invoke<T>("getObjectProperty", reference, property);
         }
 
         public static T GetGlobalObject<T>(this IJSRuntime runtime, string objectToRetrive)
         {
-            return ((IJSInProcessRuntime)runtime).Invoke<T>("GetObject", objectToRetrive);
+            return ((IJSInProcessRuntime)runtime).Invoke<T>("getObject", objectToRetrive);
         }
 
         public static T GetGlobalObject<T>(this IJSInProcessRuntime runtime, string objectToRetrive)
         {
-            return runtime.Invoke<T>("GetObject", objectToRetrive);
+            return runtime.Invoke<T>("getObject", objectToRetrive);
         }
     }
 }

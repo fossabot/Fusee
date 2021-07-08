@@ -96,9 +96,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             //        $"The context '{contextType}' is not supported in this browser");
             //}
             
-            gl = ((IJSInProcessRuntime)runtime).Invoke<IJSObjectReference>("get_intern_context");
-
-
+            gl = ((IJSInProcessObjectReference)canvas).Invoke<IJSObjectReference>("getContext", contextType, contextAttributes);
         }
 
         //public bool IsSupported => CheckWindowPropertyExists(WindowPropertyName);
@@ -331,10 +329,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
           int border,
           uint format,
           uint type,
-          int[] source)
+          Array source)
         {
-            //// TODO(MR): managed to native via javscript (implement & test)
-            ////using var nativeArray = Uint8Array.From(source);
             GLTexImage2D(target, level, internalformat, width, height, border, format, type, source);
 
         }
@@ -351,8 +347,6 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             uint type,
             Array source)
         {
-            // TODO(MR): managed to native via javscript (implement & test)
-            //using var nativeArray = Uint8Array.From(source);
             GLTexImage3D(target, level, internalformat, width, height, depth, border, format, type, source);
         }
 

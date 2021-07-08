@@ -278,10 +278,6 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             var err = gl2.GetError();
             var id = gl2.CreateTexture();
 
-            // Use pixel unpack buffer instead of client memory to
-            // transfer pixel data
-            //var pob = gl2.CreateBuffer();
-            //gl2.BindBuffer(PIXEL_UNPACK_BUFFER, pob);
             gl2.BindTexture(TEXTURE_2D, id);
 
             var glMinMagFilter = GetMinMagFilter(img.FilterMode);
@@ -291,8 +287,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             var glWrapMode = GetWrapMode(img.WrapMode);
             var pxInfo = GetTexturePixelInfo(img);
                       
-            var dataToInt  = img.PixelData.Select(x => (int)x).ToArray();
-            gl2.TexImage2D(TEXTURE_2D, 0, (int)pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, dataToInt);
+            //var dataToInt  = img.PixelData.Select(x => (int)x).ToArray();
+            gl2.TexImage2D(TEXTURE_2D, 0, (int)pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, img.PixelData);
 
             if (img.DoGenerateMipMaps && img.PixelFormat.ColorFormat != ColorFormat.Intensity)
                 gl2.GenerateMipmap(TEXTURE_2D);

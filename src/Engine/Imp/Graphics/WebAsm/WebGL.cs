@@ -807,7 +807,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         public void BufferData(uint target, Array data, uint usage)
         {
             // Do not call Invoke via JSON Serialize but upload data unmarshalled and as quick as possible to javascript
-           ((IJSUnmarshalledRuntime)WebAsmExtensions.Runtime).InvokeUnmarshalled<uint, Array, uint, ValueType>("custom_fill_buffer", target, data, usage);
+           ((IJSUnmarshalledRuntime)WebAsmExtensions.Runtime).InvokeUnmarshalled<uint, Array, uint, object>("customBufferData", target, data, usage);
         }
 
         public void BufferSubData(uint target, uint offset, Array data)
@@ -2113,10 +2113,10 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, pboOffset);
         }
 
-        public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, int[] source)
+        public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, Array source)
         {
-            ((IJSInProcessRuntime)runtime).InvokeVoid("custom_fill_texture", target, level, internalformat, width, height, border, format, type, source);
-            //Invoke("texImage2D", target, level, internalformat, width, height, border, format, type, source);
+            var parameter = new int[] { (int)target, level, internalformat, width, height, border, (int)format, (int)type };
+            ((IJSUnmarshalledRuntime)runtime).InvokeUnmarshalled<int[], Array, object>("customTexImage2D", parameter, source);
         }
 
         public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, Memory<byte> srcData, uint srcOffset)

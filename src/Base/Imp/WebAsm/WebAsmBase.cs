@@ -62,7 +62,7 @@ namespace Fusee.Base.Imp.WebAsm
             {
                 Alpha = true,
                 Antialias = true,
-                PremultipliedAlpha = true,
+                PremultipliedAlpha = false,
                 Depth = true,
                 PowerPreference = "high-performance",
                 Desynchronized = true
