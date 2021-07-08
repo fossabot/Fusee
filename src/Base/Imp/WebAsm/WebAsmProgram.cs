@@ -33,6 +33,8 @@ namespace Fusee.Base.Imp.WebAsm
         /// <param name="wasm"></param>
         public void Start(WebAsmBase wasm, IJSRuntime runtime)
         {
+            // TODO: Add Fus-Startup-Loading Screen
+
             Runtime = runtime;
             loop = Loop;
 
@@ -60,6 +62,7 @@ namespace Fusee.Base.Imp.WebAsm
             mainExecutable.Init(canvas, runtime, CanvasColor);
             mainExecutable.Run();
 
+            // TODO: Implement in javascript
             //AddEnterFullScreenHandler();
             //AddResizeHandler();
 
@@ -140,8 +143,6 @@ namespace Fusee.Base.Imp.WebAsm
 
             mainExecutable.Update(elapsedMilliseconds);
             mainExecutable.Draw();
-
-            //RequestAnimationFrame();
         }
 
         
@@ -157,18 +158,6 @@ namespace Fusee.Base.Imp.WebAsm
             Diagnostics.SetMinDebugOutputLoggingSeverityLevel(Diagnostics.SeverityLevel.None);
 
             ((IJSInProcessObjectReference)window).InvokeVoid("init", DotNetObjectReference.Create(this));
-
-        }
-
-        private bool IsBrowserSupportsWebGL2()
-        {
-            if (window == null)
-            {
-                window = Runtime.GetGlobalObject<IJSObjectReference>("window");
-            }
-
-            // This is a very simple check for WebGL2 support.
-            return true; // window.GetObjectProperty<IJSObjectReference>("WebGL2RenderingContext") != null;
         }
     }
 

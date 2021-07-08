@@ -59,6 +59,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         }
 
         // Deserialzation of EventArgs seems to be broken
+        
         [JSInvokable("OnTouchStart")]
         public static void TouchStart(TouchEventArgs args)
         {
