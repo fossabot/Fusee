@@ -1,4 +1,4 @@
-﻿using Fusee.Base.Core;
+using Fusee.Base.Core;
 using Fusee.Math.Core;
 using Microsoft.JSInterop;
 using System;
@@ -51,18 +51,14 @@ namespace Fusee.Base.Imp.WebAsm
             divCanvasName = "div_canvas";
             canvasName = "canvas";
 
-            var window = Runtime.GetGlobalObject<IJSObjectReference>("window");
+            using var window = Runtime.GetGlobalObject<IJSInProcessObjectReference>("window");
 
             var windowWidth = window.GetObjectProperty<int>(runtime, "innerWidth");
             var windowHeight = window.GetObjectProperty<int>(runtime, "innerHeight");
-
-            Console.WriteLine(windowWidth);
-            Console.WriteLine(windowHeight);
-
+           
             var canvas = HtmlHelper.AddCanvas(runtime, divCanvasName, canvasName, windowWidth, windowHeight);
             mainExecutable.Init(canvas, runtime, CanvasColor);
             mainExecutable.Run();
-
 
             //AddEnterFullScreenHandler();
             //AddResizeHandler();
@@ -111,8 +107,8 @@ namespace Fusee.Base.Imp.WebAsm
             using var canvas = Runtime.GetGlobalObject<IJSInProcessObjectReference>(canvasName);
             canvas.InvokeVoid("addEventListener", "dblclick", new Action<IJSInProcessObjectReference>((o) =>
            {
-               using (var d = Runtime.GetGlobalObject<IJSInProcessObjectReference>("document"))
-               {
+               using var d = Runtime.GetGlobalObject<IJSInProcessObjectReference>("document");
+               
                    var canvasObject = d.Invoke<IJSInProcessObjectReference>("getElementById", canvasName);
 
                    RequestFullscreen(canvasObject);
@@ -124,7 +120,7 @@ namespace Fusee.Base.Imp.WebAsm
 
                    // call fusee resize
                    mainExecutable.Resize(width, height);
-               }
+               
 
                o.Dispose();
            }), false);
@@ -190,24 +186,23 @@ namespace Fusee.Base.Imp.WebAsm
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns></returns>
-        public static IJSObjectReference AddCanvas(IJSRuntime runtime, string divId, string canvasId, int width = 800, int height = 600)
+        public static IJSInProcessObjectReference AddCanvas(IJSRuntime runtime, string divId, string canvasId, int width = 800, int height = 600)
         {
             // we need to add runtime everywhere as we do not have RenderCanvasImp._runtime, yet
 
-            var document = runtime.GetGlobalObject<IJSObjectReference>("document");
-            var body = ((IJSInProcessObjectReference)document).GetObjectProperty<IJSObjectReference>("body");
-            var canvas = ((IJSInProcessObjectReference)document).Invoke<IJSObjectReference>("createElement", "canvas");
+            using var document = runtime.GetGlobalObject<IJSInProcessObjectReference>("document");
+            using var body = document.GetObjectProperty<IJSInProcessObjectReference>("body");
+            var canvas = document.Invoke<IJSInProcessObjectReference>("createElement", "canvas");
             canvas.SetObjectProperty("width", width);
             canvas.SetObjectProperty("height", height);
             canvas.SetObjectProperty("id", canvasId);
 
-            var canvasDiv = ((IJSInProcessObjectReference)document).Invoke<IJSObjectReference>("createElement", "div");
+            using var canvasDiv = document.Invoke<IJSInProcessObjectReference>("createElement", "div");
 
             canvasDiv.SetObjectProperty("id", divId);
-            ((IJSInProcessObjectReference)canvasDiv).InvokeVoid("appendChild", canvas);
+            canvasDiv.InvokeVoid("appendChild", canvas);
 
-            ((IJSInProcessObjectReference)body).InvokeVoid("appendChild", canvasDiv);
-
+            body.InvokeVoid("appendChild", canvasDiv);
 
             return canvas;
         }

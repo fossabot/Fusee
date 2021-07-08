@@ -1,4 +1,4 @@
-﻿using Fusee.Engine.Imp.Graphics.WebAsm;
+using Fusee.Engine.Imp.Graphics.WebAsm;
 using Fusee.Math.Core;
 using Microsoft.JSInterop;
 
@@ -67,8 +67,6 @@ namespace Fusee.Base.Imp.WebAsm
                 PowerPreference = "high-performance",
                 Desynchronized = true
             };
-
-            System.Console.WriteLine("~~~" + ctx.Alpha);
 
             gl = new WebGL2RenderingContext(canvas, runtime, ctx);
            

@@ -7,14 +7,14 @@
 @code
 {
 
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            Console.WriteLine("Hello world");
             var program = new Fusee.Base.Imp.WebAsm.WebAsmProgram();
-            var runner = new Runner();
-            program.Start(runner, JS);
+            var main = new Main();
+            program.Start(main, (IJSInProcessRuntime)JS);
         }
         await base.OnAfterRenderAsync(firstRender);
     }

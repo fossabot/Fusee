@@ -24,7 +24,7 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace Fusee.Examples.Simple.Blazor
 {
-    public class Runner : WebAsmBase
+    public class Main : WebAsmBase
     {
         private RenderCanvasImp _canvasImp;
         private Core.Simple _app;

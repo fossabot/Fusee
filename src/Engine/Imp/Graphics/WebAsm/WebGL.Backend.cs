@@ -1,4 +1,4 @@
-﻿using Fusee.Base.Core;
+using Fusee.Base.Core;
 using Fusee.Base.Imp.WebAsm;
 using Microsoft.JSInterop;
 using System;

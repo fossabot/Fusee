@@ -1,4 +1,4 @@
-﻿using Fusee.Engine.Common;
+using Fusee.Engine.Common;
 using Fusee.Base.Imp.WebAsm;
 using Microsoft.JSInterop;
 using System;
@@ -104,7 +104,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         /// <remarks>Not needed in WebGL.</remarks>
         public void OpenLink(string link)
         {
-            var window = _runtime.GetGlobalObject<IJSInProcessObjectReference>("window");
+            using var window = _runtime.GetGlobalObject<IJSInProcessObjectReference>("window");
             window.InvokeVoid("open", link);
         }
 
