@@ -11,8 +11,10 @@ namespace Fusee.Engine.Core.Effects
     /// <summary>
     /// A surface effect contains information to build a shader program 
     /// </summary>
-    public abstract class SurfaceEffect : Effect
+    public abstract class SurfaceEffect : Effect, IDisposable
     {
+        private bool _disposed;
+
         internal readonly List<KeyValuePair<ShardCategory, string>> VertexShaderSrc = new List<KeyValuePair<ShardCategory, string>>();
         internal readonly List<KeyValuePair<ShardCategory, string>> GeometryShaderSrc = new List<KeyValuePair<ShardCategory, string>>();
         internal readonly List<KeyValuePair<ShardCategory, string>> FragmentShaderSrc = new List<KeyValuePair<ShardCategory, string>>();
@@ -131,6 +133,16 @@ namespace Fusee.Engine.Core.Effects
             EffectManagerEventArgs = new EffectManagerEventArgs(UniformChangedEnum.Unchanged);
             ParamDecl = new Dictionary<string, IFxParamDeclaration>();
 
+            Version = Header.Version300Es;
+            Pi = Header.DefinePi;
+            Precision = Header.EsPrecisionHighpFloat;
+            SurfVaryingFrag = $"in {SurfaceOut.StructName} {SurfaceOut.SurfOutVaryingName};\n";
+            SurfVaryingVert = $"out {SurfaceOut.StructName} {SurfaceOut.SurfOutVaryingName};\n";
+            UvIn = GLSL.CreateIn(GLSL.Type.Vec2, VaryingNameDeclarations.TextureCoordinates);
+            UvOut = GLSL.CreateOut(GLSL.Type.Vec2, VaryingNameDeclarations.TextureCoordinates);
+            TBNIn = GLSL.CreateIn(GLSL.Type.Mat3, VaryingNameDeclarations.TBN);
+            TBNOut = GLSL.CreateOut(GLSL.Type.Mat3, VaryingNameDeclarations.TBN);
+
             LightingSetup = lightingSetup;
 
             VertIn = ShaderShards.Vertex.VertProperties.InParams(lightingSetup);
@@ -141,11 +153,13 @@ namespace Fusee.Engine.Core.Effects
             var surfInType = surfaceInput.GetType();
             var surfInName = nameof(SurfaceInput);
             HandleStruct(ShaderCategory.Fragment, surfInType);
+
             foreach (var structProp in surfInType.GetProperties())
             {
                 var paramDcl = BuildFxParamDecl(structProp, GetType().GetProperty(surfInName));
                 ParamDecl.Add(paramDcl.Name, paramDcl);
             }
+
             HandleUniform(ShaderCategory.Fragment, nameof(SurfaceInput), surfInType);
 
             var lightingShards = SurfaceOut.GetLightingSetupShards(LightingSetup);
@@ -174,7 +188,8 @@ namespace Fusee.Engine.Core.Effects
             FxShaderAttribute shaderAttribute;
             FxShardAttribute shardAttribute;
 
-            foreach (var prop in t.GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy))
+            var publicProps = GetPublicProperties(t);
+            foreach (var prop in publicProps)
             {
                 var attribs = prop.GetCustomAttributes().ToList();
 
@@ -242,7 +257,7 @@ namespace Fusee.Engine.Core.Effects
                 }
             }
 
-            var allFields = t.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            var allFields = GetPublicFields(t);
             foreach (var field in allFields)
             {
                 shaderAttribute = null;
@@ -303,7 +318,6 @@ namespace Fusee.Engine.Core.Effects
                     default:
                         break;
                 }
-
             }
         }
 
@@ -606,6 +620,97 @@ namespace Fusee.Engine.Core.Effects
             GetType().GetMethod("SetFxParam")
             .MakeGenericMethod(args.Type)
             .Invoke(this, new object[] { memberName + "." + args.Name, args.Value });
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            EffectChanged?.Invoke(this, new EffectManagerEventArgs(UniformChangedEnum.Dispose));
+
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                Version = null;
+                Pi = null;
+                Precision = null;
+                SurfaceOutput = null;
+                SurfVaryingFrag = null;
+                SurfVaryingVert = null;
+                SurfOutFragMethod = null;
+                SurfOutVertMethod = null;
+                UvIn = null;
+                UvOut = null;
+                TBNIn = null;
+                TBNOut = null;
+                VertIn = null;
+            }
+
+            _disposed = true;
+        }
+
+        private PropertyInfo[] GetPublicProperties(Type type)
+        {
+            var propertyInfos = new List<PropertyInfo>();
+
+            var considered = new List<Type>();
+            var queue = new Queue<Type>();
+            considered.Add(type);
+            queue.Enqueue(type);
+            while (queue.Count > 0)
+            {
+                var t = queue.Dequeue();
+
+                if (t.BaseType == null) break;
+                if (considered.Contains(t.BaseType)) continue;
+
+                considered.Add(t.BaseType);
+                queue.Enqueue(t.BaseType);
+
+                var typeProperties = t.GetProperties();
+
+                var newPropertyInfos = typeProperties
+                    .Where(x => !propertyInfos.Contains(x));
+
+                propertyInfos.InsertRange(0, newPropertyInfos);
+            }
+
+            return propertyInfos.ToArray();
+        }
+
+        private FieldInfo[] GetPublicFields(Type type)
+        {
+            var fieldInfos = new List<FieldInfo>();
+
+            var considered = new List<Type>();
+            var queue = new Queue<Type>();
+            considered.Add(type);
+            queue.Enqueue(type);
+            while (queue.Count > 0)
+            {
+                var t = queue.Dequeue();
+
+                if (t.BaseType == null) break;
+                if (considered.Contains(t.BaseType)) continue;
+
+                considered.Add(t.BaseType);
+                queue.Enqueue(t.BaseType);
+
+                var typeFields = t.GetFields();
+
+                var newPropertyInfos = typeFields
+                    .Where(x => !fieldInfos.Contains(x));
+
+                fieldInfos.InsertRange(0, newPropertyInfos);
+            }
+
+            return fieldInfos.ToArray();
         }
     }
 }

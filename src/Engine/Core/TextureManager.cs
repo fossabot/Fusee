@@ -155,6 +155,15 @@ namespace Fusee.Engine.Core
                 return RegisterNewTexture(texture);
             }
             return foundTextureHandle;
+        }    
+        
+        public void ManualCleanup()
+        {
+            foreach (var h in _identifierToTextureHandleDictionary)
+            {
+                _toBeDeletedTextureHandles.Push(h.Value);
+            }
+            Cleanup();
         }
 
         /// <summary>
