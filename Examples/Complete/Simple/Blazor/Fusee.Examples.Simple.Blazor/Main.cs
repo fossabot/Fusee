@@ -7,20 +7,13 @@ using Fusee.Engine.Imp.Graphics.WebAsm;
 using Fusee.Serialization;
 using ProtoBuf;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using SixLabors.ImageSharp.Advanced;
-
 using Path = System.IO.Path;
-using SixLabors.ImageSharp.PixelFormats;
 
 namespace Fusee.Examples.Simple.Blazor
 {
@@ -64,7 +57,7 @@ namespace Fusee.Examples.Simple.Blazor
                     },
                     Checker = (string id) =>
                     {
-                        return Path.GetExtension(id).IndexOf("ttf", System.StringComparison.OrdinalIgnoreCase) >= 0;
+                        return Path.GetExtension(id).Contains("ttf", System.StringComparison.OrdinalIgnoreCase);
                     }
                 });
 
@@ -83,7 +76,7 @@ namespace Fusee.Examples.Simple.Blazor
                     },
                     Checker = (string id) =>
                     {
-                        return Path.GetExtension(id).IndexOf("fus", System.StringComparison.OrdinalIgnoreCase) >= 0;
+                        return Path.GetExtension(id).Contains("fus", System.StringComparison.OrdinalIgnoreCase);
                     }
                 });
 

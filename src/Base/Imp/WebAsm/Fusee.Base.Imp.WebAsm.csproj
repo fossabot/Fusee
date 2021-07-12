@@ -7,10 +7,9 @@
         <Nullable>disable</Nullable>
         <Platforms>AnyCPU</Platforms>
         <DefineConstants>$(DefineConstants);PLATFORM_WASM</DefineConstants>
-        <RunAOTCompilation>true</RunAOTCompilation>
+        <RunAOTCompilation>false</RunAOTCompilation>
     </PropertyGroup>
-
-
+    
     <PropertyGroup>
         <OutputPath>$(BaseOutputPath)\Libraries</OutputPath>
         <DocumentationFile>$(OutputPath)\$(RootNamespace).xml</DocumentationFile>

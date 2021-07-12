@@ -4,6 +4,7 @@
         <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
         <RunAOTCompilation>false</RunAOTCompilation>
         <!--<BlazorCacheBootResources>false</BlazorCacheBootResources>-->
+        <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
         <Nullable>disable</Nullable>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
@@ -33,11 +34,11 @@
 
     <Target Name="MovingAssetsToServerRoot" BeforeTargets="PostBuildEvent">
         <ItemGroup>
-            <AssetsDir Include="$(BaseOutputPath)\Examples\Simple\WebAsm\$(TargetFramework)\Assets\**\*.*" />
+            <AssetsDir Include="$(OutputPath)$(TargetFramework)\Assets\**\*.*" />
         </ItemGroup>
         <Message Text="Moving 'Assets' folder to http server root folder" Importance="high" />
-        <Move SourceFiles="@(AssetsDir)" DestinationFolder="$(BaseOutputPath)\Examples\Simple\WebAsm\$(TargetFramework)\wwwroot\Assets\%(RecursiveDir)" />
-        <RemoveDir Directories="$(BaseOutputPath)\Examples\Simple\WebAsm\$(TargetFramework)\Assets" />
+        <Move SourceFiles="@(AssetsDir)" DestinationFolder="$(OutputPath)$(TargetFramework)\wwwroot\Assets\%(RecursiveDir)" />
+        <RemoveDir Directories="$(OutputPath)$(TargetFramework)\Assets" />
     </Target>
 
 </Project>

@@ -76,6 +76,8 @@ namespace Fusee.Examples.Simple.Core
         {
             if (!_ready) return;
 
+            System.Console.WriteLine($"FPS: {FramesPerSecondAverage}");
+
             // Clear the backbuffer
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
             RC.Viewport(0, 0, Width, Height);

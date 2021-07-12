@@ -11,7 +11,7 @@
         if (firstRender)
         {
             // inject native javascript methods
-            _ = await JS.InvokeAsync<IJSObjectReference>("import", "./_framework/Fusee.Engine.Imp.Graphics.WebAsm.Native.js");
+            //_ = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/Fusee.Engine.Imp.Graphics.WebAsm/Fusee.Engine.Imp.Graphics.WebAsm.Native.js");
 
             var program = new Fusee.Base.Imp.WebAsm.WebAsmProgram();
             var main = new Main();
