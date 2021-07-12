@@ -1,3 +1,4 @@
+using Fusee.Base.Common;
 using Fusee.Base.Imp.WebAsm;
 using Microsoft.JSInterop;
 using System;
@@ -43,7 +44,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         {
             get => ((IJSInProcessObjectReference)Handle).GetObjectProperty<bool>("preserveDrawingBuffer");
             set => ((IJSInProcessObjectReference)Handle).SetObjectProperty("preserveDrawingBuffer", value);
-        }       
+        }
         public bool FailIfMajorPerformanceCaveat
         {
             get => ((IJSInProcessObjectReference)Handle).GetObjectProperty<bool>("failIfMajorPerformanceCaveat");
@@ -718,7 +719,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
         //public WebGLContextAttributes GetContextAttributes()
         //{
-            //return Invoke<WebGLContextAttributes>("getContextAttributes");
+        //return Invoke<WebGLContextAttributes>("getContextAttributes");
         //}
 
         public bool IsContextLost()
@@ -807,7 +808,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         public void BufferData(uint target, Array data, uint usage)
         {
             // Do not call Invoke via JSON Serialize but upload data unmarshalled and as quick as possible to javascript
-           ((IJSUnmarshalledRuntime)WebAsmExtensions.Runtime).InvokeUnmarshalled<uint, Array, uint, object>("customBufferData", target, data, usage);
+            ((IJSUnmarshalledRuntime)WebAsmExtensions.Runtime).InvokeUnmarshalled<uint, Array, uint, object>("customBufferData", target, data, usage);
         }
 
         public void BufferSubData(uint target, uint offset, Array data)
@@ -1066,6 +1067,17 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         public uint GetParameter(uint pname)
         {
             return InvokeForBasicType<uint>("getParameter", pname);
+        }
+
+
+        public WebGLFramebuffer GetFramebuffer(uint pname)
+        {
+            return Invoke<WebGLFramebuffer>("getParameter", pname);
+        }
+
+        public float[] GetClearColor()
+        {
+            return ((IJSInProcessRuntime)runtime).Invoke<float[]>("getClearColor");
         }
 
         public uint GetError()
@@ -2116,8 +2128,16 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, Array source)
         {
             var parameter = new int[] { (int)target, level, internalformat, width, height, border, (int)format, (int)type };
-            ((IJSUnmarshalledRuntime)runtime).InvokeUnmarshalled<int[], Array, object>("customTexImage2D", parameter, source);
+            if (type != FLOAT)
+            {
+                ((IJSUnmarshalledRuntime)runtime).InvokeUnmarshalled<int[], Array, object>("customTexImage2D", parameter, source);
+            }
+            else
+            {
+                ((IJSUnmarshalledRuntime)runtime).InvokeUnmarshalled<int[], Array, object>("customTexImage2DFloat", parameter, source);
+            }
         }
+
 
         public void GLTexImage2D(uint target, int level, int internalformat, int width, int height, int border, uint format, uint type, Memory<byte> srcData, uint srcOffset)
         {

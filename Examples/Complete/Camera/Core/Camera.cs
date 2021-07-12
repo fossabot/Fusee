@@ -11,6 +11,7 @@ using Fusee.Math.Core;
 using Fusee.Xene;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static Fusee.Engine.Core.Input;
 using static Fusee.Engine.Core.Time;
 
@@ -47,11 +48,10 @@ namespace Fusee.Examples.Camera.Core
         private float _valHorzMain;
         private float _valVertMain;
 
-        // Init is called on startup. 
-        public override void Init()
-        {
-            VSync = false;
+        private bool _loaded = false;
 
+        private async Task<int> LoadScene()
+        {
             _mainCam.Viewport = new float4(0, 0, 100, 100);
             _mainCam.BackgroundColor = new float4(0f, 0f, 0f, 1);
             _mainCam.Layer = -1;
@@ -71,7 +71,7 @@ namespace Fusee.Examples.Camera.Core
                 Scale = new float3(1, 1, 1)
             };
 
-            _gui = CreateGui();
+            _gui = await CreateGui();
             // Create the interaction handler
             _sih = new SceneInteractionHandler(_gui);
 
@@ -137,7 +137,7 @@ namespace Fusee.Examples.Camera.Core
             _angleVertMain = _mainCamTransform.Rotation.x;
 
             // Load the rocket model            
-            _rocketScene = AssetStorage.Get<SceneContainer>("rnd.fus");
+            _rocketScene = await AssetStorage.GetAsync<SceneContainer>("rnd.fus");
             //_rocketScene = Rocket.Build();
 
             _cubeOneTransform = _rocketScene.Children[0].GetComponent<Transform>();
@@ -149,11 +149,25 @@ namespace Fusee.Examples.Camera.Core
             // Wrap a SceneRenderer around the model.
             _sceneRenderer = new SceneRendererForward(_rocketScene);
             _guiRenderer = new SceneRendererForward(_gui);
+
+            _loaded = true;
+
+            return await Task.FromResult(0);
+        }
+
+        // Init is called on startup. 
+        public override async void Init()
+        {
+            VSync = false;
+
+            await LoadScene();
         }
 
         // RenderAFrame is called once a frame
         public override void RenderAFrame()
         {
+            if (!_loaded) return;
+
             if (Mouse.RightButton)
             {
                 _valHorzSnd = Mouse.XVel * 0.003f * DeltaTime;
@@ -198,10 +212,10 @@ namespace Fusee.Examples.Camera.Core
                 _sih.CheckForInteractiveObjects(RC, Mouse.Position, Width, Height);
             }
 
-            if (Touch.GetTouchActive(TouchPoints.Touchpoint_0) && !Touch.TwoPoint)
-            {
-                _sih.CheckForInteractiveObjects(RC, Touch.GetPosition(TouchPoints.Touchpoint_0), Width, Height);
-            }
+            //if (Touch.GetTouchActive(TouchPoints.Touchpoint_0) && !Touch.TwoPoint)
+            //{
+                //_sih.CheckForInteractiveObjects(RC, Touch.GetPosition(TouchPoints.Touchpoint_0), Width, Height);
+            //}
 
             // Swap buffers: Show the contents of the backbuffer (containing the currently rendered frame) on the front buffer.
             Present();
@@ -239,11 +253,11 @@ namespace Fusee.Examples.Camera.Core
             }
         }
 
-        private SceneContainer CreateGui()
+        private async Task<SceneContainer> CreateGui()
         {
-            string vsTex = AssetStorage.Get<string>("texture.vert");
-            string psTex = AssetStorage.Get<string>("texture.frag");
-            string psText = AssetStorage.Get<string>("text.frag");
+            string vsTex = await AssetStorage.GetAsync<string>("texture.vert");
+            string psTex = await AssetStorage.GetAsync<string>("texture.frag");
+            string psText = await AssetStorage.GetAsync<string>("text.frag");
 
             float canvasWidth = Width / 100f;
             float canvasHeight = Height / 100f;
@@ -256,7 +270,7 @@ namespace Fusee.Examples.Camera.Core
             btnFuseeLogo.OnMouseExit += BtnLogoExit;
             btnFuseeLogo.OnMouseDown += BtnLogoDown;
 
-            Texture guiFuseeLogo = new Texture(AssetStorage.Get<ImageData>("FuseeText.png"));
+            Texture guiFuseeLogo = new Texture(await AssetStorage.GetAsync<ImageData>("FuseeText.png"));
             TextureNode fuseeLogo = new TextureNode(
                 "fuseeLogo",
                 vsTex,
@@ -272,7 +286,7 @@ namespace Fusee.Examples.Camera.Core
                 );
             fuseeLogo.AddComponent(btnFuseeLogo);
 
-            Font fontLato = AssetStorage.Get<Font>("Lato-Black.ttf");
+            Font fontLato = await AssetStorage.GetAsync<Font>("Lato-Black.ttf");
             FontMap guiLatoBlack = new FontMap(fontLato, 24);
 
             TextNode text = new TextNode(

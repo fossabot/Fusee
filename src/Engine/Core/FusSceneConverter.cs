@@ -326,12 +326,12 @@ namespace Fusee.Engine.Core
         /// </summary>
         /// <param name="matComp"></param>
         [VisitMethod]
-        public void ConvMaterial(FusMaterialBRDF matComp)
+        public async void ConvMaterial(FusMaterialBRDF matComp)
         {
             if (_currentNode.Components == null)
                 _currentNode.Components = new List<SceneComponent>();
 
-            var effect = LookupMaterial(matComp);
+            var effect = await LookupMaterial(matComp);
             _currentNode.Components.Add(effect);
         }
 
@@ -600,7 +600,7 @@ namespace Fusee.Engine.Core
             return GetEffectForMat(m, LightingSetupFlags.Glossy, 0f, 0f, m.Roughness);
         }
 
-        private Effect LookupMaterial(FusMaterialBRDF m)
+        private async Task<Effect> LookupMaterial(FusMaterialBRDF m)
         {
             if (_matMap.TryGetValue(m, out var sfx)) return sfx;
 
@@ -618,7 +618,7 @@ namespace Fusee.Engine.Core
             {
                 if (!_texMap.TryGetValue(m.Albedo.Texture, out var albedoTex))
                 {
-                    albedoTex = new Texture(AssetStorage.Get<ImageData>(m.Albedo.Texture), true, TextureFilterMode.Linear)
+                    albedoTex = new Texture(await AssetStorage.GetAsync<ImageData>(m.Albedo.Texture), true, TextureFilterMode.Linear)
                     {
                         PathAndName = m.Albedo.Texture
                     };
@@ -630,7 +630,7 @@ namespace Fusee.Engine.Core
             {
                 if (!_texMap.TryGetValue(m.NormalMap.Texture, out var normalTex))
                 {
-                    normalTex = new Texture(AssetStorage.Get<ImageData>(m.NormalMap.Texture), false, TextureFilterMode.Linear)
+                    normalTex = new Texture(await AssetStorage.GetAsync<ImageData>(m.NormalMap.Texture), false, TextureFilterMode.Linear)
                     {
                         PathAndName = m.NormalMap.Texture
                     };
@@ -642,7 +642,7 @@ namespace Fusee.Engine.Core
             {
                 if (!_texMap.TryGetValue(m.Albedo.Texture, out var albedoTex))
                 {
-                    albedoTex = new Texture(AssetStorage.Get<ImageData>(m.Albedo.Texture), true, TextureFilterMode.Linear)
+                    albedoTex = new Texture(await AssetStorage.GetAsync<ImageData>(m.Albedo.Texture), true, TextureFilterMode.Linear)
                     {
                         PathAndName = m.Albedo.Texture
                     };
@@ -650,7 +650,7 @@ namespace Fusee.Engine.Core
                 }
                 if (!_texMap.TryGetValue(m.NormalMap.Texture, out var normalTex))
                 {
-                    normalTex = new Texture(AssetStorage.Get<ImageData>(m.NormalMap.Texture), false, TextureFilterMode.Linear)
+                    normalTex = new Texture(await AssetStorage.GetAsync<ImageData>(m.NormalMap.Texture), false, TextureFilterMode.Linear)
                     {
                         PathAndName = m.NormalMap.Texture
                     };

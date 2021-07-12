@@ -171,7 +171,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         // TODO: Make unmarshalled with custom javascript function
         protected T[] InvokeForArray<T>(string method, params object[] args)
         {
-            var rawResult = ((IJSInProcessObjectReference)gl).Invoke<IJSUnmarshalledObjectReference[]>(method, args);
+            var rawResult = ((IJSInProcessObjectReference)gl).Invoke<Array>(method, args);
             return rawResult.ToArray(item => (T)item);
 
         }

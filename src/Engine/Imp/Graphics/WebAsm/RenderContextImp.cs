@@ -180,19 +180,21 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                     internalFormat = RGBA8UI;
                     format = RGBA;
                     pxType = UNSIGNED_BYTE;
-
                     break;
                 case ColorFormat.fRGB32:
                     internalFormat = RGB32F;
                     format = RGB;
                     pxType = FLOAT;
-
                     break;
                 case ColorFormat.fRGB16:
                     internalFormat = RGB16F;
                     format = RGB;
                     pxType = FLOAT;
-
+                    break;
+                case ColorFormat.fRGBA16:
+                    internalFormat = RGBA16F;
+                    format = RGBA;
+                    pxType = FLOAT;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"CreateTexture: Image pixel format not supported {tex.PixelFormat.ColorFormat}");
@@ -209,28 +211,29 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
         private Array GetEmptyArray(ITextureBase tex)
         {
-
             Diagnostics.Warn("GetEmptyArray", null, new object[] { tex });
 
             switch (tex.PixelFormat.ColorFormat)
             {
                 case ColorFormat.RGBA:
-                    return new byte[tex.Width * tex.Height * 4];
+                    return new int[tex.Width * tex.Height * 4];
                 case ColorFormat.RGB:
-                    return new byte[tex.Width * tex.Height * 3];
+                    return new int[tex.Width * tex.Height * 3];
                 // TODO: Handle Alpha-only / Intensity-only and AlphaIntensity correctly.
                 case ColorFormat.Intensity:
-                    return new byte[tex.Width * tex.Height];
+                    return new int[tex.Width * tex.Height];
                 case ColorFormat.Depth24:
                 case ColorFormat.Depth16:
-                    return new float[tex.Width * tex.Height];
+                    return new int[tex.Width * tex.Height];
                 case ColorFormat.uiRgb8:
-                    return new byte[tex.Width * tex.Height * 4];
+                    return new int[tex.Width * tex.Height * 4];
                 case ColorFormat.fRGB32:
                 case ColorFormat.fRGB16:
                     return new float[tex.Width * tex.Height * 3];
+                case ColorFormat.fRGBA16:
+                    return new float[tex.Width * tex.Height * 4];
                 default:
-                    throw new ArgumentOutOfRangeException("CreateTexture: Image pixel format not supported");
+                    throw new ArgumentOutOfRangeException($"CreateTexture: Image pixel format not supported {tex.PixelFormat.ColorFormat}");
             }
 
         }
@@ -320,9 +323,9 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             var glWrapMode = GetWrapMode(img.WrapMode);
             var pxInfo = GetTexturePixelInfo(img);
 
-            //var imgData = GetEmptyArray(img);
+            var imgData = GetEmptyArray(img);
 
-            gl2.TexImage2D(TEXTURE_2D, 0, (int)pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, IntPtr.Zero);
+            gl2.TexImage2D(TEXTURE_2D, 0, (int)pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, imgData);
 
             if (img.DoGenerateMipMaps)
                 gl2.GenerateMipmap(TEXTURE_2D);
@@ -889,13 +892,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         {
             get
             {
-                var c = gl2.GetParameter(COLOR_CLEAR_VALUE);
-                var ret = new float[4];
-                ret[0] = (c & 0xff000000) >> 32;
-                ret[1] = (c & 0x00ff0000) >> 16;
-                ret[2] = (c & 0x0000ff00) >> 8;
-                ret[3] = (c & 0x000000ff) >> 0;
-                var retArr = ret.ToArray();
+                var retArr = gl2.GetClearColor();
                 return new float4(retArr[0], retArr[1], retArr[2], retArr[3]);
             }
             set => gl2.ClearColor(value.x, value.y, value.z, value.w);
@@ -2139,8 +2136,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
             if (gl2.CheckFramebufferStatus(FRAMEBUFFER) != FRAMEBUFFER_COMPLETE)
             {
-                throw new Exception($"Error creating Framebuffer: {gl2.GetError()}, {gl2.CheckFramebufferStatus(FRAMEBUFFER)};" +
-                    $"DepthBuffer set? {renderTarget.DepthBufferHandle != null}");
+              //throw new Exception($"Error creating Framebuffer: {gl2.GetError()}, {gl2.CheckFramebufferStatus(FRAMEBUFFER)};" +
+                  //$"DepthBuffer set? {renderTarget.DepthBufferHandle != null}");
             }
 
             gl2.Clear(DEPTH_CLEAR_VALUE | COLOR_CLEAR_VALUE);
@@ -2173,9 +2170,12 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                 //Textures
                 for (var i = 0; i < texHandles.Length; i++)
                 {
-
                     var texHandle = texHandles[i];
-                    if (texHandle == null) continue;
+                    if (texHandle == null)
+                    {
+                        attachments.Add(NONE);
+                        continue;
+                    }
 
                     if (i == depthTexPos)
                     {
@@ -2186,10 +2186,9 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                     {
                         gl2.FramebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0 + (uint)(i - depthCnt), TEXTURE_2D, ((TextureHandle)texHandle).TexHandle, 0);
                     }
-
                     attachments.Add(COLOR_ATTACHMENT0 + (uint)i);
+                }                
 
-                }
                 gl2.DrawBuffers(attachments.ToArray());
             }
             else //If a frame-buffer only has a depth texture we don't need draw buffers
@@ -2234,21 +2233,18 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
         private void ChangeFramebufferTexture2D(IRenderTarget renderTarget, int attachment, WebGLTexture handle, bool isDepth)
         {
-            // TODO (MR): Rework!
-            // ----
-
-            //var boundFbo = (WebGLFramebuffer)gl2.GetParameter(FRAMEBUFFER_BINDING);
+            var boundFbo = gl2.GetFramebuffer(FRAMEBUFFER_BINDING);
             var rtFbo = ((FrameBufferHandle)renderTarget.GBufferHandle).Handle;
 
             var isCurrentFbo = true;
+            // THIS IS not really possible right now
+            if (boundFbo != rtFbo)
+            {
+                isCurrentFbo = false;
+                gl2.BindFramebuffer(FRAMEBUFFER, rtFbo);
+            }
 
-            //if (boundFbo != rtFbo)
-            //{
-            //isCurrentFbo = false;
-            //gl2.BindFramebuffer(FRAMEBUFFER, rtFbo);
-            //}
-
-            if (!isDepth)
+            if (!isDepth && attachment != NONE)
                 gl2.FramebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0 + (uint)attachment, TEXTURE_2D, handle, 0);
             else
                 gl2.FramebufferTexture2D(FRAMEBUFFER, DEPTH_ATTACHMENT, TEXTURE_2D, handle, 0);
@@ -2256,8 +2252,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             if (gl2.CheckFramebufferStatus(FRAMEBUFFER) != FRAMEBUFFER_COMPLETE)
                 throw new Exception($"Error creating RenderTarget: {gl2.GetError()}, {gl2.CheckFramebufferStatus(FRAMEBUFFER)}");
 
-            //if (!isCurrentFbo)
-            //    gl2.BindFramebuffer(FRAMEBUFFER, boundFbo);
+            if (!isCurrentFbo)
+                gl2.BindFramebuffer(FRAMEBUFFER, boundFbo);
         }
 
         /// <summary>

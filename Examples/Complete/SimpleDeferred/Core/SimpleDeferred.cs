@@ -10,6 +10,7 @@ using Fusee.Math.Core;
 using Fusee.Xene;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using static Fusee.Engine.Core.Input;
 using static Fusee.Engine.Core.Time;
 
@@ -27,9 +28,9 @@ namespace Fusee.Examples.SimpleDeferred.Core
         private SceneRendererDeferred _sceneRendererDeferred;
         private SceneRendererForward _sceneRendererForward;
 
-        private SceneRendererForward _guiRenderer;
-        private SceneContainer _gui;
-        private SceneInteractionHandler _sih;
+        //private SceneRendererForward _guiRenderer;
+        //private SceneContainer _gui;
+        //private SceneInteractionHandler _sih;
         private readonly CanvasRenderMode _canvasRenderMode = CanvasRenderMode.Screen;
 
         private bool _keys;
@@ -45,26 +46,12 @@ namespace Fusee.Examples.SimpleDeferred.Core
         private Transform _camTransform;
         private readonly Camera _campComp = new Camera(ProjectionMethod.Perspective, 1, 1000, M.PiOver4);
 
-        // Init is called on startup.
-        public override void Init()
+        private bool _loaded = false;
+
+        private async Task<int> LoadScene()
         {
-            _camTransform = new Transform()
-            {
-                Scale = float3.One,
-                Translation = float3.Zero
-            };
-
-            _gui = CreateGui();
-
-            // Create the interaction handler
-            _sih = new SceneInteractionHandler(_gui);
-
-            // Set the clear color for the backbuffer to white (100% intensity in all color channels R, G, B, A).
-            _campComp.BackgroundColor = _backgroundColorDay = _backgroundColor = new float4(0.8f, 0.9f, 1, 1);
-            _backgroundColorNight = new float4(0, 0, 0.05f, 1);
-
             // Load the rocket model
-            _sponzaScene = AssetStorage.Get<SceneContainer>("sponza.fus");
+            _sponzaScene = await AssetStorage.GetAsync<SceneContainer>("sponza.fus");
 
             //Add lights to the scene
             _sun = new Light() { Type = LightType.Parallel, Color = new float4(0.99f, 0.9f, 0.8f, 1), Active = true, Strength = 1f, IsCastingShadows = true, Bias = 0.0f };
@@ -164,7 +151,31 @@ namespace Fusee.Examples.SimpleDeferred.Core
             _sceneRendererForward = new SceneRendererForward(_sponzaScene);
 
             // Wrap a SceneRenderer around the GUI.
-            _guiRenderer = new SceneRendererForward(_gui);
+            //_guiRenderer = new SceneRendererForward(_gui);
+
+            _loaded = true;
+            return await Task.FromResult(0);
+        }
+
+        // Init is called on startup.
+        public override async void Init()
+        {
+            _camTransform = new Transform()
+            {
+                Scale = float3.One,
+                Translation = float3.Zero
+            };
+
+            //_gui = CreateGui();
+
+            // Create the interaction handler
+            //_sih = new SceneInteractionHandler(_gui);
+
+            // Set the clear color for the backbuffer to white (100% intensity in all color channels R, G, B, A).
+            _campComp.BackgroundColor = _backgroundColorDay = _backgroundColor = new float4(0.8f, 0.9f, 1, 1);
+            _backgroundColorNight = new float4(0, 0, 0.05f, 1);
+
+            await LoadScene();
         }
 
         private bool _renderDeferred = true;
@@ -172,6 +183,8 @@ namespace Fusee.Examples.SimpleDeferred.Core
         // RenderAFrame is called once a frame
         public override void RenderAFrame()
         {
+            if (!_loaded) return;
+
             // Clear the backbuffer
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
 
@@ -225,13 +238,13 @@ namespace Fusee.Examples.SimpleDeferred.Core
                 _angleVelHorz = -RotationSpeed * Mouse.XVel * DeltaTime * 0.0005f;
                 _angleVelVert = -RotationSpeed * Mouse.YVel * DeltaTime * 0.0005f;
             }
-            else if (Touch.GetTouchActive(TouchPoints.Touchpoint_0))
-            {
-                _keys = false;
-                var touchVel = Touch.GetVelocity(TouchPoints.Touchpoint_0);
-                _angleVelHorz = -RotationSpeed * touchVel.x * DeltaTime * 0.0005f;
-                _angleVelVert = -RotationSpeed * touchVel.y * DeltaTime * 0.0005f;
-            }
+            //else if (Touch.GetTouchActive(TouchPoints.Touchpoint_0))
+            //{
+            //    _keys = false;
+            //    var touchVel = Touch.GetVelocity(TouchPoints.Touchpoint_0);
+            //    _angleVelHorz = -RotationSpeed * touchVel.x * DeltaTime * 0.0005f;
+            //    _angleVelVert = -RotationSpeed * touchVel.y * DeltaTime * 0.0005f;
+            //}
             else
             {
                 if (_keys)
@@ -260,11 +273,11 @@ namespace Fusee.Examples.SimpleDeferred.Core
 
             //_guiRenderer.Render(RC);
 
-            if (!Mouse.Desc.Contains("Android"))
-                _sih.CheckForInteractiveObjects(RC, Mouse.Position, Width, Height);
+            //if (!Mouse.Desc.Contains("Android"))
+                //_sih.CheckForInteractiveObjects(RC, Mouse.Position, Width, Height);
 
-            if (Touch.GetTouchActive(TouchPoints.Touchpoint_0) && !Touch.TwoPoint)
-                _sih.CheckForInteractiveObjects(RC, Touch.GetPosition(TouchPoints.Touchpoint_0), Width, Height);
+            //if (Touch.GetTouchActive(TouchPoints.Touchpoint_0) && !Touch.TwoPoint)
+                //_sih.CheckForInteractiveObjects(RC, Touch.GetPosition(TouchPoints.Touchpoint_0), Width, Height);
 
             // Swap buffers: Show the contents of the backbuffer (containing the currently rendered frame) on the front buffer.
             Present();
@@ -364,16 +377,16 @@ namespace Fusee.Examples.SimpleDeferred.Core
 
         public void BtnLogoEnter(CodeComponent sender)
         {
-            var effect = _gui.Children.FindNodes(node => node.Name == "fuseeLogo").First().GetComponent<Effect>();
-            effect.SetFxParam(UniformNameDeclarations.Albedo, (float4)ColorUint.Black);
-            effect.SetFxParam(UniformNameDeclarations.AlbedoMix, 0.8f);
+            //var effect = _gui.Children.FindNodes(node => node.Name == "fuseeLogo").First().GetComponent<Effect>();
+            //effect.SetFxParam(UniformNameDeclarations.Albedo, (float4)ColorUint.Black);
+            //effect.SetFxParam(UniformNameDeclarations.AlbedoMix, 0.8f);
         }
 
         public void BtnLogoExit(CodeComponent sender)
         {
-            var effect = _gui.Children.FindNodes(node => node.Name == "fuseeLogo").First().GetComponent<Effect>();
-            effect.SetFxParam(UniformNameDeclarations.Albedo, float4.One);
-            effect.SetFxParam(UniformNameDeclarations.AlbedoMix, 1f);
+            //var effect = _gui.Children.FindNodes(node => node.Name == "fuseeLogo").First().GetComponent<Effect>();
+            //effect.SetFxParam(UniformNameDeclarations.Albedo, float4.One);
+            //effect.SetFxParam(UniformNameDeclarations.AlbedoMix, 1f);
         }
 
         public void BtnLogoDown(CodeComponent sender)
