@@ -2,7 +2,7 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
-        <RunAOTCompilation>true</RunAOTCompilation>
+        <RunAOTCompilation>false</RunAOTCompilation>
         <!--<BlazorCacheBootResources>false</BlazorCacheBootResources>-->
         <Nullable>disable</Nullable>
         <Platforms>AnyCPU</Platforms>

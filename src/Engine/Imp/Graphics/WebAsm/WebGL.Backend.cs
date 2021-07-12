@@ -255,6 +255,12 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
         {
         }
 
+        public WebGL2RenderingContext(IJSObjectReference context, IJSObjectReference canvas, IJSRuntime runtime)
+           : base(canvas, runtime, "webgl2")
+        {
+            Handle = context;
+        }
+
         public WebGL2RenderingContext(IJSObjectReference canvas, IJSRuntime runtime, WebGLContextAttributes contextAttributes)
             : base(canvas, runtime, "webgl2", contextAttributes)
         {

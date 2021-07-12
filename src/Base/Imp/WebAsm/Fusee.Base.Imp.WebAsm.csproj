@@ -44,7 +44,7 @@
         </ProjectReference>
 
        <Reference Include="SharpFontManaged">
-            <HintPath>$(FuseeEngineRoot)\ext\SharpFontManaged\$(Configuration)\SharpFontManaged.dll</HintPath>
+            <HintPath>$(FuseeEngineRoot)\ext\SharpFontManaged\Debug\SharpFontManaged.dll</HintPath>
         </Reference>
 
     </ItemGroup>

@@ -58,9 +58,9 @@ namespace Fusee.Base.Imp.WebAsm
 
             canvasWidth = canvas.GetObjectProperty<int>(runtime, "width");
             canvasHeight = canvas.GetObjectProperty<int>(runtime, "height");
-            var ctx = new WebGLContextAttributes(canvas)
+            var ctxAttr = new WebGLContextAttributes(canvas)
             {
-                Alpha = true,
+                Alpha = false,
                 Antialias = true,
                 PremultipliedAlpha = false,
                 Depth = true,
@@ -68,8 +68,7 @@ namespace Fusee.Base.Imp.WebAsm
                 Desynchronized = true
             };
 
-            gl = new WebGL2RenderingContext(canvas, runtime, ctx);
-           
+            gl = new WebGL2RenderingContext(canvas, runtime, ctxAttr);
         }
 
         /// <summary>
