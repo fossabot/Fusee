@@ -1,4 +1,5 @@
 using Fusee.Engine.Common;
+using Fusee.Engine.Core.Scene;
 using Fusee.Engine.Core.ShaderShards;
 using Fusee.Math.Core;
 using System;
@@ -24,21 +25,21 @@ namespace Fusee.Engine.Core.Effects
         /// </summary>
         [FxShader(ShaderCategory.Vertex | ShaderCategory.Fragment)]
         [FxShard(ShardCategory.Header)]
-        public static string Version = Header.Version300Es;
+        public string Version = Header.Version300Es;
 
         /// <summary>
         /// The shader shard containing the definition of PI.
         /// </summary>
         [FxShader(ShaderCategory.Fragment)]
         [FxShard(ShardCategory.Header)]
-        public static string Pi = Header.DefinePi;
+        public string Pi = Header.DefinePi;
 
         /// <summary>
         /// The shader shard containing the float precision.
         /// </summary>
         [FxShader(ShaderCategory.Vertex | ShaderCategory.Fragment)]
         [FxShard(ShardCategory.Header)]
-        public static string Precision = Header.EsPrecisionHighpFloat;
+        public string Precision = Header.EsPrecisionHighpFloat;
 
         #region MUST HAVE fields
 
@@ -65,52 +66,52 @@ namespace Fusee.Engine.Core.Effects
         /// </summary>
         [FxShader(ShaderCategory.Vertex | ShaderCategory.Fragment)]
         [FxShard(ShardCategory.Property)]
-        public static string SurfaceOutput;
+        public string SurfaceOutput;
 
         /// <summary>
         /// Fragment shader "in" declaration of the <see cref="SurfaceOutput"/>.
         /// </summary>
         [FxShader(ShaderCategory.Fragment)]
         [FxShard(ShardCategory.Property)]
-        public static string SurfVaryingFrag = $"in {SurfaceOut.StructName} {SurfaceOut.SurfOutVaryingName};\n";
+        public string SurfVaryingFrag = $"in {SurfaceOut.StructName} {SurfaceOut.SurfOutVaryingName};\n";
 
         /// <summary>
         /// Vertex shader "out" declaration of the <see cref="SurfaceOutput"/>.
         /// </summary>
         [FxShader(ShaderCategory.Vertex)]
         [FxShard(ShardCategory.Property)]
-        public static string SurfVaryingVert = $"out {SurfaceOut.StructName} {SurfaceOut.SurfOutVaryingName};\n";
+        public string SurfVaryingVert = $"out {SurfaceOut.StructName} {SurfaceOut.SurfOutVaryingName};\n";
 
         /// <summary>
         /// Shader Shard Method to modify the <see cref="SurfaceOutput"/>.
         /// </summary>
         [FxShader(ShaderCategory.Fragment)]
         [FxShard(ShardCategory.SurfOut)]
-        public static string SurfOutFragMethod;
+        public string SurfOutFragMethod;
 
         /// <summary>
         /// Shader Shard Method to modify the <see cref="SurfaceOutput"/>.
         /// </summary>
         [FxShader(ShaderCategory.Vertex)]
         [FxShard(ShardCategory.SurfOut)]
-        public static string SurfOutVertMethod;
+        public string SurfOutVertMethod;
         //======================================================//
 
         [FxShader(ShaderCategory.Fragment)]
         [FxShard(ShardCategory.Property)]
-        public static string UvIn = GLSL.CreateIn(GLSL.Type.Vec2, VaryingNameDeclarations.TextureCoordinates);
+        public string UvIn = GLSL.CreateIn(GLSL.Type.Vec2, VaryingNameDeclarations.TextureCoordinates);
 
         [FxShader(ShaderCategory.Vertex)]
         [FxShard(ShardCategory.Property)]
-        public static string UvOut = GLSL.CreateOut(GLSL.Type.Vec2, VaryingNameDeclarations.TextureCoordinates);
+        public string UvOut = GLSL.CreateOut(GLSL.Type.Vec2, VaryingNameDeclarations.TextureCoordinates);
 
         [FxShader(ShaderCategory.Fragment)]
         [FxShard(ShardCategory.Property)]
-        public static string TBNIn = GLSL.CreateIn(GLSL.Type.Mat3, VaryingNameDeclarations.TBN);
+        public string TBNIn = GLSL.CreateIn(GLSL.Type.Mat3, VaryingNameDeclarations.TBN);
 
         [FxShader(ShaderCategory.Vertex)]
         [FxShard(ShardCategory.Property)]
-        public static string TBNOut = GLSL.CreateOut(GLSL.Type.Mat3, VaryingNameDeclarations.TBN);
+        public string TBNOut = GLSL.CreateOut(GLSL.Type.Mat3, VaryingNameDeclarations.TBN);
 
         /// <summary>
         /// The shader shard containing "fu" variables (in and out parameters) like fuVertex, fuNormal etc.
@@ -118,7 +119,7 @@ namespace Fusee.Engine.Core.Effects
         /// </summary>
         [FxShader(ShaderCategory.Vertex)]
         [FxShard(ShardCategory.Property)]
-        public static string VertIn;
+        public string VertIn;
 
         #endregion
 
@@ -234,10 +235,10 @@ namespace Fusee.Engine.Core.Effects
                     case ShardCategory.Method:
                     case ShardCategory.SurfOut:
 
-                        if (prop.GetAccessors(false).Any(x => x.IsStatic) && prop.PropertyType == typeof(string))
+                        if (prop.PropertyType == typeof(string))
                             HandleShard(shaderAttribute.ShaderCategory, shardAttribute, (string)prop.GetValue(this));
                         else
-                            throw new Exception($"{t.Name} ShaderEffect: Property {prop.Name} does not contain a valid shard. Either the property is not static or it's not a string.");
+                            throw new Exception($"{t.Name} ShaderEffect: Property {prop.Name} does not contain a valid shard.");
                         continue;
                     case ShardCategory.Struct:
                         HandleStruct(shaderAttribute.ShaderCategory, prop.PropertyType);
@@ -302,7 +303,7 @@ namespace Fusee.Engine.Core.Effects
                     case ShardCategory.Property:
                     case ShardCategory.Method:
                     case ShardCategory.SurfOut:
-                        if (field.IsStatic && field.FieldType == typeof(string))
+                        if (field.FieldType == typeof(string))
                         {
                             var val = (string)field.GetValue(this);
                             if (val == null || val == string.Empty)
@@ -310,7 +311,7 @@ namespace Fusee.Engine.Core.Effects
                             HandleShard(shaderAttribute.ShaderCategory, shardAttribute, val);
                         }
                         else
-                            throw new Exception($"{t.Name} ShaderEffect: Field {field.Name} does not contain a valid shard. Either the property is not static or it's not a string.");
+                            throw new Exception($"{t.Name} ShaderEffect: Field {field.Name} does not contain a valid shard.");
                         continue;
                     case ShardCategory.Struct:
                         HandleStruct(shaderAttribute.ShaderCategory, field.FieldType);
@@ -637,19 +638,7 @@ namespace Fusee.Engine.Core.Effects
 
             if (disposing)
             {
-                Version = null;
-                Pi = null;
-                Precision = null;
-                SurfaceOutput = null;
-                SurfVaryingFrag = null;
-                SurfVaryingVert = null;
-                SurfOutFragMethod = null;
-                SurfOutVertMethod = null;
-                UvIn = null;
-                UvOut = null;
-                TBNIn = null;
-                TBNOut = null;
-                VertIn = null;
+
             }
 
             _disposed = true;
@@ -667,18 +656,15 @@ namespace Fusee.Engine.Core.Effects
             {
                 var t = queue.Dequeue();
 
-                if (t.BaseType == null) break;
+                if (t.BaseType == null || t.BaseType == typeof(SceneComponent)) break;
                 if (considered.Contains(t.BaseType)) continue;
 
                 considered.Add(t.BaseType);
                 queue.Enqueue(t.BaseType);
 
-                var typeProperties = t.GetProperties();
+                var typeProps = t.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-                var newPropertyInfos = typeProperties
-                    .Where(x => !propertyInfos.Contains(x));
-
-                propertyInfos.InsertRange(0, newPropertyInfos);
+                propertyInfos.InsertRange(0, typeProps);
             }
 
             return propertyInfos.ToArray();
@@ -696,18 +682,15 @@ namespace Fusee.Engine.Core.Effects
             {
                 var t = queue.Dequeue();
 
-                if (t.BaseType == null) break;
+                if (t.BaseType == null || t.BaseType == typeof(SceneComponent)) break;
                 if (considered.Contains(t.BaseType)) continue;
 
                 considered.Add(t.BaseType);
                 queue.Enqueue(t.BaseType);
 
-                var typeFields = t.GetFields();
+                var typeFields = t.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
-                var newPropertyInfos = typeFields
-                    .Where(x => !fieldInfos.Contains(x));
-
-                fieldInfos.InsertRange(0, newPropertyInfos);
+                fieldInfos.InsertRange(0, typeFields);
             }
 
             return fieldInfos.ToArray();
