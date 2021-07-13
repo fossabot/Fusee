@@ -4,9 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:fbComp="clr-namespace:Fusee.WpfIntegration;assembly=Fusee.WpfIntegration"
+        xmlns:viewModel="clr-namespace:Fusee.Examples.Integrations.WpfFramebuffer.Frontend.ViewModel"
         xmlns:local="clr-namespace:Fusee.Examples.Integrations.WpfFramebuffer.Frontend.View"
         Title="MainWindow" Height="720" Width="1280"
         >
+    <Window.DataContext>
+        <viewModel:SimpleViewModel />
+    </Window.DataContext>
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem>
@@ -15,7 +19,7 @@
         </StatusBar>
 
         <Grid x:Name="mainGrid" Background="LightGray">
-            <fbComp:FbComponent 
+            <fbComp:FbComponent
                 x:Name="FbComp"
                 Loaded ="OtkWpfControl_Initialized"
                 Unloaded="OtkWpfControl_Unloaded"
@@ -49,7 +53,7 @@
                     Width="100" Height="25" Margin="10,10,0,0" Command="{Binding UpdateColorCommand}"/>
                     <Button x:Name="LoadButton" Grid.Column="1" Content="Reload Scene"
                     HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Width="100" Height="25" Margin="10,10,0,0" Click="LoadButton_Click"/>
+                    Width="100" Height="25" Margin="10,10,0,0" Command="{Binding LoadButton_Click}"/>
                 </Grid>
                 <DockPanel Width ="250"  Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Left">
                     <Label DockPanel.Dock="Left" FontWeight="Bold">Rot X</Label>

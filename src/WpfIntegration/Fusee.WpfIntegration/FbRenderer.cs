@@ -1,5 +1,7 @@
-﻿using OpenTK.Windowing.Desktop;
+﻿using Fusee.Engine.Imp.Graphics.Desktop;
+using OpenTK.Windowing.Desktop;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
@@ -19,6 +21,8 @@ namespace Fusee.WpfIntegration
     {
         internal event EventHandler Reload;
         internal event EventHandler<FbRenderEventArgs> Render;
+
+
         internal bool ReloadRequested;
 
         public GameWindow GameWindow
@@ -32,6 +36,7 @@ namespace Fusee.WpfIntegration
                 _gameWindow.MakeCurrent();
             }
         }
+
         private GameWindow _gameWindow;
 
         public double DrawTime { get; private set; }

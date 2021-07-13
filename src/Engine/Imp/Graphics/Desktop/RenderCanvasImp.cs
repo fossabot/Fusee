@@ -13,7 +13,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
     /// <summary>
     /// This is a default render canvas implementation creating its own rendering window.
     /// </summary>
-    public class RenderCanvasImp : RenderCanvasImpBase, IRenderCanvasImp
+    public class RenderCanvasImp : RenderCanvasImpBase, IRenderCanvasImp, IDisposable
     {
         #region Fields
 
@@ -339,14 +339,26 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <summary>
         /// Closes the GameWindow with a call to OpenTk.
         /// </summary>
-        public void CloseGameWindow()
+        public unsafe void CloseGameWindow()
         {
             if (GameWindow != null)
+            {
                 GameWindow.Close();
+
+                // Somehow NativeWindow.DestroyWindow() is never called when OpenTK.CloseWindow() is called
+                // from an WPF app, see: Fusee.WpfIntegration in combination with Fusee.Examples.*.WfpFamebuffer
+                // https://github.com/opentk/opentk/blob/master/src/OpenTK.Windowing.Desktop/NativeWindow.cs#L1091
+                // Possible life-time problems?
+                // TODO(SBu,MR): Investigate further
+                // HACK: Therefore we try to force the window destruction and garbage collection via:
+                GLFW.DestroyWindow(GameWindow.WindowPtr);
+                GameWindow = null;
+                GC.Collect();
+            }
         }
 
         /// <summary>
-        /// Presents this application instance. Call this function after rendering to show the final image. 
+        /// Presents this application instance. Call this function after rendering to show the final image.
         /// After Present is called the render buffers get flushed.
         /// </summary>
         public void Present()
@@ -476,7 +488,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         }
 
         /// <summary>
-        /// Does the unload of this instance. 
+        /// Does the unload of this instance.
         /// </summary>
         internal protected void DoUnLoad()
         {
