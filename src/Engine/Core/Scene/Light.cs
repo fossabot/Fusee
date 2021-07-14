@@ -12,11 +12,12 @@ namespace Fusee.Engine.Core.Scene
     {
         /// <summary>
         /// Represents the light status.
+        /// Turns the light on and off.
         /// </summary>
         public bool Active;
 
         /// <summary>
-        /// Represents the color.
+        /// Represents the light color.
         /// </summary>
         public float4 Color;
 
@@ -27,7 +28,7 @@ namespace Fusee.Engine.Core.Scene
 
         /// <summary>
         /// Represents the strength of the light (non-physically representation of the brightness).
-        /// Should be a value between 0 and 1.
+        /// Needs be a value between 0 and 1.
         /// </summary>
         public float Strength;
 
