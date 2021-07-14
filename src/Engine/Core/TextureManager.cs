@@ -157,15 +157,6 @@ namespace Fusee.Engine.Core
             return foundTextureHandle;
         }
 
-        public void ManualCleanup()
-        {
-            foreach (var h in _identifierToTextureHandleDictionary)
-            {
-                _toBeDeletedTextureHandles.Push(h.Value);
-            }
-            Cleanup();
-        }
-
         /// <summary>
         /// Call this method on the main thread after RenderContext.Render in order to cleanup all not used Buffers from GPU memory.
         /// </summary>

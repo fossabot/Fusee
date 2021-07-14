@@ -1627,24 +1627,6 @@ namespace Fusee.Engine.Core
             }
         }
 
-        /// <summary>
-        /// Manually disposes all effects. 
-        /// ONLY needed if the life cycle of the fusee app is controlled from outside e.g. when it is embedded in a WPF app.
-        /// </summary>
-        public void DisposeEffects()
-        {
-            _effectManager.ManualCleanup();
-        }
-
-        /// <summary>
-        /// Manually disposes all effects. 
-        /// ONLY needed if the life cycle of the fusee app is controlled from outside e.g. when it is embedded in a WPF app.
-        /// </summary>
-        public void DisposeTextures()
-        {
-            _textureManager.ManualCleanup();
-        }
-
         #endregion
 
         /// <summary>

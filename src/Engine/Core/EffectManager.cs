@@ -58,21 +58,6 @@ namespace Fusee.Engine.Core
             return _allEffects.TryGetValue(ef.SessionUniqueIdentifier, out var effect) ? effect : null;
         }
 
-        public void ManualCleanup()
-        {
-            foreach (var fx in _allEffects)
-            {
-                //SurfaceEffects contain static variables that need to be disposed of;
-                if (fx.Value is DefaultSurfaceEffect dsfx)
-                    dsfx.Dispose();
-                else if (fx.Value is SurfaceEffect surfFx)
-                    surfFx.Dispose();
-                else if (fx.Value is ShaderEffect sfx)
-                    sfx.Dispose();
-            }
-            Cleanup();
-        }
-
         /// <summary>
         /// Call this method on the main thread after RenderContext.Render in order to cleanup all not used Buffers from GPU memory.
         /// </summary>

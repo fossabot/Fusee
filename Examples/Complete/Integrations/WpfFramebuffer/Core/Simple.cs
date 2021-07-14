@@ -76,13 +76,6 @@ namespace Fusee.Examples.Integrations.WpfFramebuffer.Core
             _guiRenderer = new SceneRendererForward(_gui);
         }
 
-        public override void DeInit()
-        {
-            RC.DisposeEffects();
-            RC.DisposeTextures();
-            base.DeInit();
-        }
-
         // RenderAFrame is called once a frame
         public override void RenderAFrame()
         {
