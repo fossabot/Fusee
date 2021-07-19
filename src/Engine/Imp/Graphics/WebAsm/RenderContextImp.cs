@@ -289,7 +289,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
             var glWrapMode = GetWrapMode(img.WrapMode);
             var pxInfo = GetTexturePixelInfo(img);
-                      
+
             //var dataToInt  = img.PixelData.Select(x => (int)x).ToArray();
             gl2.TexImage2D(TEXTURE_2D, 0, (int)pxInfo.InternalFormat, img.Width, img.Height, 0, pxInfo.Format, pxInfo.PxType, img.PixelData);
 
@@ -2136,8 +2136,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
             if (gl2.CheckFramebufferStatus(FRAMEBUFFER) != FRAMEBUFFER_COMPLETE)
             {
-              //throw new Exception($"Error creating Framebuffer: {gl2.GetError()}, {gl2.CheckFramebufferStatus(FRAMEBUFFER)};" +
-                  //$"DepthBuffer set? {renderTarget.DepthBufferHandle != null}");
+                throw new Exception($"Error creating Framebuffer: {gl2.GetError()}, {gl2.CheckFramebufferStatus(FRAMEBUFFER)};" +
+                    $"DepthBuffer set? {renderTarget.DepthBufferHandle != null}");
             }
 
             gl2.Clear(DEPTH_CLEAR_VALUE | COLOR_CLEAR_VALUE);
@@ -2187,7 +2187,7 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
                         gl2.FramebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0 + (uint)(i - depthCnt), TEXTURE_2D, ((TextureHandle)texHandle).TexHandle, 0);
                     }
                     attachments.Add(COLOR_ATTACHMENT0 + (uint)i);
-                }                
+                }
 
                 gl2.DrawBuffers(attachments.ToArray());
             }
@@ -2233,16 +2233,9 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
 
         private void ChangeFramebufferTexture2D(IRenderTarget renderTarget, int attachment, WebGLTexture handle, bool isDepth)
         {
-            var boundFbo = gl2.GetFramebuffer(FRAMEBUFFER_BINDING);
             var rtFbo = ((FrameBufferHandle)renderTarget.GBufferHandle).Handle;
 
-            var isCurrentFbo = true;
-            // THIS IS not really possible right now
-            if (boundFbo != rtFbo)
-            {
-                isCurrentFbo = false;
-                gl2.BindFramebuffer(FRAMEBUFFER, rtFbo);
-            }
+            gl2.BindFramebuffer(FRAMEBUFFER, rtFbo);
 
             if (!isDepth && attachment != NONE)
                 gl2.FramebufferTexture2D(FRAMEBUFFER, COLOR_ATTACHMENT0 + (uint)attachment, TEXTURE_2D, handle, 0);
@@ -2252,8 +2245,8 @@ namespace Fusee.Engine.Imp.Graphics.WebAsm
             if (gl2.CheckFramebufferStatus(FRAMEBUFFER) != FRAMEBUFFER_COMPLETE)
                 throw new Exception($"Error creating RenderTarget: {gl2.GetError()}, {gl2.CheckFramebufferStatus(FRAMEBUFFER)}");
 
-            if (!isCurrentFbo)
-                gl2.BindFramebuffer(FRAMEBUFFER, boundFbo);
+            //if (!isCurrentFbo)
+            //    gl2.BindFramebuffer(FRAMEBUFFER, boundFbo);
         }
 
         /// <summary>
