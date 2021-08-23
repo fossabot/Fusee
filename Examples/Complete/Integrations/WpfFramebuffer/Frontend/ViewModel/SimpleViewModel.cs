@@ -12,7 +12,6 @@ using OpenTK.Windowing.Desktop;
 using System;
 using System.IO;
 using System.Reflection;
-using System.Windows;
 using System.Windows.Input;
 
 namespace Fusee.Examples.Integrations.WpfFramebuffer.Frontend.ViewModel
@@ -46,7 +45,7 @@ namespace Fusee.Examples.Integrations.WpfFramebuffer.Frontend.ViewModel
                 GlobalFBComp = FbComp;
                 LoadApp((int)FbComp.ActualWidth, (int)FbComp.ActualHeight);
 
-                FbComp.Renderer.GameWindow =(GameWindow)((Engine.Imp.Graphics.Desktop.RenderCanvasImp)App.CanvasImplementor).GameWindow;
+                FbComp.Renderer.GameWindow = (GameWindow)((Engine.Imp.Graphics.Desktop.RenderCanvasImp)App.CanvasImplementor).GameWindow;
 
                 FbComp.Renderer.GameWindow.Closing += (s) =>
                 {

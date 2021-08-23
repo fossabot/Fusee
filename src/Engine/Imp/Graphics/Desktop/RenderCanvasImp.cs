@@ -70,8 +70,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public string Caption
         {
-            get => (_gameWindow == null) ? "" : _gameWindow.Title;
-            set { if (_gameWindow != null) _gameWindow.Title = value; }
+            get => (GameWindow == null) ? "" : GameWindow.Title;
+            set { if (GameWindow != null) GameWindow.Title = value; }
         }
 
         /// <summary>
@@ -101,8 +101,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public bool VerticalSync
         {
-            get => (_gameWindow != null) && _gameWindow.VSync == OpenTK.Windowing.Common.VSyncMode.On;
-            set { if (_gameWindow != null) _gameWindow.VSync = (value) ? OpenTK.Windowing.Common.VSyncMode.On : OpenTK.Windowing.Common.VSyncMode.Off; }
+            get => (GameWindow != null) && GameWindow.VSync == OpenTK.Windowing.Common.VSyncMode.On;
+            set { if (GameWindow != null) GameWindow.VSync = (value) ? OpenTK.Windowing.Common.VSyncMode.On : OpenTK.Windowing.Common.VSyncMode.Off; }
         }
 
         /// <summary>
@@ -114,8 +114,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public bool EnableBlending
         {
-            get => _gameWindow.Blending;
-            set => _gameWindow.Blending = value;
+            get => GameWindow.Blending;
+            set => GameWindow.Blending = value;
         }
 
         /// <summary>
@@ -126,8 +126,8 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// </value>
         public bool Fullscreen
         {
-            get => (_gameWindow.WindowState == OpenTK.Windowing.Common.WindowState.Fullscreen);
-            set => _gameWindow.WindowState = (value) ? OpenTK.Windowing.Common.WindowState.Fullscreen : OpenTK.Windowing.Common.WindowState.Normal;
+            get => (GameWindow.WindowState == OpenTK.Windowing.Common.WindowState.Fullscreen);
+            set => GameWindow.WindowState = (value) ? OpenTK.Windowing.Common.WindowState.Fullscreen : OpenTK.Windowing.Common.WindowState.Normal;
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         /// <value>
         ///   <c>true</c> if [focused]; otherwise, <c>false</c>.
         /// </value>
-        public bool Focused => _gameWindow.IsFocused;
+        public bool Focused => GameWindow.IsFocused;
 
         // Some tryptichon related Fields.
 
@@ -168,7 +168,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
             set => _videoWallMonitorsHor = value;
         }
 
-        public RenderCanvasGameWindow GameWindow { get; private set; }
+        public RenderCanvasGameWindow GameWindow { get; internal set; }
 
         #endregion
 
@@ -508,7 +508,7 @@ namespace Fusee.Engine.Imp.Graphics.Desktop
         #endregion
     }
 
-    internal class RenderCanvasGameWindow : GameWindow
+    public class RenderCanvasGameWindow : GameWindow
     {
         #region Fields
 
