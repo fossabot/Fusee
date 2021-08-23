@@ -7,17 +7,12 @@ using Fusee.Engine.Core.Scene;
 using Fusee.Engine.Core.ShaderShards;
 using Fusee.Engine.GUI;
 using Fusee.Math.Core;
-using Fusee.Serialization;
 using Fusee.Xene;
-using Fusee.Xirkit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using static Fusee.Engine.Core.Input;
 using static Fusee.Engine.Core.Time;
-
-
 
 namespace Fusee.Examples.Starkiller.Core
 {
@@ -30,28 +25,22 @@ namespace Fusee.Examples.Starkiller.Core
         private SceneNode _projectiles;
         private SceneNode _schiff;
 
-        private float MeteorSpeedFactor = 2;
+        private readonly float MeteorSpeedFactor = 2;
 
         private bool[] abgefeuert;
 
         private SceneContainer _scene;
 
-
-        float Highscore = 0;
         float Leben = 0;
         bool gamestart = false;
 
-
         private SceneRendererForward _guiRenderer;
         private SceneContainer _gui;
-        private SceneInteractionHandler _sih;
         private readonly CanvasRenderMode _canvasRenderMode = CanvasRenderMode.Screen;
         private float _initCanvasWidth;
         private float _initCanvasHeight;
         private float _canvasWidth = 16;
         private float _canvasHeight = 9;
-
-
 
         private SceneContainer CreateScene()
         {
@@ -101,20 +90,11 @@ namespace Fusee.Examples.Starkiller.Core
             //Set the clear color for the backbuffer to white (100% intensity in all color channels R, G, B, A).
             RC.ClearColor = new float4(0, 0, 0, 0);
 
-            //Wrap a SceneRenderer around the model.
-
-
-
-            // Create the interaction handler
-
             _scene = CreateScene();
             _gui = CreateGui();
-            _sih = new SceneInteractionHandler(_gui);
             _sceneRenderer = new SceneRendererForward(_scene);
             _guiRenderer = new SceneRendererForward(_gui);
         }
-
-
 
         //RenderAFrame is called once a frame
         public override void RenderAFrame()
@@ -235,7 +215,6 @@ namespace Fusee.Examples.Starkiller.Core
                                 abgefeuert[i] = false;
                                 projectileTranslation.z = -50;
                                 meteorTranslation.z = -100;
-                                Highscore += 100;
                             }
 
                             _meteors.Children[j].GetTransform().Translation = meteorTranslation;
@@ -247,14 +226,9 @@ namespace Fusee.Examples.Starkiller.Core
                     //Schiff Kollision 
                     for (var k = 0; k < _meteors.Children.Count; k++)
                     {
-
                         var SchiffAABBf = _schiff.GetTransform().Matrix * _schiff.GetMesh().BoundingBox;
 
-
-
                         var MeteorsAABBf = _meteors.Children[k].GetTransform().Matrix * _meteors.Children[k].GetMesh().BoundingBox;
-
-
 
                         if (MeteorsAABBf.Intersects(SchiffAABBf))
                         {
@@ -265,7 +239,6 @@ namespace Fusee.Examples.Starkiller.Core
                             if (Leben == 0)
                             {
                                 gamestart = false;
-                                Highscore = 0;
                             }
 
                         }
@@ -388,33 +361,21 @@ namespace Fusee.Examples.Starkiller.Core
         }
 
         public void SetProjectionAndViewport()
-
         {
-
             //Set the rendering area to the entire window size
 
             RC.Viewport(0, 0, Width, Height);
 
-
-
             //Create a new projection matrix generating undistorted images on the new aspect ratio.
-
             var aspectRatio = Width / (float)Height;
 
-
-
-            //0.25*PI Rad -> 45� Opening angle along the vertical direction. Horizontal opening angle is calculated based on the aspect ratio
-
+            //0.25*PI Rad -> 45 Deg opening angle along the vertical direction. Horizontal opening angle is calculated based on the aspect ratio
             //Front clipping happens at 1 (Objects nearer than 1 world unit get clipped)
-
             //Back clipping happens at 2000 (Anything further away from the camera than 2000 world units gets clipped, polygons will be cut)
-
             var projection = float4x4.CreatePerspectiveFieldOfView(0, aspectRatio, 1, 20000);
 
             RC.Projection = projection;
 
         }
-
-
     }
 }
